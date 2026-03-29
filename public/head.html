@@ -1611,17 +1611,6 @@ button{cursor:pointer}
 .bact-btn.btn-rek2 { color:var(--text2); border-color:var(--border); }
 .bact-btn.btn-d    { background:var(--red-dim); color:var(--red); border-color:var(--red); }
 
-.bcard-inner{display:flex;gap:16px;align-items:flex-start;}
-.bcard-time{min-width:60px;text-align:center;flex-shrink:0;}
-.bcard-info{flex:1;min-width:0;}
-.bact-col{display:flex;flex-direction:column;gap:5px;min-width:150px;flex-shrink:0;}
-.bact-btn{display:block;width:100%;padding:8px 10px;font-size:12px;font-weight:600;text-align:center;border-radius:var(--r);cursor:pointer;white-space:nowrap;border:1px solid var(--border2);background:var(--card2);color:var(--text);}
-.bact-btn:hover{opacity:0.8;}
-.bact-btn.btn-mv{background:#1a1a30;color:#9999ff;border-color:#3a3a70;}
-.bact-btn.btn-arr{background:#0d2e16;color:#22c55e;border-color:#22c55e;}
-.bact-btn.btn-ok{background:#0a2828;color:#22d3ee;border-color:#22d3ee;}
-.bact-btn.btn-rek2{color:var(--text2);}
-.bact-btn.btn-d{background:var(--red-dim);color:var(--red);border-color:var(--red);}
 
 /* ── Statusa banneri ── */
 @keyframes pulse-yellow {
@@ -1770,5 +1759,31 @@ button{cursor:pointer}
   transition: opacity 0.15s;
 }
 .cfm-no:hover { opacity: 0.85; }
+
+.bcard-inner { display:flex; gap:12px; align-items:flex-start; }
+.bcard-time  { min-width:56px; text-align:center; flex-shrink:0; padding-top:2px; }
+.bcard-info  { flex:1; min-width:140px; }
+.bcc         { font-size:15px; font-weight:700; color:var(--text); margin-bottom:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.bcard-meta-row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:6px; }
+.bmeta-item  { font-size:13px; color:var(--text2); }
+.bcmt        { font-size:12px; color:var(--text2); margin-top:4px; }
+.badm        { font-size:11px; color:var(--text3); margin-top:6px; }
+
+.bcard-extra-col { min-width:130px; max-width:160px; flex-shrink:0; }
+.bcard-col-title { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+.bcard-item      { font-size:12px; color:var(--text2); padding:2px 0; border-bottom:1px solid var(--border); }
+.bcard-item-empty{ font-size:12px; color:var(--text3); padding:2px 0; }
+.bcard-add-btn   { margin-top:6px; background:none; border:1px dashed var(--border2); color:var(--text3); border-radius:var(--r); padding:4px 8px; font-size:11px; cursor:pointer; width:100%; text-align:center; }
+.bcard-add-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+.bact-col { display:flex; flex-direction:column; gap:5px; min-width:140px; flex-shrink:0; }
+.bact-btn { display:block; width:100%; padding:7px 10px; font-size:12px; font-weight:600; text-align:center; border-radius:var(--r); cursor:pointer; white-space:nowrap; border:1px solid var(--border2); background:var(--card2); color:var(--text); }
+.bact-btn:hover { opacity:0.8; }
+.bact-btn.btn-mv  { background:#1a1a30; color:#9999ff; border-color:#3a3a70; }
+.bact-btn.btn-arr { background:#0d2e16; color:#22c55e; border-color:#22c55e; }
+.bact-btn.btn-ok  { background:#0a2828; color:#22d3ee; border-color:#22d3ee; }
+.bact-btn.btn-rek2{ color:var(--text2); }
+.bact-btn.btn-d   { background:var(--red-dim); color:var(--red); border-color:var(--red); }
+
 </style>
 
