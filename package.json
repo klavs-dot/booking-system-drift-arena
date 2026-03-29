@@ -1,5 +1,5 @@
 {
-  "name": "drift-arena",
+  "name": "booking-system-drift-arena",
   "version": "1.0.0",
   "scripts": {
     "dev": "next dev",
@@ -7,9 +7,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "googleapis": "^140.0.1",
     "next": "14.2.0",
     "react": "^18",
-    "react-dom": "^18",
-    "googleapis": "^140.0.0"
+    "react-dom": "^18"
   }
 }
