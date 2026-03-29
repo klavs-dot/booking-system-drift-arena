@@ -8,3 +8,4 @@ export async function GET() {
     headers: { 'Content-Type': 'text/html; charset=utf-8' }
   });
 }
+// forced redeploy Sun Mar 29 13:46:59 UTC 2026
