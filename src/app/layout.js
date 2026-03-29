@@ -1,18 +1,22 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
 export const metadata = {
   title: 'Drift Arena — Rezervācijas',
 }
 
-export const viewport = {
-  width: 'device-width',
-  initialScale: 1,
-}
-
 export default function RootLayout({ children }) {
+  let headHtml = '';
+  try {
+    headHtml = readFileSync(join(process.cwd(), 'public', 'head.html'), 'utf-8');
+  } catch(e) {}
+
   return (
     <html lang="lv">
-      <body style={{ margin: 0, padding: 0, background: '#0d0d1a' }}>
+      <head dangerouslySetInnerHTML={{ __html: headHtml }} />
+      <body style={{ margin: 0, padding: 0 }}>
         {children}
       </body>
     </html>
-  )
+  );
 }

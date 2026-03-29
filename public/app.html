@@ -1,0 +1,3460 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drift Arena — Rezervācijas</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   DRIFT ARENA — Brand Design System
+   Primārās krāsas pēc brand book:
+   Oranžā (primary accent): #E84D0E
+   Melns (primary bg):       #111111
+   Tumši pelēks (surface):   #1C1C1C
+   Pelēks (card):            #242424
+   Gaišs pelēks (border):    #333333
+   Balts (text):             #FFFFFF
+   Sekundārais teksts:       #999999
+   Statusi: zaļš #22C55E, dzeltens #F59E0B, sarkans #EF4444
+================================================================ */
+:root {
+  /* Brand krāsas — Drift Arena */
+  --bg:        #0F0F0F;
+  --surface:   #161616;
+  --card:      #1E1E1E;
+  --card2:     #272727;
+  --border:    #2E2E2E;
+  --border2:   #3D3D3D;
+
+  /* Primārā akcenta krāsa — Drift Arena oranžā */
+  --accent:     #E84D0E;
+  --accent2:    #FF5C1A;
+  --accent-dim: #3A1506;
+  --accent-mid: #6B2208;
+
+  /* Statusa krāsas */
+  --green:      #22C55E;
+  --green-dim:  #052512;
+  --yellow:     #F59E0B;
+  --yellow-dim: #2D1E03;
+  --red:        #EF4444;
+  --red-dim:    #2D0808;
+
+  /* Teksts */
+  --text:  #F0F0F0;
+  --text2: #888888;
+  --text3: #555555;
+
+  /* Forma */
+  --r:  6px;
+  --rs: 4px;
+  --sh: 0 4px 24px rgba(0,0,0,.6);
+
+  /* Brand fonts */
+  --font-head: 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow', sans-serif;
+}
+
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-size: 14px;
+  line-height: 1.5;
+  /* Subtils chevron pattern fons — brand motīvs */
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='20' viewBox='0 0 40 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 20 L10 0 L12 0 L2 20z M10 20 L20 0 L22 0 L12 20z M20 20 L30 0 L32 0 L22 20z M30 20 L40 0 L42 0 L32 20z' fill='%23FFFFFF' fill-opacity='0.018'/%3E%3C/svg%3E");
+  background-size: 40px 20px;
+}
+button,input,select,textarea{font-family:var(--font-body)}
+button{cursor:pointer}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--accent);border-radius:0}
+
+/* ── LAYOUT ── */
+.app{display:flex;flex-direction:column;min-height:100vh}
+
+/* ── TOPBAR — brand orange left stripe ── */
+.topbar {
+  height: 88px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+/* Stats bloks topbarā */
+.topstats {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+.tstat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-bottom: 2px solid var(--border2);
+  padding: 4px 12px;
+  min-width: 80px;
+  position: relative;
+}
+.tstat:hover { border-bottom-color: var(--accent); }
+.tstat-lbl {
+  font-family: var(--font-head);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text);
+  white-space: nowrap;
+}
+.tstat-row {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+.tstat-val {
+  font-family: var(--font-head);
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--accent);
+  line-height: 1;
+  letter-spacing: 0;
+}
+.tstat-sub {
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+.tstat-sep {
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 300;
+  align-self: center;
+  margin: 0 2px;
+}
+.tstat-val.pos { color: var(--green); }
+
+/* ── LOGO — brand Barlow Condensed, caps ── */
+.logo {
+  font-family: var(--font-head);
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text);
+  white-space: nowrap;
+}
+.logo span {
+  color: var(--accent);
+}
+
+/* ── NAV BUTTONS ── */
+.nav{display:flex;gap:2px;flex:1}
+.nb {
+  background: none;
+  border: none;
+  color: var(--text2);
+  padding: 9px 18px;
+  border-radius: 0;
+  font-family: var(--font-head);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  transition: all .15s;
+  white-space: nowrap;
+  position: relative;
+}
+.nb::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transition: transform .15s;
+}
+.nb:hover {
+  color: var(--text);
+  background: rgba(232,77,14,.08);
+}
+.nb:hover::after { transform: scaleX(1); }
+.nb.active {
+  color: var(--accent);
+  background: rgba(232,77,14,.1);
+}
+.nb.active::after { transform: scaleX(1); }
+.nb-new {
+  background: var(--accent) !important;
+  color: #fff !important;
+  margin-left: auto;
+  border-radius: 0 !important;
+  letter-spacing: 2px;
+  font-size: 15px;
+  font-weight: 900;
+  padding: 0 28px;
+  height: 46px;
+}
+.nb-new::after { display:none; }
+.nb-new:hover { background: var(--accent2) !important; }
+.nb-new-wrap {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-self: stretch;
+  justify-content: center;
+}
+.nb-new-sub {
+  background: var(--surface) !important;
+  color: var(--text2) !important;
+  border: 1px solid var(--border2) !important;
+  border-radius: 0 !important;
+  font-family: var(--font-head);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all .15s;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+}
+.nb-new-sub:hover {
+  background: var(--card) !important;
+  color: var(--text) !important;
+  border-color: var(--accent) !important;
+}
+
+/* ── CAPACITY PILL ── */
+.cap-pill {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--accent);
+  border-radius: 0;
+  padding: 5px 14px;
+  font-family: var(--font-head);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text2);
+  white-space: nowrap;
+}
+.cap-pill b{color:var(--accent)}
+
+.main{flex:1;padding:28px 24px;max-width:1440px;margin:0 auto;width:100%}
+.view{display:none} .view.active{display:block}
+
+/* ── PAGE HEADER ── */
+.phdr{margin-bottom:28px}
+.ptitle {
+  font-family: var(--font-head);
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text);
+  /* Oranžā akcenta līnija kreisajā pusē */
+  border-left: 4px solid var(--accent);
+  padding-left: 16px;
+  line-height: 1;
+}
+.psub{font-size:13px;color:var(--text2);margin-top:8px;padding-left:20px}
+
+/* ── CARD ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--border2);
+  border-radius: var(--r);
+  padding: 20px;
+}
+
+/* ── BADGES ── */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 0;
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.ba { background: rgba(59,130,246,.15); color: #60a5fa; border: 1px solid rgba(59,130,246,.3); }
+.bd { background: rgba(34,197,94,.15);  color: var(--green); border: 1px solid rgba(34,197,94,.3); }
+.bc { background: var(--red-dim);       color: var(--red);   border: 1px solid rgba(239,68,68,.3); }
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:16px}
+.field label {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 6px;
+}
+.req{color:var(--accent)}
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom: 2px solid var(--border2);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: var(--rs);
+  font-size: 14px;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color .15s, background .15s;
+  -webkit-appearance: none;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: var(--card);
+}
+.field textarea{resize:vertical;min-height:72px}
+.hint{font-size:11px;color:var(--text3);margin-top:5px}
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  border-radius: 0;
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border: none;
+  transition: all .15s;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0);
+  transition: background .15s;
+}
+.btn:hover::before { background: rgba(255,255,255,.06); }
+
+/* Primary — Drift Arena oranžā */
+.btn-p {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(232,77,14,.3);
+}
+.btn-p:hover {
+  background: var(--accent2);
+  box-shadow: 0 4px 20px rgba(232,77,14,.5);
+}
+.btn-p:disabled { opacity:.35; cursor:not-allowed; box-shadow:none; }
+
+/* Secondary */
+.btn-s {
+  background: var(--card2);
+  color: var(--text2);
+  border: 1px solid var(--border2);
+}
+.btn-s:hover { color: var(--text); border-color: var(--text3); }
+
+/* Ghost */
+.btn-g {
+  background: none;
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+.btn-g:hover { color: var(--text); border-color: var(--text3); }
+
+/* Danger — delete */
+.btn-d {
+  background: var(--red-dim);
+  color: var(--red);
+  border: 1px solid rgba(239,68,68,.25);
+}
+.btn-d:hover { background: rgba(239,68,68,.2); border-color: var(--red); }
+
+/* Success — notikusi */
+.btn-ok {
+  background: var(--green-dim);
+  color: var(--green);
+  border: 1px solid rgba(34,197,94,.25);
+}
+.btn-ok:hover { background: rgba(34,197,94,.2); border-color: var(--green); }
+
+/* Move — pārcelt */
+.btn-mv {
+  background: var(--yellow-dim);
+  color: var(--yellow);
+  border: 1px solid rgba(245,158,11,.25);
+}
+.btn-mv:hover { background: rgba(245,158,11,.2); border-color: var(--yellow); }
+
+.btn-sm { padding: 5px 12px; font-size: 11px; }
+.btn-full { width:100%; justify-content:center; padding:14px; font-size:15px; letter-spacing:2px; }
+
+/* ── SPINNER / OVERLAY ── */
+.sp {
+  width:18px;height:18px;
+  border:2px solid var(--border2);
+  border-top-color:var(--accent);
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+  display:inline-block
+}
+
+.overlay {
+  position:fixed;inset:0;
+  background:rgba(15,15,15,.92);
+  display:none;align-items:center;justify-content:center;z-index:999
+}
+.overlay.on{display:flex}
+.ovlbox {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: var(--r);
+  padding: 36px 52px;
+  text-align: center;
+}
+.ovlbox p{color:var(--text2);margin-top:14px;font-size:14px}
+
+/* ── TOAST ── */
+.toast {
+  position:fixed;bottom:28px;right:28px;z-index:1000;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius:0;
+  padding:14px 20px;font-size:14px;max-width:360px;
+  box-shadow:0 8px 32px rgba(0,0,0,.6);
+  transform:translateX(12px);opacity:0;transition:all .25s;pointer-events:none;
+  font-family: var(--font-body);
+}
+.toast.on{transform:translateX(0);opacity:1}
+.toast.ok  {border-left-color:var(--green); color:var(--green)}
+.toast.err {border-left-color:var(--red);   color:var(--red)}
+.toast.warn{border-left-color:var(--yellow);color:var(--yellow)}
+
+/* ── MODAL ── */
+.mbg{position:fixed;inset:0;background:rgba(15,15,15,.85);display:none;align-items:center;justify-content:center;z-index:500;padding:20px}
+/* Rediģēšanas, dzēšanas un pārcelšanas modāļi ir augstāk par dienas modāli */
+#M_EDIT,#M_MOVE,#M_DEL{z-index:600}
+.mbg.on{display:flex}
+.mbox {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-top:3px solid var(--accent);
+  border-radius:var(--r);
+  padding:28px;width:100%;max-width:560px;
+  max-height:90vh;overflow-y:auto;
+  box-shadow:0 16px 48px rgba(0,0,0,.7);
+}
+.mtitle {
+  font-family: var(--font-head);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+.mfoot {
+  display:flex;gap:10px;justify-content:flex-end;
+  margin-top:20px;padding-top:16px;
+  border-top:1px solid var(--border);
+}
+
+/* ── CALENDAR ── */
+.cctrls{display:flex;gap:10px;align-items:center;margin-bottom:24px;flex-wrap:wrap}
+.cctrls select {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-bottom:2px solid var(--accent);
+  color:var(--text);
+  padding:9px 14px;
+  border-radius:var(--rs);
+  font-size:14px;
+  font-family:var(--font-head);
+  font-weight:700;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  outline:none;
+  cursor:pointer;
+}
+.cnbtn {
+  background:var(--card);
+  border:1px solid var(--border);
+  color:var(--text2);
+  width:38px;height:38px;
+  border-radius:0;
+  font-size:18px;
+  font-weight:700;
+  transition:all .15s;
+  display:flex;align-items:center;justify-content:center;
+}
+.cnbtn:hover{color:var(--text);background:var(--accent);border-color:var(--accent)}
+
+.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.chdr {
+  text-align:center;
+  font-family:var(--font-head);
+  font-size:11px;font-weight:800;
+  color:var(--text3);
+  text-transform:uppercase;letter-spacing:1.2px;
+  padding:8px 4px;
+  border-bottom:2px solid var(--accent);
+}
+
+.cday {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:0;
+  padding:8px 7px;
+  min-height:100px;
+  cursor:pointer;
+  transition:all .15s;
+  overflow:hidden;
+  position:relative;
+}
+.cday:hover {
+  border-color:var(--accent);
+  background:var(--card2);
+  transform:translateY(-1px);
+}
+.cday.tdy {
+  border-color:var(--accent);
+  border-top:2px solid var(--accent);
+  background: linear-gradient(180deg, rgba(232,77,14,.08) 0%, var(--card) 100%);
+}
+.cday.eday{background:none;border-color:transparent;cursor:default;min-height:0;transform:none}
+.cdnum {
+  font-family:var(--font-head);
+  font-size:18px;font-weight:900;
+  color:var(--text);
+  margin-bottom:6px;
+  letter-spacing:.5px;
+}
+.cday.tdy .cdnum{color:var(--accent)}
+.cday:hover .cdnum{color:var(--text)}
+
+.cslots{display:flex;flex-direction:column;gap:3px}
+.cslot{display:flex;align-items:center;gap:4px;font-size:10px}
+.cslbl{color:var(--text3);flex-shrink:0;width:22px;font-family:var(--font-head);font-weight:700;letter-spacing:.5px}
+.ctrk{flex:1;height:3px;background:var(--border);border-radius:0;overflow:hidden}
+.cfil{height:100%;border-radius:0;transition:width .4s}
+/* Status colours aligned to brand */
+.s0{background:var(--border)}
+.s1{background:var(--accent)}
+.s2{background:var(--yellow)}
+.s3{background:var(--green)}
+.s4{background:var(--red)}
+.cnum{font-size:12px;color:var(--text);min-width:22px;text-align:right;font-family:var(--font-head);font-weight:900}
+
+.cleg {
+  display:flex;gap:16px;flex-wrap:wrap;
+  margin-bottom:16px;font-size:11px;color:var(--text2);
+  font-family:var(--font-head);font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+}
+.cli{display:flex;align-items:center;gap:6px}
+.cld{width:10px;height:10px;border-radius:0}
+
+/* ── TODAY ── */
+.thdr{display:flex;align-items:baseline;gap:20px;margin-bottom:24px;flex-wrap:wrap}
+.tdate {
+  font-family:var(--font-head);
+  font-size:40px;font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;
+}
+.tsub{font-size:13px;color:var(--text2);font-family:var(--font-head);font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.blist{display:flex;flex-direction:column;gap:8px}
+
+/* ── BOOKING CARD ── */
+.bcard {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:0;
+  border-left:4px solid #3b82f6;
+  padding:14px 20px;
+  display:grid;
+  grid-template-columns:80px 1fr auto;
+  gap:16px;align-items:start;
+  position:relative;overflow:hidden;
+  transition:all .15s;
+}
+.bcard:hover {
+  border-color:var(--border2);
+  background:var(--card2);
+  transform:translateX(2px);
+}
+.bcard.sdone { border-left-color: var(--green); opacity:.6; }
+.bcard.sdone .bcc { text-decoration:line-through; }
+.bcard.scanc { border-left-color: var(--red); opacity:.5; }
+.bcard.sarrived { border-left-color: var(--green); border-top: 2px solid rgba(34,197,94,.4); }
+
+/* Pulsējošais banneris — Ieradušies */
+@keyframes nowpulse {
+  0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(34,197,94,.45); }
+  50%      { opacity:.85; box-shadow:0 0 0 8px rgba(34,197,94,0); }
+}
+@keyframes outsidewarn {
+  0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(239,68,68,.5); }
+  50%      { opacity:.88; box-shadow:0 0 0 10px rgba(239,68,68,0); }
+}
+.outside-warn-banner {
+  display: none;
+  align-items: center;
+  gap: 14px;
+  background: rgba(239,68,68,.08);
+  border: 1px solid rgba(239,68,68,.4);
+  border-left: 5px solid var(--red);
+  padding: 12px 20px;
+  margin-top: 14px;
+  animation: outsidewarn 1.8s ease-in-out infinite;
+  font-family: var(--font-head);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.outside-warn-banner.show { display: flex; }
+.outside-warn-dot {
+  width: 9px; height: 9px;
+  background: var(--red);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--red);
+  flex-shrink: 0;
+  animation: outsidewarn 1.8s ease-in-out infinite;
+}
+@keyframes outsidepulse {
+  0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(232,77,14,.5); }
+  50%      { opacity:.85; box-shadow:0 0 0 8px rgba(232,77,14,0); }
+}
+.boutside {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(232,77,14,.1);
+  border: 1px solid rgba(232,77,14,.35);
+  border-left: 4px solid var(--accent);
+  padding: 8px 20px;
+  margin-top: 6px;
+  animation: outsidepulse 2s ease-in-out infinite;
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+@keyframes closedpulse {
+  0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(232,77,14,.5); }
+  50%      { opacity:.82; box-shadow:0 0 0 10px rgba(232,77,14,0); }
+}
+.bclosed {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(232,77,14,.1);
+  border: 1px solid rgba(232,77,14,.3);
+  border-left: 4px solid var(--accent);
+  padding: 10px 20px;
+  margin-top: 8px;
+  animation: closedpulse 2s ease-in-out infinite;
+  font-family: var(--font-head);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+/* Checkbox slēgtajam pasākumam */
+.closed-toggle {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  padding: 14px 18px;
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s;
+}
+.closed-toggle:hover { background: var(--accent-dim); }
+.closed-toggle input[type=checkbox] {
+  width: 20px; height: 20px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.closed-toggle-lbl {
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.closed-toggle-sub {
+  font-size: 12px;
+  color: var(--text2);
+  font-family: var(--font-body);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-top: 2px;
+}
+.closed-toggle.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+.closed-toggle.active .closed-toggle-lbl { color: var(--accent); }
+@keyframes nowdot {
+  0%,100% { transform:scale(1); opacity:1; }
+  50%     { transform:scale(1.8); opacity:.5; }
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.bnow {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(34,197,94,.1);
+  border: 1px solid rgba(34,197,94,.3);
+  border-left: 4px solid var(--green);
+  padding: 10px 20px;
+  margin-top: 8px;
+  animation: nowpulse 2s ease-in-out infinite;
+  font-family: var(--font-head);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--green);
+}
+.bnow-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--green);
+  display: inline-block;
+  flex-shrink: 0;
+  animation: nowdot 1.2s ease-in-out infinite;
+}
+/* Ieradušies poga — spilgti zaļa */
+.btn-arr {
+  background: var(--green);
+  color: #000;
+  border: none;
+  font-weight: 900;
+}
+.btn-arr:hover { background: #16a34a; }
+
+/* Time column */
+.btime {
+  font-family:var(--font-head);
+  font-size:20px;font-weight:900;
+  font-variant-numeric:tabular-nums;
+  color:var(--accent);
+  line-height:1.1;
+  letter-spacing:.5px;
+}
+.bsep{font-size:10px;color:var(--text3);margin:1px 0;font-family:var(--font-head);letter-spacing:1px}
+.btime2 {
+  font-family:var(--font-head);
+  font-size:14px;font-weight:700;
+  color:var(--text2);
+  font-variant-numeric:tabular-nums;
+}
+
+/* Body */
+.bcc{font-size:15px;font-weight:700;margin-bottom:4px;font-family:var(--font-head);letter-spacing:.5px;text-transform:uppercase}
+.bmeta{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text2);font-family:var(--font-body)}
+.bcmt{margin-top:7px;font-size:14px;color:var(--text);font-weight:500}
+.bfood{margin-top:5px;font-size:14px;color:var(--yellow);font-weight:600}
+.badm{margin-top:4px;font-size:11px;color:var(--text3)}
+.bacts{display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+
+/* Section separator */
+.ssep {
+  margin:32px 0 20px;
+  display:flex;align-items:center;gap:12px;
+  font-family:var(--font-head);
+  font-size:12px;font-weight:800;
+  text-transform:uppercase;letter-spacing:2px;
+  color:var(--text3);
+}
+.ssep::before,.ssep::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── WIZARD STEPS ── */
+.wiz{max-width:720px}
+
+/* ── DIENAS NOSLODZES TABULA ── */
+.new-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  align-items: start;
+}
+.new-layout .wiz { max-width: none; }
+.day-load-panel {
+  position: sticky;
+  top: 84px;
+}
+.dlp-hdr {
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  border-left: 4px solid var(--accent);
+  padding: 6px 0 6px 12px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.dlp-date {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.dlp-empty {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--border2);
+  padding: 28px 16px;
+  text-align: center;
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.dlp-table {
+  background: var(--card);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.dlp-row {
+  display: grid;
+  grid-template-columns: 50px 1fr 32px;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--border);
+  transition: background .1s;
+}
+.dlp-row:last-child { border-bottom: none; }
+.dlp-row:hover { background: var(--card2); }
+.dlp-row.dlp-busy { border-left: 2px solid var(--accent); }
+.dlp-row.dlp-sel { background: rgba(232,77,14,.08); border-left: 2px solid var(--accent); }
+.dlp-hour {
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--text2);
+  letter-spacing: .5px;
+}
+.dlp-row.dlp-busy .dlp-hour,
+.dlp-row.dlp-sel  .dlp-hour { color: var(--text); }
+.dlp-bar-wrap {
+  height: 6px;
+  background: var(--border);
+  overflow: hidden;
+}
+.dlp-bar {
+  height: 100%;
+  transition: width .4s;
+}
+.dlp-cnt {
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 900;
+  text-align: right;
+  color: var(--text3);
+}
+.dlp-row.dlp-busy .dlp-cnt { color: var(--text); }
+.dlp-legend {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  font-family: var(--font-head);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text3);
+  flex-wrap: wrap;
+}
+.dlp-li { display:flex;align-items:center;gap:5px; }
+.dlp-ld { width:10px;height:4px; }
+.sbar{display:flex;margin-bottom:32px;border-radius:0;overflow:hidden;border:1px solid var(--border)}
+.si {
+  flex:1;padding:12px;
+  background:var(--card);
+  font-family:var(--font-head);
+  font-size:12px;font-weight:800;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text3);text-align:center;
+  border-right:1px solid var(--border);
+  transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.si:last-child{border-right:none}
+.si.active{background:var(--accent);color:#fff;letter-spacing:2px}
+.si.done{background:rgba(34,197,94,.1);color:var(--green);border-color:rgba(34,197,94,.2)}
+.snum {
+  width:22px;height:22px;border-radius:0;
+  background:rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:900;
+}
+.spanel{display:none} .spanel.active{display:block}
+
+/* ── CAPACITY DISPLAY ── */
+/* ── SCANNING LOADER ── */
+@keyframes scanline {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(400%); opacity: 0; }
+}
+@keyframes scan-flicker {
+  0%,100% { opacity:1 }
+  92%     { opacity:1 }
+  93%     { opacity:.4 }
+  94%     { opacity:1 }
+  96%     { opacity:.6 }
+  97%     { opacity:1 }
+}
+@keyframes scan-blink {
+  0%,49% { opacity:1 }
+  50%,100%{ opacity:0 }
+}
+@keyframes bar-fill {
+  from { width: 0% }
+}
+@keyframes greenin {
+  from { opacity:0; transform:translateY(-6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.cap-ok-banner {
+  margin-top: 14px;
+  background: rgba(34,197,94,.08);
+  border: 1px solid rgba(34,197,94,.3);
+  border-left: 4px solid var(--green);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: greenin .3s ease both;
+  font-family: var(--font-head);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--green);
+}
+.cap-ok-dot {
+  width: 8px; height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--green);
+  flex-shrink: 0;
+}
+.cap-scanning {
+  margin-top: 14px;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-left: 4px solid var(--accent);
+  padding: 20px 20px 16px;
+  position: relative;
+  overflow: hidden;
+  animation: scan-flicker 3s infinite;
+}
+.cap-scanning::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: scanline 1.4s linear infinite;
+  pointer-events: none;
+}
+.scan-title {
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.scan-title::after {
+  content: '█';
+  animation: scan-blink .8s step-end infinite;
+  font-size: 13px;
+}
+.scan-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.scan-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.scan-row-lbl {
+  font-family: var(--font-head);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+  width: 90px;
+  flex-shrink: 0;
+}
+.scan-row-bar {
+  flex: 1;
+  height: 3px;
+  background: var(--border);
+  overflow: hidden;
+}
+.scan-row-fill {
+  height: 100%;
+  background: var(--accent);
+  animation: scan-flicker 2s infinite;
+}
+/* ── CAPACITY RESULT BOX ── */
+.occbox {
+  margin-top: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-left: 4px solid var(--accent);
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+}
+.occbox-hdr {
+  background: rgba(232,77,14,.08);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  font-family: var(--font-head);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.occbox-hdr span { color: var(--text3); font-size: 9px; letter-spacing: 2px; }
+.ocrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.ocrow:last-child { border-bottom: none; }
+.oclbl {
+  font-family: var(--font-head);
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+.ocval {
+  font-family: var(--font-head);
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #fff;
+}
+.cv-ok   { color: var(--green); }
+.cv-warn { color: var(--yellow); }
+.cv-full { color: var(--accent); }
+/* Big capacity bar */
+.cbtr-wrap {
+  padding: 12px 16px 14px;
+  background: rgba(0,0,0,.2);
+  border-top: 1px solid var(--border);
+}
+.cbtr-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-head);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  margin-bottom: 6px;
+}
+.cbtr {
+  height: 12px;
+  background: var(--border);
+  border: 1px solid var(--border2);
+  overflow: hidden;
+  position: relative;
+}
+.cbfil {
+  height: 100%;
+  transition: width .7s cubic-bezier(.23,1,.32,1), background .4s;
+  animation: bar-fill .7s cubic-bezier(.23,1,.32,1) both;
+  position: relative;
+}
+.cbfil::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: rgba(255,255,255,.6);
+}
+.cbtr-pct {
+  margin-top: 5px;
+  text-align: right;
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+/* Error/capacity exceeded box */
+.ebox {
+  background:var(--accent-dim);
+  border:1px solid rgba(232,77,14,.35);
+  border-left:4px solid var(--accent);
+  border-radius:var(--rs);
+  padding:14px 16px;
+  color:var(--text);
+  font-size:13px;margin-top:12px;
+}
+.ebox strong{
+  display:block;margin-bottom:8px;
+  font-family:var(--font-head);
+  font-size:16px;font-weight:900;
+  letter-spacing:1px;text-transform:uppercase;
+  color:var(--accent);
+}
+
+/* Alternative time buttons */
+.altgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:6px;margin-top:10px}
+.altbtn {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-bottom:2px solid var(--border2);
+  color:var(--text);
+  border-radius:0;
+  padding:12px 10px;
+  cursor:pointer;text-align:left;
+  transition:all .15s;
+}
+.altbtn:hover {
+  border-color:var(--accent);
+  border-bottom-color:var(--accent);
+  background:var(--accent-dim);
+  color:var(--accent);
+  transform:translateY(-1px);
+}
+.alttime{font-family:var(--font-head);font-size:15px;font-weight:900;letter-spacing:.5px}
+.altfree{font-size:11px;color:var(--text3);margin-top:3px;font-family:var(--font-head);font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.altbtn:hover .altfree{color:var(--accent)}
+.altbtn-nearest{border-color:var(--green);border-bottom-color:var(--green);background:rgba(34,197,94,.07)}
+.altbtn-nearest .alttime{color:var(--green)}
+.altnearest{font-family:var(--font-head);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:4px}
+
+/* Empty state */
+.empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.eico{font-size:36px;margin-bottom:12px}
+
+/* ══ RĒĶINU SADAĻA ══ */
+.inv-alerts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media(max-width:800px){ .inv-alerts{ grid-template-columns:1fr; } }
+
+@keyframes redpulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,.3); }
+  50%      { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+}
+.inv-alert-box {
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.inv-alert-box.unsent {
+  border-color: rgba(239,68,68,.5);
+  animation: redpulse 2.5s ease-in-out infinite;
+}
+.inv-alert-box.unpaid {
+  border-color: rgba(251,191,36,.4);
+}
+.inv-alert-hdr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.inv-alert-box.unsent .inv-alert-hdr { background:rgba(239,68,68,.12); color:var(--red); border-bottom:1px solid rgba(239,68,68,.3); }
+.inv-alert-box.unpaid .inv-alert-hdr { background:rgba(251,191,36,.08); color:var(--yellow); border-bottom:1px solid rgba(251,191,36,.25); }
+.inv-alert-cnt {
+  font-family: var(--font-head);
+  font-size: 18px;
+  font-weight: 900;
+  margin-left: auto;
+  background: rgba(0,0,0,.3);
+  padding: 2px 10px;
+  min-width: 28px;
+  text-align: center;
+}
+.inv-alert-list { max-height: 280px; overflow-y: auto; }
+.inv-alert-list::-webkit-scrollbar{ width:3px; }
+.inv-alert-list::-webkit-scrollbar-thumb{ background:var(--accent); }
+.inv-alert-row {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.inv-alert-row:last-child { border-bottom: none; }
+.inv-alert-row:hover { background: var(--card2); }
+.inv-ar-time { font-family:var(--font-head); font-weight:900; font-size:12px; color:var(--text2); }
+.inv-ar-name { font-weight:700; color:var(--text); font-size:13px; }
+.inv-ar-email { font-size:11px; color:var(--text3); margin-top:2px; }
+.inv-ar-phone { font-size:11px; color:var(--text3); }
+.inv-ar-empty { padding:16px 14px; text-align:center; font-family:var(--font-head); font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text3); }
+
+/* Rēķinu tabula */
+.inv-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.inv-filter-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: var(--font-head);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all .15s;
+  border-radius: 0;
+}
+.inv-filter-btn:hover { border-color: var(--accent); color:var(--text); }
+.inv-filter-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+.inv-search {
+  margin-left: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 6px 12px;
+  width: 220px;
+  border-radius: 0;
+  outline: none;
+}
+.inv-search:focus { border-color: var(--accent); }
+.inv-table { width:100%; border-collapse:collapse; }
+.inv-table th {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  font-family: var(--font-head);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text2);
+  text-align: left;
+  white-space: nowrap;
+}
+.inv-table td {
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--text);
+  vertical-align: top;
+}
+.inv-table tr:hover td { background: var(--card2); }
+.inv-table tr.inv-r-invoice td { border-left: 3px solid var(--accent); }
+.inv-rekviziti-short {
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text2);
+  font-size: 11px;
+}
+.inv-cb {
+  width: 18px; height: 18px;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+.inv-cb-sent  { accent-color: var(--accent); }
+.inv-cb-paid  { accent-color: var(--green); }
+.inv-status-sent { color:var(--accent); font-weight:700; font-family:var(--font-head); font-size:10px; letter-spacing:1px; }
+.inv-status-paid { color:var(--green);  font-weight:700; font-family:var(--font-head); font-size:10px; letter-spacing:1px; }
+.inv-status-no   { color:var(--text3);  font-size:10px; }
+
+/* Rekvizītu poga kartītē */
+/* UR meklēšana */
+.ur-search-wrap { position:relative; }
+.ur-search-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.ur-search-input {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 0;
+  outline: none;
+}
+.ur-search-input:focus { border-color: var(--accent); }
+.ur-search-btn {
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s;
+}
+.ur-search-btn:hover { background: var(--accent2); }
+.ur-search-btn:disabled { opacity:.5; cursor:default; }
+.ur-results {
+  position: absolute;
+  top: 100%;
+  left: 0; right: 0;
+  z-index: 500;
+  background: var(--card);
+  border: 1px solid var(--accent);
+  border-top: 2px solid var(--accent);
+  max-height: 260px;
+  overflow-y: auto;
+  display: none;
+}
+.ur-results.open { display: block; }
+.ur-results::-webkit-scrollbar { width:3px; }
+.ur-results::-webkit-scrollbar-thumb { background:var(--accent); }
+.ur-result-item {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .1s;
+}
+.ur-result-item:last-child { border-bottom: none; }
+.ur-result-item:hover { background: var(--card2); border-left: 3px solid var(--accent); }
+.ur-result-name { font-family:var(--font-head); font-size:13px; font-weight:900; color:var(--text); }
+.ur-result-reg  { font-size:11px; color:var(--accent); font-family:var(--font-head); font-weight:700; letter-spacing:.8px; }
+.ur-result-adr  { font-size:11px; color:var(--text2); margin-top:2px; }
+.ur-status { font-size:11px; color:var(--text3); padding:10px 14px; font-family:var(--font-head); letter-spacing:1px; text-transform:uppercase; }
+
+.btn-rek { background:var(--card2); border:1px solid var(--border2); color:var(--text2); font-size:11px; padding:4px 8px; cursor:pointer; font-family:var(--font-head); font-weight:700; letter-spacing:.8px; text-transform:uppercase; transition:all .15s; white-space:nowrap; }
+.btn-rek:hover { border-color:var(--accent); color:var(--accent); }
+.inv-req-field { display:none; grid-column:1/-1; }
+.inv-req-field.show { display:block; }
+
+/* ── CUSTOM DATE / TIME PICKER ── */
+.picker-wrap { position:relative; }
+.picker-btn {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom: 2px solid var(--border2);
+  color: var(--text);
+  padding: 11px 16px;
+  border-radius: var(--rs);
+  font-family: var(--font-head);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: left;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.picker-btn.empty-val {
+  color: var(--text2);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: .5px;
+}
+.picker-btn:hover, .picker-btn.open {
+  border-color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: var(--card);
+}
+.picker-btn .pb-arrow {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text3);
+  transition: transform .15s;
+}
+.picker-btn.open .pb-arrow { transform: rotate(180deg); color: var(--accent); }
+
+/* Dropdown panel */
+.picker-drop {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 300;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--accent);
+  border-radius: var(--rs);
+  box-shadow: 0 12px 40px rgba(0,0,0,.6);
+  display: none;
+  min-width: 100%;
+}
+.picker-drop.open { display: block; }
+
+/* Date picker — mini calendar inside dropdown */
+.pdcal { padding: 12px; width: 280px; }
+.pdcal-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.pdcal-month {
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.pdcal-nav {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  width: 28px; height: 28px;
+  border-radius: 0;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .12s;
+}
+.pdcal-nav:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.pdcal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.pdcal-dh {
+  text-align: center;
+  font-family: var(--font-head);
+  font-size: 9px; font-weight: 800;
+  letter-spacing: .8px;
+  color: var(--text3);
+  text-transform: uppercase;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--accent);
+  margin-bottom: 2px;
+}
+.pdcal-day {
+  text-align: center;
+  padding: 6px 2px;
+  font-family: var(--font-head);
+  font-size: 13px; font-weight: 700;
+  color: var(--text2);
+  cursor: pointer;
+  border-radius: 0;
+  transition: all .1s;
+}
+.pdcal-day:hover { background: var(--accent); color: #fff; }
+.pdcal-day.today { color: var(--accent); border-bottom: 2px solid var(--accent); }
+.pdcal-day.selected { background: var(--accent); color: #fff; }
+.pdcal-day.past { color: var(--text3); cursor: default; }
+.pdcal-day.past:hover { background: none; color: var(--text3); }
+.pdcal-day.empty { cursor: default; }
+
+/* Time picker — scrollable list */
+.ptlist {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 4px 0;
+  min-width: 130px;
+}
+.ptlist::-webkit-scrollbar { width: 3px; }
+.ptlist::-webkit-scrollbar-thumb { background: var(--accent); }
+.pt-item {
+  padding: 9px 18px;
+  font-family: var(--font-head);
+  font-size: 15px; font-weight: 700;
+  letter-spacing: .5px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all .1s;
+  border-left: 3px solid transparent;
+}
+.pt-item:hover { background: var(--card2); color: var(--text); border-left-color: var(--accent); }
+.pt-item.selected { background: var(--accent-dim); color: var(--accent); border-left-color: var(--accent); font-weight: 900; }
+</style>
+
+</head>
+<body>
+<div class="app">
+
+<!-- OVERLAY -->
+<div class="overlay" id="OVL">
+  <div class="ovlbox">
+    <div class="sp" style="width:32px;height:32px;border-width:3px"></div>
+    <p id="OVLMSG">Lūdzu uzgaidi...</p>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="TOAST"></div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo">DRIFT<span>ARENA</span></div>
+  <nav class="nav">
+    <button class="nb active" id="nb-calendar" onclick="goNav('calendar',this)">📅 Pārskats</button>
+    <button class="nb" id="nb-today"    onclick="goNav('today',this)">🕐 Šodien</button>
+    <button class="nb" id="nb-invoices" onclick="goNav('invoices',this)">🧾 Rēķini</button>
+    <div class="nb-new-wrap">
+      <button class="nb nb-new" id="nb-new" onclick="goNav('new',this)">＋ Jauna rezervācija</button>
+      <button class="nb-new-sub" id="nb-outside" onclick="goNavOutside()">＋ Pieņemt ārpus darba laika</button>
+    </div>
+  </nav>
+  <!-- STATISTIKAS PANELIS -->
+  <div class="topstats">
+    <div class="tstat">
+      <div class="tstat-lbl">Šodien</div>
+      <div class="tstat-row">
+        <span class="tstat-val" id="st-td-r">—</span>
+        <span class="tstat-sub">rez.</span>
+        <span class="tstat-sep">·</span>
+        <span class="tstat-val" id="st-td-p">—</span>
+        <span class="tstat-sub">cilv.</span>
+      </div>
+    </div>
+    <div class="tstat">
+      <div class="tstat-lbl">Rīt</div>
+      <div class="tstat-row">
+        <span class="tstat-val" id="st-tm-r">—</span>
+        <span class="tstat-sub">rez.</span>
+        <span class="tstat-sep">·</span>
+        <span class="tstat-val" id="st-tm-p">—</span>
+        <span class="tstat-sub">cilv.</span>
+      </div>
+    </div>
+    <div class="tstat">
+      <div class="tstat-lbl">Šonedēļ</div>
+      <div class="tstat-row">
+        <span class="tstat-val" id="st-wk-r">—</span>
+        <span class="tstat-sub">rez.</span>
+        <span class="tstat-sep">·</span>
+        <span class="tstat-val" id="st-wk-p">—</span>
+        <span class="tstat-sub">cilv.</span>
+      </div>
+    </div>
+    <div class="tstat">
+      <div class="tstat-lbl">Šomēnes</div>
+      <div class="tstat-row">
+        <span class="tstat-val" id="st-mo-r">—</span>
+        <span class="tstat-sub">rez.</span>
+        <span class="tstat-sep">·</span>
+        <span class="tstat-val" id="st-mo-p">—</span>
+        <span class="tstat-sub">cilv.</span>
+      </div>
+    </div>
+  </div>
+  <div class="cap-pill">Kapacitāte: <b>90</b></div>
+</header>
+
+<main class="main">
+
+<!-- ══ PĀRSKATS ══ -->
+<div class="view active" id="view-calendar">
+  <div class="phdr">
+    <div class="ptitle">PĀRSKATS</div>
+    <div class="psub">Klikšķini uz dienas, lai redzētu rezervācijas</div>
+  </div>
+  <div class="cctrls">
+    <div style="display:flex;gap:6px">
+      <button class="cnbtn" onclick="calPrev()">‹</button>
+      <button class="cnbtn" onclick="calNext()">›</button>
+    </div>
+    <select id="calM" onchange="renderCal()">
+      <option value="0">Janvāris</option><option value="1">Februāris</option>
+      <option value="2">Marts</option><option value="3">Aprīlis</option>
+      <option value="4">Maijs</option><option value="5">Jūnijs</option>
+      <option value="6">Jūlijs</option><option value="7">Augusts</option>
+      <option value="8">Septembris</option><option value="9">Oktobris</option>
+      <option value="10">Novembris</option><option value="11">Decembris</option>
+    </select>
+    <select id="calY" onchange="renderCal()"></select>
+  </div>
+  <div class="cleg">
+    <span class="cli"><span class="cld" style="background:var(--border)"></span>Nav</span>
+    <span class="cli"><span class="cld" style="background:var(--accent)"></span>&lt;15</span>
+    <span class="cli"><span class="cld" style="background:var(--yellow)"></span>15–40</span>
+    <span class="cli"><span class="cld" style="background:var(--green)"></span>40–60</span>
+    <span class="cli"><span class="cld" style="background:var(--red)"></span>60+</span>
+  </div>
+  <div class="cgrid" id="CAL"></div>
+</div>
+
+<!-- ══ ŠODIEN ══ -->
+<div class="view" id="view-today">
+  <div class="thdr">
+    <div class="tdate" id="TD_TITLE"></div>
+    <div class="tsub"  id="TD_COUNT"></div>
+  </div>
+  <div class="blist" id="TD_LIST"></div>
+  <div class="ssep">Rītdiena</div>
+  <div class="blist" id="TM_LIST"></div>
+</div>
+
+<!-- ══ JAUNA REZERVĀCIJA ══ -->
+<div class="view" id="view-new">
+  <div class="phdr">
+    <div class="ptitle">JAUNA REZERVĀCIJA</div>
+    <div class="psub">3 soļi · kapacitāte pārbaudīta automātiski</div>
+    <div class="outside-warn-banner" id="OUTSIDE_WARN">
+      <span class="outside-warn-dot"></span>
+      Ārpus darba laika rezervācija
+      <span class="outside-warn-dot"></span>
+    </div>
+  </div>
+  <div class="new-layout">
+  <div class="wiz">
+    <div class="sbar">
+      <div class="si active" id="si1"><span class="snum">1</span>Skaits</div>
+      <div class="si" id="si2"><span class="snum">2</span>Laiks</div>
+      <div class="si" id="si3"><span class="snum">3</span>Detaļas</div>
+    </div>
+
+    <!-- 1. solis: cilvēku skaits -->
+    <div class="spanel active card" id="sp1">
+      <div class="field">
+        <label>👥 Cilvēku skaits <span class="req">*</span></label>
+        <input type="number" id="w_ppl" min="1" max="90" placeholder="Cik cilvēku?" oninput="s1val()">
+        <div class="hint">Maks. 90 cilvēki vienlaicīgi arēnā</div>
+      </div>
+      <button class="btn btn-p" id="btn_s1" onclick="gotoStep(2)" disabled>Tālāk →</button>
+    </div>
+
+    <!-- 2. solis: datums un laiks (dropdown) -->
+    <div class="spanel card" id="sp2">
+      <!-- Slēptie lauki — JS tos lasa kā parasti -->
+      <input type="hidden" id="w_date">
+      <select id="w_from" style="display:none"></select>
+      <select id="w_to"   style="display:none"></select>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <!-- Datuma picker -->
+        <div class="field">
+          <label>📅 Datums <span class="req">*</span></label>
+          <div class="picker-wrap" id="dp_wrap">
+            <button type="button" class="picker-btn empty-val" id="dp_btn" onclick="togglePicker('dp')">
+              <span id="dp_label">Izvēlies datumu</span>
+              <span class="pb-arrow">▼</span>
+            </button>
+            <div class="picker-drop" id="dp_drop">
+              <div class="pdcal" id="dp_cal"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Sākuma laiks -->
+        <div class="field">
+          <label>🕐 Sākums <span class="req">*</span></label>
+          <div class="picker-wrap" id="fp_wrap">
+            <button type="button" class="picker-btn empty-val" id="fp_btn" onclick="togglePicker('fp')">
+              <span id="fp_label">Izvēlies sākuma laiku</span>
+              <span class="pb-arrow">▼</span>
+            </button>
+            <div class="picker-drop" id="fp_drop">
+              <div class="ptlist" id="fp_list"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Beigu laiks -->
+        <div class="field">
+          <label>🕐 Beigas <span class="req">*</span></label>
+          <div class="picker-wrap" id="tp_wrap">
+            <button type="button" class="picker-btn empty-val" id="tp_btn" onclick="togglePicker('tp')">
+              <span id="tp_label">Izvēlies beigu laiku</span>
+              <span class="pb-arrow">▼</span>
+            </button>
+            <div class="picker-drop" id="tp_drop">
+              <div class="ptlist" id="tp_list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="HOURS_INFO" style="font-size:12px;color:var(--text2);margin:8px 0 4px;font-family:var(--font-head);letter-spacing:.8px"></div>
+      <div id="CAP_RES"></div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-s" onclick="gotoStep(1)">← Atpakaļ</button>
+        <button class="btn btn-p" id="btn_s2" onclick="gotoStep(3)" disabled>Turpināt →</button>
+      </div>
+    </div>
+
+    <!-- 3. solis: klienta dati -->
+    <div class="spanel card" id="sp3">
+      <div id="S3SUM" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--text2);display:flex;gap:16px;flex-wrap:wrap"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field">
+          <label>👤 Vārds / Uzņēmums <span class="req">*</span></label>
+          <input type="text" id="w_client" placeholder="Jānis Bērziņš vai SIA XYZ">
+        </div>
+        <div class="field">
+          <label>📞 Telefons <span class="req">*</span></label>
+          <input type="tel" id="w_phone" placeholder="2XXXXXXX">
+        </div>
+        <div class="field">
+          <label>✉️ E-pasts</label>
+          <input type="email" id="w_email" placeholder="nav obligāts">
+        </div>
+        <div class="field">
+          <label>💳 Maksāšanas veids</label>
+          <select id="w_inv" onchange="toggleInvFields('w')">
+            <option>Uz vietas</option>
+            <option>Ar rēķinu - pēcapmaksa</option>
+            <option>Ar rēķinu - priekšapmaksa</option>
+          </select>
+        </div>
+        <!-- Rēķina lauki — rādās tikai ja izvēlēts rēķins -->
+        <div class="field inv-req-field" id="w_inv_email_wrap">
+          <label>📧 E-pasts rēķinam <span class="req" id="w_inv_email_req">*</span></label>
+          <input type="email" id="w_inv_email" placeholder="invoice@company.lv">
+        </div>
+        <div class="field inv-req-field" id="w_rekviziti_wrap" style="grid-column:1/-1">
+          <label>🏢 Rekvizīti <span class="req" id="w_rek_req">*</span></label>
+          <textarea id="w_rekviziti" placeholder="Uzņēmuma nosaukums, reģ. nr., PVN nr., juridiskā adrese..." style="min-height:72px"></textarea>
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>📝 Komentāri</label>
+          <textarea id="w_cmt" placeholder="Dzimšanas diena, braucieni, īpašas vēlmes..."></textarea>
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>🍕 Ēdieni</label>
+          <textarea id="w_food" placeholder="Komplekts, picas vai 'precizēs'" style="min-height:56px"></textarea>
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>👩‍💼 Administrators <span class="req">*</span></label>
+          <input type="text" id="w_admin" placeholder="Tavs vārds (datums un laiks tiks fiksēts automātiski)">
+          <div class="hint">📌 Datums un laiks tiks ierakstīts automātiski pēc Rīgas laika</div>
+        </div>
+        <!-- SLĒGTAIS PASĀKUMS -->
+        <label class="closed-toggle" id="closed_toggle" onclick="toggleClosed()">
+          <input type="checkbox" id="w_closed" onclick="event.stopPropagation();toggleClosed()">
+          <div>
+            <div class="closed-toggle-lbl">🔒 Slēgtais pasākums</div>
+            <div class="closed-toggle-sub">Šajā laikā citas rezervācijas netiks pieņemtas neatkarīgi no brīvajām vietām</div>
+          </div>
+        </label>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-s" onclick="gotoStep(2)">← Atpakaļ</button>
+        <button class="btn btn-p btn-full" id="btn_save" onclick="submitNew()" style="flex:1">
+          💾 Saglabāt rezervāciju
+        </button>
+      </div>
+    </div>
+  </div><!-- /wiz -->
+
+  <!-- LABĀ PUSE — dienas noslodzes tabula -->
+  <div class="day-load-panel" id="DLP">
+    <div class="dlp-hdr">
+      <span>Dienas noslodze</span>
+      <span class="dlp-date" id="DLP_DATE">— izvēlies datumu —</span>
+    </div>
+    <div id="DLP_BODY">
+      <div class="dlp-empty">📅 Izvēlies datumu,<br>lai redzētu noslodzi</div>
+    </div>
+    <div class="dlp-legend" id="DLP_LEG" style="display:none">
+      <span class="dlp-li"><span class="dlp-ld" style="background:var(--border)"></span>Brīvs</span>
+      <span class="dlp-li"><span class="dlp-ld" style="background:var(--accent)"></span>&lt;25%</span>
+      <span class="dlp-li"><span class="dlp-ld" style="background:var(--yellow)"></span>25–60%</span>
+      <span class="dlp-li"><span class="dlp-ld" style="background:var(--green)"></span>60–85%</span>
+      <span class="dlp-li"><span class="dlp-ld" style="background:var(--red)"></span>85%+</span>
+    </div>
+  </div>
+  </div><!-- /new-layout -->
+</div>
+
+<!-- ══ RĒĶINI ══ -->
+<div class="view" id="view-invoices">
+  <div class="phdr">
+    <div class="ptitle">RĒĶINI</div>
+    <div class="psub">Pārskats par rēķiniem un apmaksām</div>
+  </div>
+
+  <!-- Brīdinājuma bloki -->
+  <div class="inv-alerts">
+    <div class="inv-alert-box unsent">
+      <div class="inv-alert-hdr">
+        🔴 Jānosūta rēķins
+        <span class="inv-alert-cnt" id="INV_UNSENT_CNT">0</span>
+      </div>
+      <div class="inv-alert-list" id="INV_UNSENT_LIST">
+        <div class="inv-ar-empty">Nav nenosūtītu rēķinu</div>
+      </div>
+    </div>
+    <div class="inv-alert-box unpaid">
+      <div class="inv-alert-hdr">
+        🟡 Nosūtīts, bet nav apmaksāts
+        <span class="inv-alert-cnt" id="INV_UNPAID_CNT">0</span>
+      </div>
+      <div class="inv-alert-list" id="INV_UNPAID_LIST">
+        <div class="inv-ar-empty">Visi nosūtītie rēķini ir apmaksāti</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtri + meklēšana -->
+  <div class="inv-filters">
+    <button class="inv-filter-btn active" onclick="setInvFilter('all',this)">Visi</button>
+    <button class="inv-filter-btn" onclick="setInvFilter('invoice',this)">Ar rēķinu</button>
+    <button class="inv-filter-btn" onclick="setInvFilter('unsent',this)">Nenosūtīti</button>
+    <button class="inv-filter-btn" onclick="setInvFilter('unpaid',this)">Neapmaksāti</button>
+    <button class="inv-filter-btn" onclick="setInvFilter('paid',this)">Apmaksāti</button>
+    <input class="inv-search" id="INV_SEARCH" type="text" placeholder="🔍 Meklēt..." oninput="renderInvoiceTable()">
+  </div>
+
+  <!-- Tabula -->
+  <div style="overflow-x:auto">
+    <table class="inv-table" id="INV_TABLE">
+      <thead>
+        <tr>
+          <th>Datums / Laiks</th>
+          <th>Uzņēmums / Klients</th>
+          <th>Rekvizīti</th>
+          <th>Kontakti</th>
+          <th>E-pasts rēķinam</th>
+          <th>Cilv.</th>
+          <th>Ēdieni</th>
+          <th>Komentāri</th>
+          <th>Rēķins nosūtīts</th>
+          <th>Rēķins apmaksāts</th>
+        </tr>
+      </thead>
+      <tbody id="INV_TBODY"></tbody>
+    </table>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- ══ REKVIZĪTU MODAL ══ -->
+<div class="mbg" id="M_REK">
+  <div class="mbox" style="max-width:520px">
+    <div class="mtitle">📋 Rekvizīti un rēķina e-pasts</div>
+    <input type="hidden" id="rek_id">
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+      <!-- UR meklēšana -->
+      <div class="field">
+        <label style="color:var(--accent);font-family:var(--font-head);font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase">🔍 Meklēt Uzņēmumu reģistrā (UR)</label>
+        <div class="ur-search-wrap">
+          <div class="ur-search-row">
+            <input class="ur-search-input" id="ur_query" type="text"
+              placeholder="Nosaukums vai reģ. nr. (40003xxxxxx)..."
+              onkeydown="if(event.key==='Enter')urSearch()">
+            <button class="ur-search-btn" id="ur_btn" onclick="urSearch()">🔍 Meklēt</button>
+          </div>
+          <div class="ur-results" id="ur_results"></div>
+        </div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--font-head);letter-spacing:.8px">
+          Dati: Latvijas Uzņēmumu reģistrs / data.gov.lv · PVN numurs jāpievieno manuāli
+        </div>
+      </div>
+
+      <div class="field">
+        <label>📧 E-pasts rēķinam</label>
+        <input type="email" id="rek_email" placeholder="invoice@company.lv">
+      </div>
+      <div class="field">
+        <label>🏢 Rekvizīti</label>
+        <textarea id="rek_val" placeholder="Uzņēmuma nosaukums&#10;Reģ. nr.: &#10;PVN nr.: (ja ir)&#10;Juridiskā adrese: " style="min-height:130px"></textarea>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-s" onclick="closeM('M_REK')">Atcelt</button>
+      <button class="btn btn-p" onclick="saveRek()">💾 Saglabāt</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EDIT MODAL ══ -->
+<div class="mbg" id="M_EDIT">
+  <div class="mbox" style="max-width:640px">
+    <div class="mtitle">✏️ Rediģēt rezervāciju</div>
+    <input type="hidden" id="e_id">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field"><label>📅 Datums</label><input type="date" id="e_date"></div>
+      <div class="field"><label>👥 Cilvēku skaits</label><input type="number" id="e_ppl" min="1" max="90"></div>
+      <div class="field"><label>🕐 Sākums</label><select id="e_from"></select></div>
+      <div class="field"><label>🕐 Beigas</label><select id="e_to"></select></div>
+      <div class="field"><label>👤 Vārds / Uzņēmums</label><input type="text" id="e_client"></div>
+      <div class="field"><label>📞 Telefons</label><input type="tel" id="e_phone"></div>
+      <div class="field"><label>✉️ E-pasts</label><input type="email" id="e_email"></div>
+      <div class="field"><label>💳 Maksāšanas veids</label>
+        <select id="e_inv" onchange="toggleInvFields('e')">
+          <option>Uz vietas</option>
+          <option>Ar rēķinu - pēcapmaksa</option>
+          <option>Ar rēķinu - priekšapmaksa</option>
+        </select>
+      </div>
+      <div class="field inv-req-field" id="e_inv_email_wrap">
+        <label>📧 E-pasts rēķinam <span class="req">*</span></label>
+        <input type="email" id="e_inv_email" placeholder="invoice@company.lv">
+      </div>
+      <div class="field inv-req-field" id="e_rekviziti_wrap" style="grid-column:1/-1">
+        <label>🏢 Rekvizīti <span class="req">*</span></label>
+        <textarea id="e_rekviziti" placeholder="Uzņēmuma nosaukums, reģ. nr., PVN nr., juridiskā adrese..." style="min-height:72px"></textarea>
+      </div>
+      <div class="field" style="grid-column:1/-1"><label>📝 Komentāri</label><textarea id="e_cmt"></textarea></div>
+      <div class="field" style="grid-column:1/-1"><label>🍕 Ēdieni</label><textarea id="e_food" style="min-height:56px"></textarea></div>
+      <div class="field">
+        <label>👩‍💼 Administrators</label>
+        <input type="text" id="e_admin" placeholder="Tavs vārds">
+        <div class="hint">📌 Labošanas laiks tiks atjaunināts automātiski</div>
+      </div>
+      <div class="field"><label>📌 Statuss</label>
+        <select id="e_status">
+          <option>Aktīva</option><option>Ieradušies</option><option>Notikusi</option><option>Atcelta</option>
+        </select>
+      </div>
+    </div>
+    <div id="E_CAP_ERR"></div>
+    <div class="mfoot">
+      <button class="btn btn-s" onclick="closeM('M_EDIT')">Atcelt</button>
+      <button class="btn btn-p" onclick="saveEdit()">💾 Saglabāt</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MOVE MODAL ══ -->
+<div class="mbg" id="M_MOVE">
+  <div class="mbox">
+    <div class="mtitle">📅 Pārcelt rezervāciju</div>
+    <input type="hidden" id="mv_id">
+    <p id="MV_INFO" style="color:var(--text2);font-size:13px;margin-bottom:16px"></p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div class="field"><label>📅 Jauns datums</label><input type="date" id="mv_date" onchange="chkMoveCap()"></div>
+      <div class="field"><label>🕐 Jauns sākums</label><select id="mv_from" onchange="chkMoveCap()"></select></div>
+      <div class="field"><label>🕐 Jaunas beigas</label><select id="mv_to" onchange="chkMoveCap()"></select></div>
+    </div>
+    <div id="MV_CAP"></div>
+    <div class="mfoot">
+      <button class="btn btn-s" onclick="closeM('M_MOVE')">Atcelt</button>
+      <button class="btn btn-p" id="btn_mv" onclick="confirmMove()" disabled>📅 Pārcelt</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DELETE CONFIRM MODAL ══ -->
+<div class="mbg" id="M_DEL">
+  <div class="mbox" style="max-width:420px">
+    <div class="mtitle">🗑️ Dzēst rezervāciju?</div>
+    <p style="color:var(--text2);font-size:14px;margin-bottom:8px">
+      Klients: <b id="DEL_NAME" style="color:var(--text)"></b>
+    </p>
+    <p style="color:var(--text3);font-size:13px">
+      Rezervācija tiks pilnīgi izdzēsta no Google Sheets un vairs nebūs atjaunojama.
+    </p>
+    <div class="mfoot">
+      <button class="btn btn-s" onclick="closeM('M_DEL')">Atcelt</button>
+      <button class="btn btn-d" onclick="confirmDel()">🗑️ Jā, dzēst</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DAY DETAIL MODAL ══ -->
+<div class="mbg" id="M_DAY">
+  <div class="mbox" style="max-width:720px">
+    <div class="mtitle" id="DAY_TITLE"></div>
+    <div class="blist" id="DAY_LIST"></div>
+    <div class="mfoot">
+      <button class="btn btn-s" onclick="closeM('M_DAY')">Aizvērt</button>
+      <button class="btn btn-p" onclick="newForDate()">＋ Pievienot šai dienai</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// KONSTANTES UN STATE
+// ================================================================
+const CAP = 90;
+const MLV = ['Janvāris','Februāris','Marts','Aprīlis','Maijs','Jūnijs',
+             'Jūlijs','Augusts','Septembris','Oktobris','Novembris','Decembris'];
+const DLV = ['Pirmdiena','Otrdiena','Trešdiena','Ceturtdiena','Piektdiena','Sestdiena','Svētdiena'];
+
+let ALL = [];
+let calY, calM;
+let _delId = null;
+let _mvId = null, _mvPpl = 0;
+let _dayDate = '';
+let _capOk = false;
+let _outsideHours = false; // true = pieņem ārpus darba laika
+let _workOpen = '10:00', _workClose = '23:00'; // noklusējums, atjauninās pēc datuma
+
+// Darba laiki klients-pusē (jāsaskan ar Code.gs WORK_HOURS)
+const WORK_HOURS_CLIENT = {
+  0: { open:'10:00', close:'22:00' }, // Sv
+  1: { open:'11:00', close:'22:00' }, // Pr
+  2: { open:'11:00', close:'22:00' }, // Ot
+  3: { open:'11:00', close:'22:00' }, // Tr
+  4: { open:'11:00', close:'22:00' }, // Ce
+  5: { open:'11:00', close:'23:00' }, // Pk
+  6: { open:'10:00', close:'23:00' }, // Se
+};
+function getWorkHoursClient(dateStr) {
+  if (!dateStr) return { open:'10:00', close:'23:00' };
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const dow = new Date(y, m-1, d).getDay();
+  return WORK_HOURS_CLIENT[dow] || { open:'10:00', close:'23:00' };
+}
+
+// ================================================================
+// LAIKA DROPDOWN KONSTRUKTORS
+// Ģenerē opcijas no 00:00 līdz 23:45 ar 15 min soli
+// ================================================================
+function buildTimeSel(selId, selected, fromMin, toMin) {
+  const sel = document.getElementById(selId);
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = '';
+  const start = (fromMin !== undefined) ? fromMin : 0;
+  const end   = (toMin   !== undefined) ? toMin   : 24*60;
+  for (let total = start; total <= end; total += 15) {
+    if (total >= 24*60) break;
+    const h = Math.floor(total/60), m = total%60;
+    const t = p2(h) + ':' + p2(m);
+    const o = document.createElement('option');
+    o.value = t; o.textContent = t;
+    sel.appendChild(o);
+  }
+  // Uzstāda vērtību TIKAI ja explicit selected padots (ne null/undefined/empty)
+  if (selected) {
+    const nearest = nearestQuarter(selected);
+    const opt = sel.querySelector(`option[value="${nearest}"]`);
+    if (opt) { sel.value = opt.value; }
+  } else if (prev) {
+    // Saglabā iepriekšējo vērtību ja tā joprojām eksistē sarakstā
+    const opt = sel.querySelector(`option[value="${prev}"]`);
+    if (opt) { sel.value = opt.value; }
+    else { sel.value = ''; }
+  } else {
+    sel.value = '';
+  }
+}
+
+// Atjauno laiku dropdownus pēc izvēlētā datuma (darba laiks)
+function applyWorkHours(dateStr, fromSelId, toSelId, defaultFrom, defaultTo) {
+  const wh = getWorkHoursClient(dateStr);
+  const openMin  = _outsideHours ? 0      : tmin(wh.open);
+  const closeMin = _outsideHours ? 24*60  : tmin(wh.close);
+  buildTimeSel(fromSelId, defaultFrom || null, openMin, closeMin);
+  buildTimeSel(toSelId,   defaultTo   || null, openMin, closeMin);
+  return wh;
+}
+
+// Noapaļo laiku uz tuvāko 15min soli lejup
+function nearestQuarter(t) {
+  const m = String(t||'').match(/(\d{1,2}):(\d{2})/);
+  if (!m) return '09:00';
+  const h = parseInt(m[1]);
+  const min = Math.floor(parseInt(m[2]) / 15) * 15;
+  return p2(h) + ':' + p2(min);
+}
+
+// ================================================================
+// INIT
+// ================================================================
+window.onload = function() {
+  const now = new Date();
+  calY = now.getFullYear(); calM = now.getMonth();
+
+  // Calendar year dropdown
+  const ys = document.getElementById('calY');
+  for (let y = now.getFullYear()-1; y <= now.getFullYear()+2; y++) {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    if (y === calY) o.selected = true;
+    ys.appendChild(o);
+  }
+  document.getElementById('calM').value = calM;
+
+  // Šodien sadaļas virsraksts
+  document.getElementById('TD_TITLE').textContent =
+    now.getDate() + '. ' + MLV[now.getMonth()] + ' ' + now.getFullYear();
+
+  // Laika dropdowni (jauna rezervācija)
+  buildTimeSel('w_from', '17:00');
+  buildTimeSel('w_to',   '20:00');
+
+  loadAll();
+};
+
+// ================================================================
+// NAVIGĀCIJA
+// ================================================================
+function goNav(name, btn) {
+  if (name === 'invoices') { setTimeout(renderInvoices, 50); }
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'calendar') renderCal();
+  if (name === 'today')    renderToday();
+  if (name === 'new')      resetWiz();
+}
+
+// ================================================================
+// DATU IELĀDE
+// ================================================================
+function loadAll(silent) {
+  if (!silent) ovl('Ielādē rezervācijas...');
+  window.__gsr__
+    .withSuccessHandler(r => { ALL = JSON.parse(r); hovl(); renderCal(); renderToday(); updateStats(); if (document.getElementById('view-invoices').classList.contains('active')) renderInvoices(); })
+    .withFailureHandler(e => { hovl(); toast('Kļūda ielādējot: ' + e.message, 'err'); })
+    .sGetAll();
+}
+
+function updateStats() {
+  const now   = new Date();
+  const today = isoToday();
+  const tom   = isoOffset(1);
+
+  // Nedēļas sākums (pirmdiena)
+  const dow = now.getDay(); // 0=sv
+  const diff = (dow === 0) ? -6 : 1 - dow;
+  const wkStart = new Date(now); wkStart.setDate(now.getDate() + diff); wkStart.setHours(0,0,0,0);
+  const wkEnd   = new Date(wkStart); wkEnd.setDate(wkStart.getDate() + 6); wkEnd.setHours(23,59,59,999);
+
+  // Mēneša sākums/beigas
+  const moStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const moEnd   = new Date(now.getFullYear(), now.getMonth()+1, 0);
+
+  function isoDate(d) {
+    return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+  }
+
+  function calc(filterFn) {
+    const filtered = ALL.filter(b => b.status !== 'Atcelta' && filterFn(b));
+    return { r: filtered.length, p: filtered.reduce((s,b) => s + (parseInt(b.people)||0), 0) };
+  }
+
+  const td = calc(b => b.date === today);
+  const tm = calc(b => b.date === tom);
+  const wk = calc(b => b.date >= isoDate(wkStart) && b.date <= isoDate(wkEnd));
+  const mo = calc(b => b.date >= isoDate(moStart) && b.date <= isoDate(moEnd));
+
+  function setVal(id, n) {
+    const el = document.getElementById(id);
+    el.textContent = n;
+    el.classList.toggle('pos', n > 0);
+  }
+  setVal('st-td-r', td.r); setVal('st-td-p', td.p);
+  setVal('st-tm-r', tm.r); setVal('st-tm-p', tm.p);
+  setVal('st-wk-r', wk.r); setVal('st-wk-p', wk.p);
+  setVal('st-mo-r', mo.r); setVal('st-mo-p', mo.p);
+}
+
+// ================================================================
+// KALENDĀRS
+// ================================================================
+function calPrev() { calM--; if (calM<0){calM=11;calY--;} syncCalSel(); renderCal(); }
+function calNext() { calM++; if (calM>11){calM=0;calY++;} syncCalSel(); renderCal(); }
+function syncCalSel() {
+  document.getElementById('calM').value = calM;
+  document.getElementById('calY').value = calY;
+}
+function renderCal() {
+  calM = parseInt(document.getElementById('calM').value);
+  calY = parseInt(document.getElementById('calY').value);
+  const td = isoToday();
+  const fd = new Date(calY, calM, 1);
+  let off = fd.getDay() - 1; if (off < 0) off = 6;
+  const dim = new Date(calY, calM+1, 0).getDate();
+
+  let h = DLV.map(d => `<div class="chdr">${d}</div>`).join('');
+  for (let i = 0; i < off; i++) h += '<div class="cday eday"></div>';
+  for (let d = 1; d <= dim; d++) {
+    const ds = `${calY}-${p2(calM+1)}-${p2(d)}`;
+    const sl = daySlots(ds);
+    h += `<div class="cday${ds===td?' tdy':''}" onclick="openDay('${ds}')">
+      <div class="cdnum">${d}</div>
+      <div class="cslots">
+        ${slotBar('AM', sl.am)}
+        ${slotBar('MD', sl.mid)}
+        ${slotBar('PM', sl.pm)}
+      </div>
+    </div>`;
+  }
+  document.getElementById('CAL').innerHTML = h;
+}
+
+function daySlots(ds) {
+  const b = ALL.filter(x => x.date===ds && x.status!=='Atcelta');
+  return {
+    am:  peakOcc(b, 9*60,  13*60),
+    mid: peakOcc(b, 13*60, 17*60),
+    pm:  peakOcc(b, 17*60, 24*60),
+  };
+}
+
+// Peak occupancy sweep-line (gan serverī, gan klientā konsistenti)
+function peakOcc(bookings, fromM, toM) {
+  const filtered = bookings.filter(b =>
+    tmin(b.timeFrom) < toM && tmin(b.timeTo) > fromM
+  );
+  if (!filtered.length) return 0;
+
+  const pts = new Set([fromM, toM]);
+  filtered.forEach(b => { pts.add(tmin(b.timeFrom)); pts.add(tmin(b.timeTo)); });
+  const sorted = [...pts].filter(p => p >= fromM && p <= toM).sort((a,b) => a-b);
+
+  let mx = 0;
+  for (let i = 0; i < sorted.length-1; i++) {
+    const mid = (sorted[i] + sorted[i+1]) / 2;
+    const occ = filtered
+      .filter(b => tmin(b.timeFrom) <= mid && tmin(b.timeTo) > mid)
+      .reduce((s,b) => s + b.people, 0);
+    if (occ > mx) mx = occ;
+  }
+  return mx;
+}
+
+function slotBar(lbl, cnt) {
+  const pct = Math.min(100, Math.round(cnt/CAP*100));
+  const cls = cnt>=60?'s4':cnt>=40?'s3':cnt>=15?'s2':cnt>0?'s1':'s0';
+  return `<div class="cslot">
+    <span class="cslbl">${lbl}</span>
+    <div class="ctrk"><div class="cfil ${cls}" style="width:${pct}%"></div></div>
+    <span class="cnum">${cnt||''}</span>
+  </div>`;
+}
+
+// ================================================================
+// DIENAS MODALAIS LOGS
+// ================================================================
+function openDay(ds) {
+  _dayDate = ds;
+  const [y,m,d] = ds.split('-');
+  document.getElementById('DAY_TITLE').textContent =
+    `📅 ${parseInt(d)}. ${MLV[parseInt(m)-1]} ${y}`;
+  const list = ALL.filter(b => b.date===ds)
+    .sort((a,b) => tmin(a.timeFrom)-tmin(b.timeFrom));
+  document.getElementById('DAY_LIST').innerHTML =
+    list.length ? list.map(renderCard).join('') : emptyEl('Nav rezervāciju šajā dienā');
+  openM('M_DAY');
+}
+function newForDate() {
+  closeM('M_DAY');
+  goNav('new', document.getElementById('nb-new'));
+  // Iestāda datumu un picker pogu
+  document.getElementById('w_date').value = _dayDate;
+  const [y,m,d] = _dayDate.split('-');
+  document.getElementById('dp_label').textContent =
+    `${parseInt(d)}. ${MLV[parseInt(m)-1]} ${y}`;
+  document.getElementById('dp_btn').classList.remove('empty-val');
+  _dpYear  = parseInt(y);
+  _dpMonth = parseInt(m) - 1;
+  applyWorkHours(_dayDate, 'w_from', 'w_to', null, null);
+  updateHoursInfo(_dayDate);
+}
+
+// ================================================================
+// ŠODIEN SKATS
+// ================================================================
+function renderToday() {
+  const t  = isoToday();
+  const tm = isoOffset(1);
+  const tb  = ALL.filter(b=>b.date===t).sort((a,b)=>tmin(a.timeFrom)-tmin(b.timeFrom));
+  const tmb = ALL.filter(b=>b.date===tm).sort((a,b)=>tmin(a.timeFrom)-tmin(b.timeFrom));
+  const ac = tb.filter(b=>b.status!=='Atcelta').length;
+  document.getElementById('TD_COUNT').textContent =
+    `${ac} aktīva rezervācija${ac===1?'':'s'}`;
+  document.getElementById('TD_LIST').innerHTML =
+    tb.length ? tb.map(renderCard).join('') : emptyEl('Šodien nav rezervāciju');
+  document.getElementById('TM_LIST').innerHTML =
+    tmb.length ? tmb.map(renderCard).join('') : emptyEl('Rīt nav rezervāciju');
+}
+
+// ================================================================
+// REZERVĀCIJAS KARTĪTE
+// Rāda TIKAI HH:MM — nekādas timezone/GMT/angļu datumu virknes
+// ================================================================
+function renderCard(b) {
+  const sc = b.status==='Notikusi'?'sdone':b.status==='Atcelta'?'scanc':b.status==='Ieradušies'?'sarrived':'';
+  const bdg = b.status==='Notikusi'
+    ?`<span class="badge bd">✓ Notikusi</span>`
+    :b.status==='Atcelta'
+    ?`<span class="badge bc">Atcelta</span>`
+    :b.status==='Ieradušies'
+    ?`<span class="badge bd">🟢 Ieradušies</span>`
+    :`<span class="badge ba">Aktīva</span>`;
+
+  // cleanT garantē tīru HH:MM bez timezone garbage
+  const tf = cleanT(b.timeFrom);
+  const tt = cleanT(b.timeTo);
+
+  const isArrived = b.status === 'Ieradušies';
+  const arrivedBanner = isArrived
+    ? `<div class="bnow"><span class="bnow-dot"></span>Ir ieradušies un viss notiek! 🙂<span class="bnow-dot"></span></div>`
+    : '';
+  const isClosed = b.closed === true;
+  const closedBanner = isClosed
+    ? `<div class="bclosed"><span class="bnow-dot" style="background:var(--accent)"></span>Slēgtais pasākums<span class="bnow-dot" style="background:var(--accent)"></span></div>`
+    : '';
+  const isOutside = b.outside === true;
+  const outsideBanner = isOutside
+    ? `<div class="boutside"><span class="bnow-dot" style="background:var(--accent)"></span>Ārpus darba laika<span class="bnow-dot" style="background:var(--accent)"></span></div>`
+    : '';
+
+  return `<div class="bcard ${sc}">
+    <div>
+      <div class="btime">${tf}</div>
+      <div class="bsep">↓</div>
+      <div class="btime2">${tt}</div>
+    </div>
+    <div>
+      <div class="bcc">${esc(b.client||'—')}</div>
+      <div class="bmeta">
+        <span>👥 <b>${b.people}</b> cilv.</span>
+        ${b.phone   ? '<span>📞 ' + esc(b.phone) + '</span>'   : ''}
+        ${b.invoice ? '<span>💳 ' + esc(b.invoice) + '</span>' : ''}
+        ${bdg}
+      </div>
+      ${b.comment  ? '<div class="bcmt">💬 ' + esc(b.comment) + '</div>'  : ''}
+      ${b.food     ? '<div class="bfood">🍕 ' + esc(b.food) + '</div>'    : ''}
+      ${b.admin    ? '<div class="badm">👩‍💼 ' + esc(b.admin) + ' · ' + esc(b.accepted) + '</div>' : ''}
+    </div>
+    <div class="bacts">
+      <button class="btn btn-g btn-sm" onclick="openEdit('${b.id}')">✏️ Labot</button>
+      <button class="btn btn-mv btn-sm" onclick="openMove('${b.id}')">📅 Pārcelt</button>
+      ${b.status==='Aktīva' ? '<button class="btn btn-arr btn-sm" onclick="markArrived(\'' + b.id + '\')">✅ Ieradušies</button>' : ''}
+      ${b.status!=='Notikusi' && b.status!=='Ieradušies' ? '<button class="btn btn-ok btn-sm" onclick="markDone(\'' + b.id + '\')">✓ Notikusi</button>' : b.status==='Ieradušies' ? '<button class="btn btn-ok btn-sm" onclick="markDone(\'' + b.id + '\')">✓ Pabeigt</button>' : ''}
+      <button class="btn-rek" onclick="openRek('${b.id}')">${b.rekviziti ? '📋 Labot rekvizītus' : '📋 Pievienot rekvizītus'}</button>
+      <button class="btn btn-d btn-sm" onclick="openDel('${b.id}','${esc(b.client||'')}')">🗑️ Dzēst</button>
+    </div>
+    ${arrivedBanner}
+    ${closedBanner}
+    ${outsideBanner}
+  </div>`;
+}
+
+// Ekstrahē tīru HH:MM — ignorē visu citu (GMT, timezone tekstu)
+function cleanT(val) {
+  if (!val) return '—';
+  const m = String(val).match(/(\d{1,2}):(\d{2})/);
+  return m ? p2(parseInt(m[1])) + ':' + m[2] : '—';
+}
+
+// ================================================================
+// STATUSA MAIŅA — NOTIKUSI
+// ================================================================
+function markDone(id) {
+  ovl('Saglabā...');
+  window.__gsr__
+    .withSuccessHandler(() => { hovl(); toast('✓ Atzīmēts kā notikusi', 'ok'); loadAll(true); })
+    .withFailureHandler(e  => { hovl(); toast('Kļūda: ' + e.message, 'err'); })
+    .sSetStatus(id, 'Notikusi');
+}
+
+function markArrived(id) {
+  ovl('Saglabā...');
+  window.__gsr__
+    .withSuccessHandler(() => { hovl(); toast('🟢 Ieradušies! Viss notiek!', 'ok'); loadAll(true); })
+    .withFailureHandler(e  => { hovl(); toast('Kļūda: ' + e.message, 'err'); })
+    .sSetStatus(id, 'Ieradušies');
+}
+
+// ================================================================
+// DZĒŠANA — fiziska izdzēšana no Sheets
+// ================================================================
+function openDel(id, name) {
+  _delId = id;
+  document.getElementById('DEL_NAME').textContent = name;
+  openM('M_DEL');
+}
+function confirmDel() {
+  closeM('M_DEL');
+  ovl('Dzēš...');
+  window.__gsr__
+    .withSuccessHandler(r => {
+      hovl();
+      const res = JSON.parse(r);
+      if (res.ok) { toast('Rezervācija dzēsta ✓', 'ok'); loadAll(true); }
+      else toast('Kļūda: ' + res.reason, 'err');
+    })
+    .withFailureHandler(e => { hovl(); toast('Kļūda: ' + e.message, 'err'); })
+    .sDelete(_delId);
+}
+
+// ================================================================
+// REDIĢĒŠANA
+// ================================================================
+function openEdit(id) {
+  const b = ALL.find(x => x.id===id);
+  if (!b) return;
+  document.getElementById('e_id').value     = b.id;
+  document.getElementById('e_date').value   = b.date;
+  document.getElementById('e_ppl').value    = b.people;
+  document.getElementById('e_client').value = b.client;
+  document.getElementById('e_phone').value  = b.phone;
+  document.getElementById('e_email').value  = b.email;
+  document.getElementById('e_inv').value    = b.invoice;
+  document.getElementById('e_inv_email').value = b.invEmail || '';
+  document.getElementById('e_rekviziti').value = b.rekviziti || '';
+  document.getElementById('e_cmt').value    = b.comment;
+  toggleInvFields('e');
+  document.getElementById('e_food').value   = b.food;
+  document.getElementById('e_admin').value  = b.admin;
+  document.getElementById('e_status').value = b.status;
+  // Dropdown laiki ar tīrām HH:MM vērtībām
+  buildTimeSel('e_from', cleanT(b.timeFrom));
+  buildTimeSel('e_to',   cleanT(b.timeTo));
+  document.getElementById('E_CAP_ERR').innerHTML = '';
+  openM('M_EDIT');
+}
+
+function saveEdit() {
+  const id = document.getElementById('e_id').value;
+  const data = {
+    date:     document.getElementById('e_date').value,
+    timeFrom: document.getElementById('e_from').value,
+    timeTo:   document.getElementById('e_to').value,
+    people:   document.getElementById('e_ppl').value,
+    client:   document.getElementById('e_client').value,
+    phone:    document.getElementById('e_phone').value,
+    email:    document.getElementById('e_email').value,
+    invoice:   document.getElementById('e_inv').value,
+    invEmail:  document.getElementById('e_inv_email').value,
+    rekviziti: document.getElementById('e_rekviziti').value,
+    comment:   document.getElementById('e_cmt').value,
+    food:     document.getElementById('e_food').value,
+    admin:    document.getElementById('e_admin').value,
+    status:   document.getElementById('e_status').value,
+  };
+  closeM('M_EDIT');
+  ovl('Saglabā...');
+  window.__gsr__
+    .withSuccessHandler(r => {
+      hovl();
+      const res = JSON.parse(r);
+      if (res.ok) {
+        toast('Saglabāts ✓', 'ok'); loadAll(true);
+      } else if (res.reason === 'capacity') {
+        toast(`Nav vietas! Aizņemti ${res.occupied}/${CAP}`, 'err');
+        // Atkārtoti atver edit logu ar alternatīviem laikiem
+        openEdit(id);
+        document.getElementById('E_CAP_ERR').innerHTML = buildAltHtml(res.alts, 'e_from', 'e_to');
+      } else {
+        toast('Kļūda: ' + res.reason, 'err');
+      }
+    })
+    .withFailureHandler(e => { hovl(); toast('Kļūda: ' + e.message, 'err'); })
+    .sUpdate(id, data);
+}
+
+// ================================================================
+// PĀRCELŠANA
+// ================================================================
+function openMove(id) {
+  const b = ALL.find(x => x.id===id);
+  if (!b) return;
+  _mvId = id; _mvPpl = b.people;
+  document.getElementById('mv_id').value = id;
+  document.getElementById('MV_INFO').textContent =
+    `${b.client} · ${b.people} cilvēki · pašreiz: ${cleanT(b.timeFrom)}–${cleanT(b.timeTo)} (${b.date})`;
+  document.getElementById('mv_date').value = b.date;
+  buildTimeSel('mv_from', cleanT(b.timeFrom));
+  buildTimeSel('mv_to',   cleanT(b.timeTo));
+  document.getElementById('MV_CAP').innerHTML = '';
+  document.getElementById('btn_mv').disabled = false;
+  openM('M_MOVE');
+}
+
+function chkMoveCap() {
+  const date = document.getElementById('mv_date').value;
+  const from = document.getElementById('mv_from').value;
+  const to   = document.getElementById('mv_to').value;
+  if (!date || !from || !to) return;
+  if (tmin(from) >= tmin(to)) {
+    document.getElementById('MV_CAP').innerHTML =
+      `<div class="ebox"><strong>⚠️ Kļūda</strong>Sākumam jābūt pirms beigām.</div>`;
+    document.getElementById('btn_mv').disabled = true; return;
+  }
+  document.getElementById('MV_CAP').innerHTML =
+    `<div class="cap-scanning" style="margin-top:8px"><div class="scan-title">▸ Skenē kapacitāti</div><div class="scan-bars"><div class="scan-row"><div class="scan-row-lbl">Kapacitāte</div><div class="scan-row-bar"><div class="scan-row-fill" style="width:100%"></div></div></div></div></div>`;
+
+  // Pārbauda kapacitāti, izņemot šo pašu rezervāciju
+  window.__gsr__
+    .withSuccessHandler(r => {
+      const occ = JSON.parse(r);
+      const tot = occ + _mvPpl;
+      if (tot > CAP) {
+        document.getElementById('btn_mv').disabled = true;
+        window.__gsr__
+          .withSuccessHandler(r2 => {
+            const alts = JSON.parse(r2);
+            document.getElementById('MV_CAP').innerHTML =
+              `<div class="ebox"><strong>🚫 Nav vietas!</strong>Aizņemti ${occ}/${CAP} · Kopā būtu ${tot}</div>
+               ${alts.length ? buildAltHtml(alts,'mv_from','mv_to') : '<p style="color:var(--text3);font-size:12px;margin-top:8px">Nav pieejamu alternatīvu šajā dienā.</p>'}`;
+          })
+          .sAltExclude(date, _mvPpl, _mvId, document.getElementById("mv_from").value);
+      } else {
+        document.getElementById('btn_mv').disabled = false;
+        const pct = Math.min(100, Math.round(tot/CAP*100));
+        const col = tot>=70?'var(--accent)':tot>=40?'var(--gold)':'var(--green)';
+        document.getElementById('MV_CAP').innerHTML =
+          `<div class="occbox">
+            <div class="ocrow"><span class="oclbl">Jau aizņemti</span><span class="ocval">${occ}/${CAP}</span></div>
+            <div class="ocrow"><span class="oclbl">Pēc pārcelšanas</span><span class="ocval cv-ok">${tot}/${CAP}</span></div>
+            <div class="cbtr"><div class="cbfil" style="width:${pct}%;background:${col}"></div></div>
+          </div>`;
+      }
+    })
+    .withFailureHandler(e => {
+      document.getElementById('MV_CAP').innerHTML = `<div class="ebox">Kļūda: ${e.message}</div>`;
+    })
+    .sOccExclude(date, from, to, _mvId);
+}
+
+function confirmMove() {
+  closeM('M_MOVE');
+  ovl('Pārceļ...');
+  window.__gsr__
+    .withSuccessHandler(r => {
+      hovl();
+      const res = JSON.parse(r);
+      if (res.ok) {
+        toast('Rezervācija pārcelta ✓', 'ok'); loadAll(true);
+      } else if (res.reason === 'capacity') {
+        toast(`Nav vietas! Aizņemti ${res.occupied}/${CAP}`, 'err');
+      } else {
+        toast('Kļūda: ' + res.reason, 'err');
+      }
+    })
+    .withFailureHandler(e => { hovl(); toast('Kļūda: ' + e.message, 'err'); })
+    .sUpdate(_mvId, {
+      date:     document.getElementById('mv_date').value,
+      timeFrom: document.getElementById('mv_from').value,
+      timeTo:   document.getElementById('mv_to').value,
+    });
+}
+
+// ================================================================
+// VEDNIS — JAUNA REZERVĀCIJA
+// ================================================================
+// ================================================================
+// CUSTOM DATE / TIME PICKERS
+// ================================================================
+let _dpYear, _dpMonth; // mini-kalendārs stāvoklis
+
+function togglePicker(id) {
+  const drop = document.getElementById(id + '_drop');
+  const btn  = document.getElementById(id + '_btn');
+  const isOpen = drop.classList.contains('open');
+  // Aizver visus
+  ['dp','fp','tp'].forEach(x => {
+    document.getElementById(x+'_drop').classList.remove('open');
+    document.getElementById(x+'_btn').classList.remove('open');
+  });
+  if (!isOpen) {
+    drop.classList.add('open');
+    btn.classList.add('open');
+    if (id === 'dp') renderDpCal();
+    if (id === 'fp') renderTimeList('fp', 'w_from');
+    if (id === 'tp') renderTimeList('tp', 'w_to');
+  }
+}
+
+// Aizver picker ja klikšķina ārpus
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.picker-wrap')) {
+    ['dp','fp','tp'].forEach(x => {
+      const d = document.getElementById(x+'_drop');
+      const b = document.getElementById(x+'_btn');
+      if (d) d.classList.remove('open');
+      if (b) b.classList.remove('open');
+    });
+  }
+});
+
+// ── Mini-kalendārs datuma pickerim ──
+function renderDpCal() {
+  const now = new Date();
+  if (!_dpYear)  _dpYear  = now.getFullYear();
+  if (!_dpMonth) _dpMonth = now.getMonth();
+  const selVal = document.getElementById('w_date').value;
+
+  const fd  = new Date(_dpYear, _dpMonth, 1);
+  let off   = fd.getDay() - 1; if (off < 0) off = 6;
+  const dim = new Date(_dpYear, _dpMonth + 1, 0).getDate();
+  const today = isoToday();
+
+  const DNs = ['Pr','Ot','Tr','Ce','Pk','Se','Sv'];
+  let html = `<div class="pdcal-hdr">
+    <button class="pdcal-nav" onclick="dpNav(-1);event.stopPropagation()">‹</button>
+    <span class="pdcal-month">${MLV[_dpMonth]} ${_dpYear}</span>
+    <button class="pdcal-nav" onclick="dpNav(1);event.stopPropagation()">›</button>
+  </div>
+  <div class="pdcal-grid">`;
+  DNs.forEach(d => html += `<div class="pdcal-dh">${d}</div>`);
+  for (let i = 0; i < off; i++) html += `<div class="pdcal-day empty"></div>`;
+  for (let d = 1; d <= dim; d++) {
+    const ds  = `${_dpYear}-${p2(_dpMonth+1)}-${p2(d)}`;
+    const isPast = ds < today;
+    const isTdy  = ds === today;
+    const isSel  = ds === selVal;
+    let cls = 'pdcal-day';
+    if (isPast) cls += ' past';
+    if (isTdy)  cls += ' today';
+    if (isSel)  cls += ' selected';
+    const click = isPast ? '' : `onclick="selectDate('${ds}');event.stopPropagation()"`;
+    html += `<div class="${cls}" ${click}>${d}</div>`;
+  }
+  html += '</div>';
+  document.getElementById('dp_cal').innerHTML = html;
+}
+
+function dpNav(dir) {
+  _dpMonth += dir;
+  if (_dpMonth < 0)  { _dpMonth = 11; _dpYear--; }
+  if (_dpMonth > 11) { _dpMonth = 0;  _dpYear++; }
+  renderDpCal();
+}
+
+function selectDate(ds) {
+  document.getElementById('w_date').value = ds;
+  const [y,m,d] = ds.split('-');
+  document.getElementById('dp_label').textContent =
+    `${parseInt(d)}. ${MLV[parseInt(m)-1]} ${y}`;
+  const btn = document.getElementById('dp_btn');
+  btn.classList.remove('empty-val');
+  // Aizver kalendāru
+  document.getElementById('dp_drop').classList.remove('open');
+  btn.classList.remove('open');
+  // Atjauno darba laiku un laiku pickeru opcijas
+  onDateChange();
+}
+
+// ── Laika saraksts ──
+function renderTimeList(pickerId, selId) {
+  const list  = document.getElementById(pickerId + '_list');
+  const selEl = document.getElementById(selId);
+  const curVal = selEl.value;
+  let html = '';
+  // Iegūst opcijas no slēptā select
+  Array.from(selEl.options).forEach(opt => {
+    const isSel = opt.value === curVal;
+    html += `<div class="pt-item${isSel ? ' selected' : ''}"
+      onclick="selectTime('${pickerId}','${selId}','${opt.value}');event.stopPropagation()">
+      ${opt.value}
+    </div>`;
+  });
+  list.innerHTML = html;
+  // Skrolla pie izvēlētā
+  setTimeout(() => {
+    const sel = list.querySelector('.selected');
+    if (sel) sel.scrollIntoView({ block: 'center' });
+  }, 30);
+}
+
+function selectTime(pickerId, selId, val) {
+  // Ieraksta vērtību slēptajā select
+  const selEl = document.getElementById(selId);
+  selEl.value = val;
+  // Atjaunina pogas tekstu
+  const lbl = document.getElementById(pickerId + '_label');
+  lbl.textContent = val;
+  const btn = document.getElementById(pickerId + '_btn');
+  btn.classList.remove('empty-val');
+  // Aizver
+  document.getElementById(pickerId + '_drop').classList.remove('open');
+  btn.classList.remove('open');
+  // Triggerē kapacitātes pārbaudi
+  checkCap();
+}
+
+// Atjauno laiku picker pogu tekstu pēc applyWorkHours
+function refreshTimeBtns() {
+  const fromVal = document.getElementById('w_from').value;
+  const toVal   = document.getElementById('w_to').value;
+  if (fromVal) {
+    document.getElementById('fp_label').textContent = fromVal;
+    document.getElementById('fp_btn').classList.remove('empty-val');
+  } else {
+    document.getElementById('fp_label').textContent = 'Izvēlies sākuma laiku';
+    document.getElementById('fp_btn').classList.add('empty-val');
+  }
+  if (toVal) {
+    document.getElementById('tp_label').textContent = toVal;
+    document.getElementById('tp_btn').classList.remove('empty-val');
+  } else {
+    document.getElementById('tp_label').textContent = 'Izvēlies beigu laiku';
+    document.getElementById('tp_btn').classList.add('empty-val');
+  }
+}
+
+function goNavOutside() {
+  // Aktivizē nb-new vizuāli
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
+  document.getElementById('nb-new').classList.add('active');
+  goNav('new', document.getElementById('nb-new'));
+  // Iestata _outsideHours režīmu — checkCap ignorēs darba laika pārbaudi
+  _outsideHours = true;
+  document.getElementById('OUTSIDE_WARN').classList.add('show');
+  // Vizuāls indikators HOURS_INFO
+  setTimeout(() => {
+    const hi = document.getElementById('HOURS_INFO');
+    if (hi) hi.innerHTML =
+      `⚠️ <span style="color:var(--yellow);font-weight:900">Ārpus darba laika režīms</span> — darba laika ierobežojumi neattiecas`;
+  }, 50);
+}
+
+function resetWiz() {
+  _capOk = false;
+  showStep(1);
+  // Notīra vērtības — NAV default datuma
+  document.getElementById('w_date').value = '';
+  document.getElementById('CAP_RES').innerHTML = '';
+  document.getElementById('HOURS_INFO').innerHTML = '';
+  document.getElementById('btn_s2').disabled = true;
+  document.getElementById('btn_s1').disabled = true;
+  ['w_ppl','w_client','w_phone','w_email','w_cmt','w_food','w_admin','w_inv_email','w_rekviziti']
+    .forEach(id => document.getElementById(id).value = '');
+  toggleInvFields('w');
+  // Notīra picker pogas
+  document.getElementById('dp_label').textContent = 'Izvēlies datumu';
+  document.getElementById('dp_btn').classList.add('empty-val');
+  document.getElementById('fp_label').textContent = 'Izvēlies sākuma laiku';
+  document.getElementById('fp_btn').classList.add('empty-val');
+  document.getElementById('tp_label').textContent = 'Izvēlies beigu laiku';
+  document.getElementById('tp_btn').classList.add('empty-val');
+  // Notīra w_from/w_to select vērtības
+  document.getElementById('w_from').value = '';
+  document.getElementById('w_to').value   = '';
+  document.getElementById('w_closed').checked = false;
+  document.getElementById('closed_toggle').classList.remove('active');
+  _dpYear = null; _dpMonth = null;
+  _outsideHours = false;
+  const ow = document.getElementById('OUTSIDE_WARN');
+  if (ow) ow.classList.remove('show');
+}
+
+function updateHoursInfo(dateStr) {
+  const wh = getWorkHoursClient(dateStr);
+  const el = document.getElementById('HOURS_INFO');
+  if (el) el.innerHTML = `⏰ Darba laiks šajā dienā: <b style="color:var(--text)">${wh.open} – ${wh.close}</b>`;
+}
+
+function toggleClosed() {
+  const cb = document.getElementById('w_closed');
+  const tg = document.getElementById('closed_toggle');
+  // Nākamā tika notiks pēc noklusētā checkbox toggle, tāpēc lasām pēc notikuma
+  setTimeout(() => {
+    tg.classList.toggle('active', cb.checked);
+  }, 0);
+}
+
+function showStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById(`sp${i}`).classList.toggle('active', i===n);
+    const si = document.getElementById(`si${i}`);
+    si.classList.remove('active','done');
+    if (i < n) si.classList.add('done');
+    if (i === n) si.classList.add('active');
+  }
+  if (n===3) buildS3();
+}
+
+function s1val() {
+  const v = parseInt(document.getElementById('w_ppl').value);
+  document.getElementById('btn_s1').disabled = !(v > 0 && v <= 90);
+}
+
+function gotoStep(n) {
+  if (n===3 && !_capOk) { toast('Vispirms pārbaudi kapacitāti!', 'warn'); return; }
+  showStep(n);
+}
+
+function onDateChange() {
+  const date = document.getElementById('w_date').value;
+  if (!date) return;
+  // Atjauno darba laiku dropdownus — resetē laiku uz tukšu
+  document.getElementById('w_from').value = '';
+  document.getElementById('w_to').value   = '';
+  document.getElementById('fp_label').textContent = 'Izvēlies sākuma laiku';
+  document.getElementById('fp_btn').classList.add('empty-val');
+  document.getElementById('tp_label').textContent = 'Izvēlies beigu laiku';
+  document.getElementById('tp_btn').classList.add('empty-val');
+  applyWorkHours(date, 'w_from', 'w_to', null, null);
+  updateHoursInfo(date);
+  document.getElementById('CAP_RES').innerHTML = '';
+  document.getElementById('btn_s2').disabled = true;
+  _capOk = false;
+  renderDLP(date);
+}
+
+// ── Dienas noslodzes tabula ──────────────────────────────────────
+function renderDLP(dateStr) {
+  const [y,m,d] = dateStr.split('-');
+  document.getElementById('DLP_DATE').textContent =
+    `${parseInt(d)}. ${MLV[parseInt(m)-1]} ${y}`;
+
+  const wh = getWorkHoursClient(dateStr);
+  const openH  = Math.floor(tmin(wh.open)  / 60);
+  const closeH = Math.ceil (tmin(wh.close) / 60);
+
+  // Filtrē šīs dienas rezervācijas (bez atceltajām)
+  const dayB = ALL.filter(b => b.date === dateStr && b.status !== 'Atcelta');
+
+  // Aprēķina cilvēku skaitu katrā stundā (sweep per hour)
+  const hours = [];
+  for (let h = openH; h < closeH; h++) {
+    const midMin = h * 60 + 30;
+    const cnt = dayB
+      .filter(b => tmin(b.timeFrom) <= midMin && tmin(b.timeTo) > midMin)
+      .reduce((s, b) => s + (parseInt(b.people)||0), 0);
+    hours.push({ h, cnt });
+  }
+
+  // Atlasa laika posmu no forma
+  const selFrom = document.getElementById('w_from').value;
+  const selTo   = document.getElementById('w_to').value;
+  const sfMin   = selFrom ? tmin(selFrom) : -1;
+  const stMin   = selTo   ? tmin(selTo)   : -1;
+
+  let html = '<div class="dlp-table">';
+  hours.forEach(({ h, cnt }) => {
+    const pct  = Math.min(100, Math.round(cnt / CAP * 100));
+    const col  = cnt === 0 ? 'var(--border)' :
+                 pct >= 85 ? 'var(--red)'    :
+                 pct >= 60 ? 'var(--green)'  :
+                 pct >= 25 ? 'var(--yellow)' : 'var(--accent)';
+    const lbl  = p2(h) + ':00';
+    const midM = h * 60 + 30;
+    const inSel = sfMin > 0 && stMin > 0 && midM >= sfMin && midM < stMin;
+    const busy  = cnt > 0;
+    let cls = 'dlp-row';
+    if (inSel) cls += ' dlp-sel';
+    else if (busy) cls += ' dlp-busy';
+    html += `<div class="${cls}">
+      <div class="dlp-hour">${lbl}</div>
+      <div class="dlp-bar-wrap"><div class="dlp-bar" style="width:${pct}%;background:${col}"></div></div>
+      <div class="dlp-cnt" style="color:${cnt>0?col:'var(--text3)'}">${cnt||''}</div>
+    </div>`;
+  });
+  html += '</div>';
+
+  document.getElementById('DLP_BODY').innerHTML = html;
+  document.getElementById('DLP_LEG').style.display = 'flex';
+}
+
+function checkCap() {
+  const date = document.getElementById('w_date').value;
+  const from = document.getElementById('w_from').value;
+  const to   = document.getElementById('w_to').value;
+  // Rāda hint kamēr nav abi laiki
+  if (!date || !from || !to) {
+    const missing = !date ? 'datumu' : !from ? 'sākuma laiku' : 'beigu laiku';
+    document.getElementById('CAP_RES').innerHTML =
+      `<div style="color:var(--text3);font-family:var(--font-head);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 0">◌ Izvēlies ${missing}, lai pārbaudītu kapacitāti</div>`;
+    _capOk = false;
+    document.getElementById('btn_s2').disabled = true;
+    return;
+  }
+
+  if (tmin(from) >= tmin(to)) {
+    document.getElementById('CAP_RES').innerHTML =
+      `<div class="ebox"><strong>⚠️ Kļūda</strong>Sākuma laikam jābūt pirms beigu laika.</div>`;
+    _capOk = false;
+    document.getElementById('btn_s2').disabled = true;
+    return;
+  }
+  // Darba laika pārbaude klienta pusē (izlaižam ja ārpus darba laika režīms)
+  const wh = getWorkHoursClient(date);
+  if (!_outsideHours && (tmin(from) < tmin(wh.open) || tmin(to) > tmin(wh.close))) {
+    document.getElementById('CAP_RES').innerHTML =
+      `<div class="ebox"><strong>⏰ Ārpus darba laika</strong>Šajā dienā strādājam <b>${wh.open} – ${wh.close}</b>. Lūdzu izvēlies laiku šajā diapazonā.</div>`;
+    _capOk = false;
+    document.getElementById('btn_s2').disabled = true;
+    return;
+  }
+
+  document.getElementById('CAP_RES').innerHTML =
+    `<div class="cap-scanning">
+      <div class="scan-title">▸ Skenē kapacitāti</div>
+      <div class="scan-bars">
+        <div class="scan-row"><div class="scan-row-lbl">Kapacitāte</div><div class="scan-row-bar"><div class="scan-row-fill" style="width:100%"></div></div></div>
+        <div class="scan-row"><div class="scan-row-lbl">Datums</div><div class="scan-row-bar"><div class="scan-row-fill" style="width:70%;animation-delay:.1s"></div></div></div>
+        <div class="scan-row"><div class="scan-row-lbl">Laika posms</div><div class="scan-row-bar"><div class="scan-row-fill" style="width:55%;animation-delay:.2s"></div></div></div>
+      </div>
+    </div>`;
+
+  window.__gsr__
+    .withSuccessHandler(r => {
+      const occ  = JSON.parse(r);
+      const need = parseInt(document.getElementById('w_ppl').value) || 0;
+      const tot  = occ + need;
+      const free = CAP - occ;
+      const pct  = Math.min(100, Math.round(tot/CAP*100));
+      const col  = tot >= CAP ? 'var(--accent)' : tot >= 60 ? 'var(--gold)' : 'var(--green)';
+
+      if (tot > CAP) {
+        _capOk = false;
+        document.getElementById('btn_s2').disabled = true;
+
+        window.__gsr__
+          .withSuccessHandler(r2 => {
+            const alts = JSON.parse(r2);
+            document.getElementById('CAP_RES').innerHTML =
+              `<div class="ebox">
+                <strong>🚫 Nav vietas šajā laikā!</strong>
+                Jau aizņemti: ${occ}/${CAP} · Vajadzīgi: ${need} · Trūkst: ${tot-CAP}
+                <div style="margin-top:10px;font-size:12px;color:rgba(255,255,255,.7)">
+                  Izlasi alternatīvos laikus zemāk un piedāvā klientam:
+                </div>
+              </div>
+              ${alts.length
+                ? buildAltHtml(alts, 'w_from', 'w_to')
+                : '<p style="color:var(--text3);font-size:12px;margin-top:8px">Nav brīvu laiku šajā dienā šim cilvēku skaitam.</p>'
+              }`;
+          })
+          .sAlternatives(date, need, from);
+      } else {
+        _capOk = true;
+        document.getElementById('btn_s2').disabled = false;
+        // Atjauno DLP laika posma highlight
+        const dlpDate = document.getElementById('w_date').value;
+        if (dlpDate) renderDLP(dlpDate);
+        document.getElementById('CAP_RES').innerHTML =
+          `<div class="cap-ok-banner"><span class="cap-ok-dot"></span>✓ Šajā laikā var veikt rezervāciju</div>
+          <div class="occbox">
+            <div class="occbox-hdr">▸ KAPACITĀTES ANALĪZE <span>LAIKS: ${from}–${to}</span></div>
+            <div class="ocrow">
+              <span class="oclbl">Jau aizņemti</span>
+              <span class="ocval ${occ>=70?'cv-full':occ>=40?'cv-warn':'cv-ok'}">${occ}<small style="font-size:11px;color:var(--text3)">/${CAP}</small></span>
+            </div>
+            <div class="ocrow">
+              <span class="oclbl">Jaunā rezervācija</span>
+              <span class="ocval" style="color:var(--text)">+${need}</span>
+            </div>
+            <div class="ocrow">
+              <span class="oclbl">Kopā</span>
+              <span class="ocval ${tot>=70?'cv-full':tot>=40?'cv-warn':'cv-ok'}">${tot}<small style="font-size:11px;color:var(--text3)">/${CAP}</small></span>
+            </div>
+            <div class="ocrow">
+              <span class="oclbl">Brīvi paliks</span>
+              <span class="ocval cv-ok">${CAP-tot}</span>
+            </div>
+            <div class="cbtr-wrap">
+              <div class="cbtr-labels"><span>0%</span><span>NOSLODZE</span><span>100%</span></div>
+              <div class="cbtr"><div class="cbfil" style="width:${pct}%;background:${col}"></div></div>
+              <div class="cbtr-pct" style="color:${col}">${pct}%</div>
+            </div>
+          </div>`;
+      }
+    })
+    .withFailureHandler(e => {
+      document.getElementById('CAP_RES').innerHTML =
+        `<div class="ebox">Kļūda pārbaudot kapacitāti: ${e.message}</div>`;
+    })
+    .sOccupancy(date, from, to);
+}
+
+function buildS3() {
+  const date = document.getElementById('w_date').value;
+  const from = document.getElementById('w_from').value;
+  const to   = document.getElementById('w_to').value;
+  const ppl  = document.getElementById('w_ppl').value;
+  const [y,m,d] = (date||'--').split('-');
+  document.getElementById('S3SUM').innerHTML =
+    `<span>📅 ${date ? parseInt(d)+'. '+MLV[parseInt(m)-1]+' '+y : '–'}</span>
+     <span>🕐 ${from} – ${to}</span>
+     <span>👥 ${ppl} cilvēki</span>`;
+}
+
+function submitNew() {
+  const client = document.getElementById('w_client').value.trim();
+  const phone  = document.getElementById('w_phone').value.trim();
+  const admin  = document.getElementById('w_admin').value.trim();
+
+  if (!client || !phone) { toast('Ievadi vārdu un telefonu!', 'warn'); return; }
+  if (!admin)            { toast('Ievadi administratora vārdu!', 'warn'); return; }
+  const wInv = document.getElementById('w_inv').value;
+  if (wInv.includes('rēķin')) {
+    const wIE = document.getElementById('w_inv_email').value.trim();
+    const wRk = document.getElementById('w_rekviziti').value.trim();
+    if (!wIE) { toast('🧾 Ievadi e-pastu rēķinam!', 'warn'); return; }
+    if (!wRk) { toast('🧾 Ievadi rekvizītus!', 'warn'); return; }
+  }
+
+  const btn = document.getElementById('btn_save');
+  btn.disabled = true; btn.textContent = '⏳ Saglabā...';
+
+  const data = {
+    date:     document.getElementById('w_date').value,
+    timeFrom: document.getElementById('w_from').value,
+    timeTo:   document.getElementById('w_to').value,
+    people:   document.getElementById('w_ppl').value,
+    client, phone,
+    email:    document.getElementById('w_email').value,
+    invoice:  document.getElementById('w_inv').value,
+    comment:  document.getElementById('w_cmt').value,
+    food:     document.getElementById('w_food').value,
+    admin,
+    closed:    document.getElementById('w_closed').checked,
+    outside:   _outsideHours,
+    invEmail:  document.getElementById('w_inv_email').value,
+    rekviziti: document.getElementById('w_rekviziti').value,
+    status:    'Aktīva',
+  };
+
+  window.__gsr__
+    .withSuccessHandler(r => {
+      btn.disabled = false; btn.textContent = '💾 Saglabāt rezervāciju';
+      const res = JSON.parse(r);
+      if (res.ok) {
+        toast(`✅ Rezervācija saglabāta! ID: ${res.id}`, 'ok');
+        resetWiz(); loadAll(true);
+        goNav('today', document.getElementById('nb-today'));
+      } else if (res.reason === 'capacity') {
+        toast(`🚫 Nav vietas! Aizņemti ${res.occupied}/${CAP}`, 'err');
+        showStep(2);
+      } else if (res.reason === 'hours') {
+        toast(`⏰ Ārpus darba laika! Strādājam ${res.open} – ${res.close}`, 'err');
+        showStep(2);
+      } else if (res.reason === 'closed_event') {
+        toast('🔒 Šajā laikā ir slēgtais pasākums — rezervācija nav iespējama', 'err');
+        showStep(2);
+      } else {
+        toast('Kļūda: ' + JSON.stringify(res), 'err');
+      }
+    })
+    .withFailureHandler(e => {
+      btn.disabled = false; btn.textContent = '💾 Saglabāt rezervāciju';
+      toast('Kļūda: ' + e.message, 'err');
+    })
+    .sSave(data);
+}
+
+// ================================================================
+// ALTERNATĪVO LAIKU BLOKS — universāls helpers
+// selFrom/selTo: dropdown ID kuriem pielietot izvēlēto laiku
+// ================================================================
+function buildAltHtml(alts, selFrom, selTo) {
+  if (!alts || !alts.length) return '';
+  const items = alts.map((a, i) => {
+    const isNearest = i === 0;
+    return `<button class="altbtn${isNearest ? ' altbtn-nearest' : ''}"
+       onclick="buildTimeSel('${selFrom}','${a.from}');buildTimeSel('${selTo}','${a.to}');checkCap();">
+      ${isNearest ? '<div class="altnearest">✅ Vistuvākais laiks</div>' : ''}
+      <div class="alttime">${a.from} – ${a.to}</div>
+      <div class="altfree">Brīvi: ${a.free} cilvēki</div>
+    </button>`;
+  }).join('');
+  return `<div>
+    <p style="font-size:12px;color:var(--text2);margin:10px 0 6px">
+      Pieejamie alternatīvie laiki tajā pašā dienā:
+    </p>
+    <div class="altgrid">${items}</div>
+  </div>`;
+}
+
+// ================================================================
+// RĒĶINU SADAĻA
+// ================================================================
+let _invFilter = 'all';
+
+function setInvFilter(f, btn) {
+  _invFilter = f;
+  document.querySelectorAll('.inv-filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderInvoiceTable();
+}
+
+function renderInvoices() {
+  renderInvoiceAlerts();
+  renderInvoiceTable();
+}
+
+function renderInvoiceAlerts() {
+  const inv = ALL.filter(b => b.status !== 'Atcelta' && isInvoice(b));
+
+  // Nenosūtītie
+  const unsent = inv.filter(b => !b.invSent);
+  document.getElementById('INV_UNSENT_CNT').textContent = unsent.length;
+  document.getElementById('INV_UNSENT_LIST').innerHTML = unsent.length
+    ? unsent.map(b => `
+      <div class="inv-alert-row">
+        <div class="inv-ar-time">${fmtDate(b.date)}<br>${cleanT(b.timeFrom)}–${cleanT(b.timeTo)}</div>
+        <div>
+          <div class="inv-ar-name">${esc(b.client)}</div>
+          <div class="inv-ar-email">${esc(b.invEmail||b.email||'—')}</div>
+          <div class="inv-ar-phone">${esc(b.phone)}</div>
+        </div>
+        <button class="btn btn-ok btn-sm" style="font-size:10px;white-space:nowrap" onclick="quickInvSent('${b.id}')">✓ Nosūtīts</button>
+      </div>`).join('')
+    : '<div class="inv-ar-empty">✅ Nav nenosūtītu rēķinu</div>';
+
+  // Nosūtīti bet neapmaksāti
+  const unpaid = inv.filter(b => b.invSent && !b.invPaid);
+  document.getElementById('INV_UNPAID_CNT').textContent = unpaid.length;
+  document.getElementById('INV_UNPAID_LIST').innerHTML = unpaid.length
+    ? unpaid.map(b => `
+      <div class="inv-alert-row">
+        <div class="inv-ar-time">${fmtDate(b.date)}<br>${cleanT(b.timeFrom)}–${cleanT(b.timeTo)}</div>
+        <div>
+          <div class="inv-ar-name">${esc(b.client)}</div>
+          <div class="inv-ar-email">${esc(b.invEmail||b.email||'—')}</div>
+          <div class="inv-ar-phone">${esc(b.phone)}</div>
+        </div>
+        <button class="btn btn-ok btn-sm" style="font-size:10px;white-space:nowrap" onclick="quickInvPaid('${b.id}')">✓ Apmaksāts</button>
+      </div>`).join('')
+    : '<div class="inv-ar-empty">✅ Visi nosūtītie rēķini ir apmaksāti</div>';
+}
+
+function renderInvoiceTable() {
+  const q = (document.getElementById('INV_SEARCH')?.value || '').toLowerCase();
+  let rows = ALL.filter(b => b.status !== 'Atcelta');
+
+  // Filtrs
+  if (_invFilter === 'invoice') rows = rows.filter(b => isInvoice(b));
+  else if (_invFilter === 'unsent')  rows = rows.filter(b => isInvoice(b) && !b.invSent);
+  else if (_invFilter === 'unpaid')  rows = rows.filter(b => isInvoice(b) && b.invSent && !b.invPaid);
+  else if (_invFilter === 'paid')    rows = rows.filter(b => isInvoice(b) && b.invPaid);
+
+  // Meklēšana
+  if (q) rows = rows.filter(b =>
+    b.client.toLowerCase().includes(q) ||
+    (b.invEmail||'').toLowerCase().includes(q) ||
+    (b.email||'').toLowerCase().includes(q) ||
+    b.date.includes(q)
+  );
+
+  // Kārtot pēc datuma desc
+  rows.sort((a,b) => b.date.localeCompare(a.date));
+
+  const tbody = document.getElementById('INV_TBODY');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:24px;font-family:var(--font-head);font-size:11px;letter-spacing:2px;text-transform:uppercase">Nav ierakstu</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(b => {
+    const isInv = isInvoice(b);
+    const rekShort = b.rekviziti ? (b.rekviziti.length > 40 ? b.rekviziti.slice(0,40)+'…' : b.rekviziti) : '—';
+    const sentCb = `<input type="checkbox" class="inv-cb inv-cb-sent" ${b.invSent?'checked':''} onchange="setInvSent('${b.id}',this.checked)" title="Rēķins nosūtīts">`;
+    const paidCb = `<input type="checkbox" class="inv-cb inv-cb-paid" ${b.invPaid?'checked':''} onchange="setInvPaid('${b.id}',this.checked)" title="Rēķins apmaksāts">`;
+    return `<tr class="${isInv?'inv-r-invoice':''}">
+      <td style="white-space:nowrap;font-family:var(--font-head);font-weight:700">${fmtDate(b.date)}<br><span style="color:var(--text2);font-size:11px">${cleanT(b.timeFrom)}–${cleanT(b.timeTo)}</span></td>
+      <td><b>${esc(b.client)}</b><br><span style="color:var(--text2);font-size:11px">💳 ${esc(b.invoice)}</span></td>
+      <td><div class="inv-rekviziti-short" title="${esc(b.rekviziti)}">${esc(rekShort)}</div></td>
+      <td>${esc(b.phone)}</td>
+      <td style="font-size:11px">${esc(b.invEmail||b.email||'—')}</td>
+      <td style="text-align:center;font-family:var(--font-head);font-weight:900">${b.people}</td>
+      <td style="font-size:11px;color:var(--yellow)">${esc(b.food||'—')}</td>
+      <td style="font-size:11px;color:var(--text2)">${esc(b.comment||'—')}</td>
+      <td style="text-align:center">${sentCb}</td>
+      <td style="text-align:center">${paidCb}</td>
+    </tr>`;
+  }).join('');
+}
+
+function isInvoice(b) {
+  return b.invoice && b.invoice.toLowerCase().includes('rēķin');
+}
+
+function fmtDate(ds) {
+  if (!ds) return '—';
+  const [y,m,d] = ds.split('-');
+  return `${parseInt(d)}. ${MLV[parseInt(m)-1]}`;
+}
+
+function setInvSent(id, val) {
+  window.__gsr__
+    .withSuccessHandler(r => { loadAll(true); })
+    .withFailureHandler(e => toast('Kļūda: ' + e.message, 'err'))
+    .sSetInvSent(id, val);
+}
+
+function setInvPaid(id, val) {
+  window.__gsr__
+    .withSuccessHandler(r => { loadAll(true); })
+    .withFailureHandler(e => toast('Kļūda: ' + e.message, 'err'))
+    .sSetInvPaid(id, val);
+}
+
+function quickInvSent(id) {
+  window.__gsr__
+    .withSuccessHandler(r => { loadAll(true); })
+    .sSetInvSent(id, true);
+}
+
+function quickInvPaid(id) {
+  window.__gsr__
+    .withSuccessHandler(r => { loadAll(true); })
+    .sSetInvPaid(id, true);
+}
+
+// Rekvizītu mini-modal (vienkāršs prompt → alert aizstāts ar modal)
+function openRek(id) {
+  const b = ALL.find(x => x.id === id);
+  if (!b) return;
+  document.getElementById('rek_id').value = id;
+  document.getElementById('rek_val').value = b.rekviziti || '';
+  document.getElementById('rek_email').value = b.invEmail || b.email || '';
+  openM('M_REK');
+}
+
+// ── Uzņēmumu reģistra meklēšana ─────────────────────────────────
+async function urSearch() {
+  const q = document.getElementById('ur_query').value.trim();
+  if (!q) return;
+  const btn = document.getElementById('ur_btn');
+  const res = document.getElementById('ur_results');
+  btn.disabled = true;
+  btn.textContent = '⏳';
+  res.innerHTML = '<div class="ur-status">Meklē...</div>';
+  res.classList.add('open');
+
+  try {
+    // Nosaka vai meklēšana pēc reģ. nr. vai nosaukuma
+    const isRegNr = /^\d{10,11}$/.test(q.replace(/\s/g,''));
+    const field   = isRegNr ? 'regcode' : 'name';
+    const apiQ    = isRegNr ? q.replace(/\s/g,'') : q;
+
+    const url = `https://data.gov.lv/dati/api/3/action/datastore_search?resource_id=25e80bf3-f107-4ab4-89ef-251b5b9374e9&q=${encodeURIComponent(apiQ)}&limit=8`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const json = await resp.json();
+    const records = json?.result?.records || [];
+
+    if (!records.length) {
+      res.innerHTML = '<div class="ur-status">Nav atrasts. Pārbaudi nosaukumu vai reģ. nr.</div>';
+      return;
+    }
+
+    res.innerHTML = records.map(r => {
+      const name = r.name || r['Nosaukums'] || r['nosaukums'] || '—';
+      const reg  = r.regcode || r['Reģistrācijas numurs'] || r['regNr'] || '—';
+      const adr  = r.address || r['Juridiskā adrese'] || r['adrese'] || '';
+      return '<div class="ur-result-item" onclick="urFill(' + JSON.stringify(name) + ',' + JSON.stringify(reg) + ',' + JSON.stringify(adr) + ')">' +
+        '<div class="ur-result-name">' + esc(name) + '</div>' +
+        '<div class="ur-result-reg">Reģ. nr.: ' + esc(reg) + '</div>' +
+        (adr ? '<div class="ur-result-adr">📍 ' + esc(adr) + '</div>' : '') +
+        '</div>';
+    }).join('');
+
+  } catch(e) {
+    res.innerHTML = `<div class="ur-status">⚠️ Kļūda: ${e.message}. Pārbaudi interneta savienojumu.</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔍 Meklēt';
+  }
+}
+
+function urFill(name, reg, adr) {
+  // Aizpilda rekvizītu lauku ar UR datiem
+  const lines = [name];
+  if (reg && reg !== '—') lines.push(`Reģ. nr.: ${reg}`);
+  lines.push('PVN nr.: (ja ir)');
+  if (adr) lines.push(`Jur. adrese: ${adr}`);
+  document.getElementById('rek_val').value = lines.join('\n');
+  // Aizver rezultātu sarakstu
+  document.getElementById('ur_results').classList.remove('open');
+  document.getElementById('ur_query').value = name;
+  toast('✓ Rekvizīti ielādēti no UR', 'ok');
+}
+
+// Aizver UR rezultātus klikšķinot ārpus
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.ur-search-wrap')) {
+    const r = document.getElementById('ur_results');
+    if (r) r.classList.remove('open');
+  }
+});
+
+function saveRek() {
+  const id  = document.getElementById('rek_id').value;
+  const val = document.getElementById('rek_val').value.trim();
+  const em  = document.getElementById('rek_email').value.trim();
+  closeM('M_REK');
+  ovl('Saglabā...');
+  window.__gsr__
+    .withSuccessHandler(r => { hovl(); const res=JSON.parse(r); if(res.ok){toast('Rekvizīti saglabāti ✓','ok');loadAll(true);}else{toast('Kļūda','err');} })
+    .withFailureHandler(e => { hovl(); toast('Kļūda: '+e.message,'err'); })
+    .sSetRekviziti(id, val, em);
+}
+
+// Rāda/slēpj rēķina laukus atkarībā no maksāšanas veida
+function toggleInvFields(prefix) {
+  const sel = document.getElementById(prefix + '_inv');
+  if (!sel) return;
+  const isInv = sel.value.includes('rēķin');
+  const eWrap = document.getElementById(prefix + '_inv_email_wrap');
+  const rWrap = document.getElementById(prefix === 'w' ? 'w_rekviziti_wrap' : 'e_rekviziti_wrap');
+  if (eWrap) eWrap.classList.toggle('show', isInv);
+  if (rWrap) rWrap.classList.toggle('show', isInv);
+}
+
+// ================================================================
+// UTILĪTES
+// ================================================================
+function isoToday() {
+  const n = new Date();
+  return `${n.getFullYear()}-${p2(n.getMonth()+1)}-${p2(n.getDate())}`;
+}
+function isoOffset(d) {
+  const n = new Date(); n.setDate(n.getDate()+d);
+  return `${n.getFullYear()}-${p2(n.getMonth()+1)}-${p2(n.getDate())}`;
+}
+// "HH:MM" → minūtes; ignorē visu citu
+function tmin(t) {
+  const m = String(t||'').match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1])*60 + parseInt(m[2]) : 0;
+}
+function p2(n) { return String(n).padStart(2,'0'); }
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function emptyEl(msg) {
+  return `<div class="empty"><div class="eico">📭</div><p>${msg}</p></div>`;
+}
+function openM(id)  { document.getElementById(id).classList.add('on'); }
+function closeM(id) { document.getElementById(id).classList.remove('on'); }
+function ovl(msg) {
+  document.getElementById('OVLMSG').textContent = msg || 'Lūdzu uzgaidi...';
+  document.getElementById('OVL').classList.add('on');
+}
+function hovl() { document.getElementById('OVL').classList.remove('on'); }
+function toast(msg, type) {
+  const t = document.getElementById('TOAST');
+  t.textContent = msg;
+  t.className = 'toast on ' + (type||'');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('on'), 4500);
+}
+</script>
+
+<script>
+window.__gsr__ = {
+  withSuccessHandler: function(fn) {
+    return {
+      withFailureHandler: function(fe) {
+        const api = (method, body) => fetch('/api/bookings', {
+          method: method === 'GET' ? 'GET' : 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: method === 'GET' ? undefined : JSON.stringify({...body, _method: method})
+        }).then(r => r.json()).then(d => {
+          if (d.error) throw new Error(d.error);
+          return d;
+        });
+        return {
+          sGetAll:       () => fetch('/api/bookings').then(r=>r.json()).then(d=>fn(JSON.stringify(d.bookings||[]))).catch(fe),
+          sSave:         (data) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'save',...data})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
+          sUpdate:       (id,data) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'update',id,...data})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
+          sDelete:       (id) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'delete',id})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
+          sSetStatus:    (id,s) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'status',id,status:s})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
+          sOccupancy:    (dt,f,t) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'occupancy',date:dt,from:f,to:t})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||0))).catch(fe),
+          sOccExclude:   (dt,f,t,ex) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'occupancy',date:dt,from:f,to:t,excludeId:ex})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||0))).catch(fe),
+          sAlternatives: (dt,n) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'alternatives',date:dt,people:n})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||[]))).catch(fe),
+          sAltExclude:   (dt,n,ex) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'alternatives',date:dt,people:n,excludeId:ex})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||[]))).catch(fe),
+          sWorkHours:    (dt) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'workhours',date:dt})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||{}))).catch(fe),
+        };
+      }
+    };
+  }
+};
+window.google = { script: { run: window.__gsr__ } };
+</script>
+</body>
+</html>
