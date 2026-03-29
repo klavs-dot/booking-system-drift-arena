@@ -1589,7 +1589,7 @@ window.__gsr__={withSuccessHandler:function(fn){return{withFailureHandler:functi
   sAlternatives:function(dt,n){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'alternatives',date:dt,people:n})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||[]))}).catch(fe)},
   sAltExclude:function(dt,n,ex){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'alternatives',date:dt,people:n,excludeId:ex})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||[]))}).catch(fe)},
   sWorkHours:function(dt){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'workhours',date:dt})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||{}))}).catch(fe)}
-}}}}};
+}}}}}};
 window.google={script:{run:window.__gsr__}};
 </script>
 
@@ -2169,6 +2169,18 @@ function nearestQuarter(t) {
 // ================================================================
 // INIT
 // ================================================================
+
+// Confirm dialogs
+function cfm(msg, fn) {
+  const ov = document.createElement('div');
+  ov.className = 'cfm-overlay';
+  ov.innerHTML = '<div class="cfm-box"><p>' + msg + '</p><div class="cfm-btns"><button class="cfm-yes" id="cfm-yes">Jā</button><button class="cfm-no" id="cfm-no">Nē</button></div></div>';
+  document.body.appendChild(ov);
+  ov.querySelector('#cfm-yes').onclick = function() { ov.remove(); fn(); };
+  ov.querySelector('#cfm-no').onclick  = function() { ov.remove(); };
+  ov.onclick = function(e) { if (e.target === ov) ov.remove(); };
+}
+
 window.onload = function() {
   const now = new Date();
   calY = now.getFullYear(); calM = now.getMonth();
@@ -2394,15 +2406,15 @@ function nowMinutes() {
 // Rāda TIKAI HH:MM — nekādas timezone/GMT/angļu datumu virknes
 // ================================================================
 function renderCard(b, nowMin) {
-  // Aprēķināt vai rezervācija notiek tagad vai ir pagājusi (tikai šodienai)
   const bFrom = tmin(b.timeFrom);
   const bTo   = tmin(b.timeTo);
   const isNow  = nowMin !== undefined && nowMin >= 0 && nowMin >= bFrom && nowMin < bTo;
   const isPast = nowMin !== undefined && nowMin >= 0 && nowMin >= bTo;
-  const needsAction = isNow && b.status === 'Aktīva'; // notiek bet admins vēl nav atzīmējis
+  const needsAction = isNow && b.status === 'Aktīva';
 
   const sc = b.status==='Notikusi'?'sdone':b.status==='Atcelta'?'scanc':b.status==='Ieradušies'?'sarrived':'';
   const timeClass = isNow ? 'is-now' : (isPast && b.status==='Aktīva' ? 'is-past' : '');
+
   const bdg = b.status==='Notikusi'
     ?`<span class="badge bd">✓ Notikusi</span>`
     :b.status==='Atcelta'
@@ -2411,62 +2423,63 @@ function renderCard(b, nowMin) {
     ?`<span class="badge bd">🟢 Ieradušies</span>`
     :`<span class="badge ba">Aktīva</span>`;
 
-  // cleanT garantē tīru HH:MM bez timezone garbage
   const tf = cleanT(b.timeFrom);
   const tt = cleanT(b.timeTo);
 
+  // Pogas — visas vienādas, viena kolonna
+  const btnArr  = b.status==='Aktīva'
+    ? `<button class="bact-btn btn-arr" onclick="cfm('Atzīmēt kā ieradušies?', function(){markArrived(\'${b.id}\')})">✅ Ieradušies</button>` : '';
+  const btnDone = b.status!=='Notikusi'
+    ? `<button class="bact-btn btn-ok" onclick="cfm('Atzīmēt kā notikušu?', function(){markDone(\'${b.id}\')})">✓ Notikusi</button>` : '';
+  const btnEdit = `<button class="bact-btn btn-g" onclick="cfm('Atvērt labošanu?', function(){openEdit(\'${b.id}\')})">✏️ Labot</button>`;
+  const btnMove = `<button class="bact-btn btn-mv" onclick="cfm('Pārcelt rezervāciju?', function(){openMove(\'${b.id}\')})">📅 Pārcelt</button>`;
+  const btnRek  = `<button class="bact-btn btn-rek2" onclick="cfm('Atvērt rekvizītus?', function(){openRek(\'${b.id}\')})">📋 ${b.rekviziti?'Labot':'Pievienot'} rekvizītus</button>`;
+  const btnDel  = `<button class="bact-btn btn-d" onclick="cfm('Dzēst rezervāciju?', function(){openDel(\'${b.id}\',\'${esc(b.client||'\'')}\')})">🗑️ Dzēst</button>`;
+
+  // Mirgojoša poga ja notiek
+  const nowBanner = needsAction
+    ? `<button class="btn-notiek" onclick="cfm('Atzīmēt ka klienti ieradušies?', function(){markArrived(\'${b.id}\')})">⚡ REZERVĀCIJA NOTIEK — atzīmēt ierašanos!</button>`
+    : (isPast && b.status==='Aktīva'
+      ? `<button class="btn-mark-done" onclick="cfm('Atzīmēt kā notikušu?', function(){markDone(\'${b.id}\')})">✓ Atzīmēt kā notikušu</button>`
+      : '');
+
   const isArrived = b.status === 'Ieradušies';
   const arrivedBanner = isArrived
-    ? `<div class="bnow"><span class="bnow-dot"></span>Ir ieradušies un viss notiek! 🙂<span class="bnow-dot"></span></div>`
-    : '';
+    ? `<div class="bnow"><span class="bnow-dot"></span>Ir ieradušies un viss notiek! 🙂<span class="bnow-dot"></span></div>` : '';
   const isClosed = b.closed === true;
   const closedBanner = isClosed
-    ? `<div class="bclosed"><span class="bnow-dot" style="background:var(--accent)"></span>Slēgtais pasākums<span class="bnow-dot" style="background:var(--accent)"></span></div>`
-    : '';
+    ? `<div class="bclosed"><span class="bnow-dot" style="background:var(--accent)"></span>Slēgtais pasākums<span class="bnow-dot" style="background:var(--accent)"></span></div>` : '';
   const isOutside = b.outside === true;
   const outsideBanner = isOutside
-    ? `<div class="boutside"><span class="bnow-dot" style="background:var(--accent)"></span>Ārpus darba laika<span class="bnow-dot" style="background:var(--accent)"></span></div>`
-    : '';
-
-  const nowBanner = needsAction
-    ? `<div style="padding:8px 12px 4px;"><button class="btn-notiek" onclick="markArrived('${b.id}')">⚡ Rezervācija NOTIEK — atzīmēt ierašanos!</button></div>`
-    : (isNow && b.status==='Ieradušies'
-      ? ''
-      : (isPast && b.status==='Aktīva'
-        ? `<div style="padding:6px 12px 2px;display:flex;gap:6px;"><button class="btn btn-ok btn-sm" onclick="markDone('${b.id}')">✓ Atzīmēt kā notikušu</button></div>`
-        : ''));
+    ? `<div class="boutside"><span class="bnow-dot" style="background:var(--accent)"></span>Ārpus darba laika<span class="bnow-dot" style="background:var(--accent)"></span></div>` : '';
 
   return `<div class="bcard ${sc} ${timeClass}">
-    <div>
-      <div class="btime">${tf}</div>
-      <div class="bsep">↓</div>
-      <div class="btime2">${tt}</div>
-    </div>
-    <div>
-      <div class="bcc">${esc(b.client||'—')}</div>
-      <div class="bmeta">
-        <span>👥 <b>${b.people}</b> cilv.</span>
-        ${b.phone   ? '<span>📞 ' + esc(b.phone) + '</span>'   : ''}
-        ${b.invoice ? '<span>💳 ' + esc(b.invoice) + '</span>' : ''}
-        ${bdg}
+    <div style="display:flex;gap:16px;align-items:flex-start;">
+      <div style="min-width:64px;text-align:center;padding-top:2px;">
+        <div class="btime">${tf}</div>
+        <div class="bsep">↓</div>
+        <div class="btime2">${tt}</div>
       </div>
-      ${b.comment  ? '<div class="bcmt">💬 ' + esc(b.comment) + '</div>'  : ''}
-      ${b.food     ? '<div class="bfood">🍕 ' + esc(b.food) + '</div>'    : ''}
-      ${b.admin    ? '<div class="badm">👩‍💼 ' + esc(b.admin) + ' · ' + esc(b.accepted) + '</div>' : ''}
-    </div>
-    <div class="bacts">
-      <button class="btn btn-g btn-sm" onclick="openEdit('${b.id}')">✏️ Labot</button>
-      <button class="btn btn-mv btn-sm" onclick="openMove('${b.id}')">📅 Pārcelt</button>
-      ${b.status==='Aktīva' ? '<button class="btn btn-arr btn-sm" onclick="markArrived(\'' + b.id + '\')">✅ Ieradušies</button>' : ''}
-      ${b.status!=='Notikusi' && b.status!=='Ieradušies' ? '<button class="btn btn-ok btn-sm" onclick="markDone(\'' + b.id + '\')">✓ Notikusi</button>' : b.status==='Ieradušies' ? '<button class="btn btn-ok btn-sm" onclick="markDone(\'' + b.id + '\')">✓ Pabeigt</button>' : ''}
-      <button class="btn-rek" onclick="openRek('${b.id}')">${b.rekviziti ? '📋 Labot rekvizītus' : '📋 Pievienot rekvizītus'}</button>
-      <button class="btn btn-d btn-sm" onclick="openDel('${b.id}','${esc(b.client||'')}')">🗑️ Dzēst</button>
-    </div>
-      <button class="btn btn-g" onclick="openEdit('${b.id}')">✏️ Labot</button>
-      <button class="btn btn-mv" onclick="openMove('${b.id}')">📅 Pārcelt</button>
-      ${b.status==='Aktīva' ? '<button class="btn btn-arr" onclick="markArrived(\'' + b.id + '\')">✅ Ieradušies</button>' : ''}
-      ${b.status!=='Notikusi' && b.status!=='Ieradušies' ? '<button class="btn btn-ok" onclick="markDone(\'' + b.id + '\')">✓ Notikusi</button>' : b.status==='Ieradušies' ? '<button class="btn btn-ok" onclick="markDone(\'' + b.id + '\')">✓ Pabeigt</button>' : ''}
-      <button class="btn btn-d" onclick="openDel('${b.id}','${esc(b.client||'')}')">🗑️ Dzēst</button>
+      <div style="flex:1;min-width:0;">
+        <div class="bcc">${esc(b.client||'—')}</div>
+        <div class="bmeta">
+          <span>👥 <b>${b.people}</b> cilv.</span>
+          ${b.phone   ? '<span>📞 ' + esc(b.phone) + '</span>'   : ''}
+          ${b.invoice ? '<span>💳 ' + esc(b.invoice) + '</span>' : ''}
+          ${bdg}
+        </div>
+        ${b.comment ? '<div class="bcmt">💬 ' + esc(b.comment) + '</div>' : ''}
+        ${b.food    ? '<div class="bfood">🍕 ' + esc(b.food) + '</div>'   : ''}
+        ${b.admin   ? '<div class="badm">👩‍💼 ' + esc(b.admin) + ' · ' + esc(b.accepted) + '</div>' : ''}
+      </div>
+      <div class="bact-col">
+        ${btnEdit}
+        ${btnMove}
+        ${btnArr}
+        ${btnDone}
+        ${btnRek}
+        ${btnDel}
+      </div>
     </div>
     ${nowBanner}
     ${arrivedBanner}
@@ -2474,6 +2487,7 @@ function renderCard(b, nowMin) {
     ${outsideBanner}
   </div>`;
 }
+
 
 // Ekstrahē tīru HH:MM — ignorē visu citu (GMT, timezone tekstu)
 function cleanT(val) {
