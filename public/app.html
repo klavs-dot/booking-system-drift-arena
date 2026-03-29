@@ -1593,8 +1593,8 @@ button{cursor:pointer}
 <header class="topbar">
   <div class="logo">DRIFT<span>ARENA</span></div>
   <nav class="nav">
-    <button class="nb active" id="nb-calendar" onclick="goNav('calendar',this)">📅 Pārskats</button>
-    <button class="nb" id="nb-today"    onclick="goNav('today',this)">🕐 Šodien</button>
+    <button class="nb" id="nb-calendar" onclick="goNav('calendar',this)">📅 Pārskats</button>
+    <button class="nb active" id="nb-today" onclick="goNav('today',this)">🕐 Šodien</button>
     <button class="nb" id="nb-invoices" onclick="goNav('invoices',this)">🧾 Rēķini</button>
     <div class="nb-new-wrap">
       <button class="nb nb-new" id="nb-new" onclick="goNav('new',this)">＋ Jauna rezervācija</button>
@@ -1650,7 +1650,7 @@ button{cursor:pointer}
 <main class="main">
 
 <!-- ══ PĀRSKATS ══ -->
-<div class="view active" id="view-calendar">
+<div class="view" id="view-calendar">
   <div class="phdr">
     <div class="ptitle">PĀRSKATS</div>
     <div class="psub">Klikšķini uz dienas, lai redzētu rezervācijas</div>
@@ -1681,7 +1681,7 @@ button{cursor:pointer}
 </div>
 
 <!-- ══ ŠODIEN ══ -->
-<div class="view" id="view-today">
+<div class="view active" id="view-today">
   <div class="thdr">
     <div class="tdate" id="TD_TITLE"></div>
     <div class="tsub"  id="TD_COUNT"></div>
@@ -2175,6 +2175,8 @@ window.onload = function() {
   buildTimeSel('w_to',   '20:00');
 
   loadAll();
+  // Pēc ielādes aktivizēt šodienas skatu
+  goNav('today', document.getElementById('nb-today'));
 };
 
 // ================================================================
@@ -3430,14 +3432,6 @@ window.__gsr__ = {
   withSuccessHandler: function(fn) {
     return {
       withFailureHandler: function(fe) {
-        const api = (method, body) => fetch('/api/bookings', {
-          method: method === 'GET' ? 'GET' : 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: method === 'GET' ? undefined : JSON.stringify({...body, _method: method})
-        }).then(r => r.json()).then(d => {
-          if (d.error) throw new Error(d.error);
-          return d;
-        });
         return {
           sGetAll:       () => fetch('/api/bookings').then(r=>r.json()).then(d=>fn(JSON.stringify(d.bookings||[]))).catch(fe),
           sSave:         (data) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'save',...data})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
