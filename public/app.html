@@ -1624,6 +1624,71 @@ button{cursor:pointer}
 .bact-btn.btn-ok{background:#0a2828;color:#22d3ee;border-color:#22d3ee;}
 .bact-btn.btn-rek2{color:var(--text2);}
 .bact-btn.btn-d{background:var(--red-dim);color:var(--red);border-color:var(--red);}
+
+/* ── Statusa banneri ── */
+@keyframes pulse-yellow {
+  0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(234,179,8,0.5); }
+  50%      { opacity:0.85; box-shadow:0 0 12px 4px rgba(234,179,8,0.3); }
+}
+@keyframes pulse-green {
+  0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(34,197,94,0.4); }
+  50%      { opacity:0.9; box-shadow:0 0 16px 6px rgba(34,197,94,0.2); }
+}
+@keyframes pulse-red {
+  0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(239,68,68,0.4); }
+  50%      { opacity:0.9; box-shadow:0 0 16px 6px rgba(239,68,68,0.2); }
+}
+.btn-mark-done {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px 20px;
+  background: #1a1400;
+  color: #facc15;
+  border: 2px solid #ca8a04;
+  border-radius: var(--r);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-align: center;
+  animation: pulse-yellow 0.8s ease-in-out infinite;
+}
+.btn-notiek {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px 20px;
+  background: #031a0a;
+  color: #22c55e;
+  border: 2px solid #16a34a;
+  border-radius: var(--r);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-align: center;
+  animation: pulse-green 1.8s ease-in-out infinite;
+}
+.bclosed {
+  margin-top: 10px;
+  padding: 12px 20px;
+  background: #1a0303;
+  color: #ef4444;
+  border: 2px solid #dc2626;
+  border-radius: var(--r);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  animation: pulse-red 1.8s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 </style>
 
 </head>
