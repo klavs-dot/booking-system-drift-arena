@@ -1,7 +1,7 @@
 import { google } from 'googleapis';
 
 const SHEET_ID   = process.env.SHEET_ID;
-const SHEET_NAME = 'Rezervācijas';
+const SHEET_NAME = 'Rezervacijas';
 
 function getAuth() {
   let credentials = process.env.GOOGLE_SERVICE_ACCOUNT;
