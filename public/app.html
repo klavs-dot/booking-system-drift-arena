@@ -1578,18 +1578,26 @@ button{cursor:pointer}
 </head>
 <body>
 <script>
-window.__gsr__={withSuccessHandler:function(fn){return{withFailureHandler:function(fe){return{
-  sGetAll:function(){fetch('/api/bookings').then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.bookings||[]))}).catch(fe)},
-  sSave:function(d){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({_action:'save'},d))}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d))}).catch(fe)},
-  sUpdate:function(id,d){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({_action:'update',id:id},d))}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d))}).catch(fe)},
-  sDelete:function(id){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'delete',id:id})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d))}).catch(fe)},
-  sSetStatus:function(id,s){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'status',id:id,status:s})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d))}).catch(fe)},
-  sOccupancy:function(dt,f,t){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'occupancy',date:dt,from:f,to:t})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||0))}).catch(fe)},
-  sOccExclude:function(dt,f,t,ex){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'occupancy',date:dt,from:f,to:t,excludeId:ex})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||0))}).catch(fe)},
-  sAlternatives:function(dt,n){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'alternatives',date:dt,people:n})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||[]))}).catch(fe)},
-  sAltExclude:function(dt,n,ex){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'alternatives',date:dt,people:n,excludeId:ex})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||[]))}).catch(fe)},
-  sWorkHours:function(dt){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'workhours',date:dt})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||{}))}).catch(fe)}
-}}}}}};
+window.__gsr__={
+  withSuccessHandler:function(fn){
+    return {
+      withFailureHandler:function(fe){
+        return {
+          sGetAll:function(){fetch('/api/bookings').then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.bookings||[]))}).catch(fe)},
+          sSave:function(d){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({_action:'save'},d))}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d))}).catch(fe)},
+          sUpdate:function(id,d){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({_action:'update',id:id},d))}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d))}).catch(fe)},
+          sDelete:function(id){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'delete',id:id})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d))}).catch(fe)},
+          sSetStatus:function(id,s){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'status',id:id,status:s})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d))}).catch(fe)},
+          sOccupancy:function(dt,f,t){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'occupancy',date:dt,from:f,to:t})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||0))}).catch(fe)},
+          sOccExclude:function(dt,f,t,ex){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'occupancy',date:dt,from:f,to:t,excludeId:ex})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||0))}).catch(fe)},
+          sAlternatives:function(dt,n){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'alternatives',date:dt,people:n})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||[]))}).catch(fe)},
+          sAltExclude:function(dt,n,ex){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'alternatives',date:dt,people:n,excludeId:ex})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||[]))}).catch(fe)},
+          sWorkHours:function(dt){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'workhours',date:dt})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||{}))}).catch(fe)}
+        };
+      }
+    };
+  }
+};
 window.google={script:{run:window.__gsr__}};
 </script>
 
