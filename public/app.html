@@ -1847,6 +1847,10 @@ button{cursor:pointer}
 .bextra-edit { background:none; border:none; color:var(--text3); cursor:pointer; font-size:11px; padding:0 2px; opacity:0.5; }
 .bextra-edit:hover { color:#22d3ee; opacity:1; }
 
+
+.bc-info-actions { display:flex; flex-direction:column; gap:4px; margin-bottom:8px; }
+.bc-info-actions .bact-btn { width:100%; text-align:left; }
+
 </style>
 
 </head>
@@ -3103,6 +3107,10 @@ function renderCard(b, nowMin) {
     + '<div class="bc-grid">'
     + '<div class="bc-time"><div class="btime">'+tf+'</div><div class="bsep">|</div><div class="btime2">'+tt+'</div><div style="margin-top:8px;">'+bdg+'</div></div>'
     + '<div class="bc-info">'
+    +   '<div class="bc-info-actions">'
+    +     '<button class="bact-btn btn-g" data-fn="openEdit" data-id="'+id+'" onclick="cfmAct(this)">&#9998; Labot rezervāciju</button>'
+    +     '<button class="bact-btn btn-mv" data-fn="openMove" data-id="'+id+'" onclick="cfmAct(this)">&#128197; Pārcelt laiku/datumu</button>'
+    +   '</div>'
     +   '<div class="bcc">'+esc(b.client||'—')+'</div>'
     +   '<div class="bmeta-r">&#128222; '+esc(b.phone||'—')+'</div>'
     +   '<div class="bmeta-r">&#128101; '+b.people+' cilv.</div>'
