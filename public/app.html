@@ -2427,7 +2427,7 @@ function showPinDialog(id, cl) {
     'border-radius:var(--r);color:var(--text);font-size:22px;text-align:center;',
     'letter-spacing:6px;box-sizing:border-box;margin-bottom:4px;">',
     '<p id="pin-err" style="color:var(--red);font-size:12px;height:18px;margin-bottom:10px;"></p>',
-    '<div id="pin-step2" style="display:none;">',
+    '<div id="pin-step2" style="display:none;margin-top:8px;">',
     '<p style="font-size:13px;color:var(--text2);margin-bottom:8px;text-align:left;">Kāds ir iemesls dzēšanai?</p>',
     '<textarea id="pin-reason" rows="3" placeholder="Ievadi iemeslu..." ',
     'style="width:100%;padding:10px;background:var(--card2);border:1px solid var(--border2);',
@@ -2454,12 +2454,28 @@ function showPinDialog(id, cl) {
       if (inp.value === '31593') {
         pinOk = true;
         inp.style.borderColor = '#22c55e';
-        err.textContent = '';
+        err.textContent = '✓ PIN pareizs!';
+        err.style.color = '#22c55e';
         inp.disabled = true;
         step2.style.display = 'block';
-        okBtn.textContent = 'Dzēst';
+        step2.style.borderTop = '1px solid var(--border)';
+        step2.style.paddingTop = '12px';
+        step2.style.marginTop = '12px';
+        okBtn.textContent = 'Dzēst rezervāciju';
         okBtn.style.background = 'var(--red)';
-        ov.querySelector('#pin-reason').focus();
+        okBtn.style.border = '1px solid var(--red)';
+        var ra = ov.querySelector('#pin-reason');
+        ra.style.background = 'var(--card2)';
+        ra.style.border = '2px solid var(--border2)';
+        ra.style.borderRadius = 'var(--r)';
+        ra.style.color = 'var(--text)';
+        ra.style.padding = '10px';
+        ra.style.width = '100%';
+        ra.style.boxSizing = 'border-box';
+        ra.style.fontSize = '13px';
+        ra.style.resize = 'none';
+        ra.style.marginBottom = '10px';
+        setTimeout(function() { ra.focus(); }, 50);
       } else {
         inp.style.borderColor = 'var(--red)';
         inp.value = '';
