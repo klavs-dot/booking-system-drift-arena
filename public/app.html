@@ -1873,6 +1873,25 @@ button{cursor:pointer}
 .bextra-q    { padding:2px 5px; background:var(--card2); border:1px solid var(--border2); border-radius:4px; color:var(--text2); font-size:11px; font-weight:700; cursor:pointer; }
 .bextra-q:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
 
+
+/* Timeline 7 dienu skats */
+.tl-day        { border-bottom: 2px solid var(--border); margin-bottom: 0; }
+.tl-today      { border-left: 4px solid var(--accent); }
+.tl-day-hdr    { display:flex; justify-content:space-between; align-items:baseline;
+                 padding: 18px 24px 10px; position:sticky; top:0; z-index:10;
+                 background: var(--bg); border-bottom: 1px solid var(--border); }
+.tl-day-left   { display:flex; align-items:baseline; gap:14px; }
+.tl-rel        { font-family: var(--font-head); font-size:26px; font-weight:800;
+                 color:var(--text); text-transform:uppercase; letter-spacing:1px; }
+.tl-today .tl-rel { color:var(--accent); }
+.tl-date       { font-size:13px; color:var(--text3); font-weight:500; letter-spacing:0.3px; }
+.tl-count      { font-size:12px; color:var(--text2); background:var(--card2);
+                 padding: 3px 10px; border-radius:20px; border:1px solid var(--border2); }
+.tl-empty-lbl  { font-size:12px; color:var(--text3); }
+.tl-cards      { padding: 6px 0 6px; }
+.tl-cards .bcard { border-left-color: #3b82f6; }
+.tl-today .tl-cards .bcard { }
+
 </style>
 
 </head>
@@ -1919,7 +1938,7 @@ window.google={script:{run:window.__gsr__}};
   <div class="logo">DRIFT<span>ARENA</span></div>
   <nav class="nav">
     <button class="nb" id="nb-calendar" onclick="goNav('calendar',this)">📅 Pārskats</button>
-    <button class="nb active" id="nb-today" onclick="goNav('today',this)">🕐 Šodien</button>
+    <button class="nb active" id="nb-today" onclick="goNav('today',this)">📅 Timeline</button>
     <button class="nb" id="nb-invoices" onclick="goNav('invoices',this)">🧾 Rēķini</button>
     <div class="nb-new-wrap">
       <button class="nb nb-new" id="nb-new" onclick="goNav('new',this)">＋ Jauna rezervācija</button>
@@ -2005,15 +2024,9 @@ window.google={script:{run:window.__gsr__}};
   <div class="cgrid" id="CAL"></div>
 </div>
 
-<!-- ══ ŠODIEN ══ -->
+<!-- ══ TIMELINE ══ -->
 <div class="view active" id="view-today">
-  <div class="thdr">
-    <div class="tdate" id="TD_TITLE"></div>
-    <div class="tsub"  id="TD_COUNT"></div>
-  </div>
-  <div class="blist" id="TD_LIST"></div>
-  <div class="ssep">Rītdiena</div>
-  <div class="blist" id="TM_LIST"></div>
+  <div id="TIMELINE_CONTENT"></div>
 </div>
 
 <!-- ══ JAUNA REZERVĀCIJA ══ -->
@@ -3014,9 +3027,7 @@ window.onload = function() {
   }
   document.getElementById('calM').value = calM;
 
-  // Šodien sadaļas virsraksts
-  document.getElementById('TD_TITLE').textContent =
-    now.getDate() + '. ' + MLV[now.getMonth()] + ' ' + now.getFullYear();
+  // Timeline virsraksts tiek renderēts renderToday()
 
   // Laika dropdowni (jauna rezervācija)
   buildTimeSel('w_from', '17:00');
@@ -3200,19 +3211,40 @@ function newForDate() {
 // ŠODIEN SKATS
 // ================================================================
 function renderToday() {
-  const t  = isoToday();
-  const tm = isoOffset(1);
-  const tb  = ALL.filter(b=>b.date===t).sort((a,b)=>tmin(a.timeFrom)-tmin(b.timeFrom));
-  const tmb = ALL.filter(b=>b.date===tm).sort((a,b)=>tmin(a.timeFrom)-tmin(b.timeFrom));
-  const ac = tb.filter(b=>b.status!=='Atcelta').length;
-  document.getElementById('TD_COUNT').textContent =
-    `${ac} aktīva rezervācija${ac===1?'':'s'}`;
-  // Padodam nowMin lai renderCard zina kuras notiek/pagājušas
-  const nowMin = nowMinutes();
-  document.getElementById('TD_LIST').innerHTML =
-    tb.length ? tb.map(b=>renderCard(b, nowMin)).join('') : emptyEl('Šodien nav rezervāciju');
-  document.getElementById('TM_LIST').innerHTML =
-    tmb.length ? tmb.map(b=>renderCard(b, -1)).join('') : emptyEl('Rīt nav rezervāciju');
+  var nowMin = nowMinutes();
+  var DAY_NAMES = ['Svētdiena','Pirmdiena','Otrdiena','Trešdiena','Ceturtdiena','Piektdiena','Sestdiena'];
+  var RELATIVE = {0:'Šodien', 1:'Rīt', 2:'Parīt'};
+  var out = '';
+
+  for (var i = 0; i < 7; i++) {
+    var ds = isoOffset(i);
+    var d = new Date(); d.setDate(d.getDate() + i); d.setHours(0,0,0,0);
+    var dayName = i < 3 ? RELATIVE[i] : DAY_NAMES[d.getDay()];
+    var parts = ds.split('-');
+    var dateStr = parseInt(parts[2]) + '. ' + MLV[parseInt(parts[1])-1] + ' ' + parts[0];
+    var bookings = ALL.filter(function(b){return b.date===ds;}).sort(function(a,b){return tmin(a.timeFrom)-tmin(b.timeFrom);});
+    var active = bookings.filter(function(b){return b.status!=='Atcelta';}).length;
+    var nm = i===0 ? nowMin : -1;
+    var cardsHtml = bookings.length
+      ? bookings.map(function(b){return renderCard(b, nm);}).join('')
+      : emptyEl(dayName + ' nav rezervāciju');
+    var countHtml = active > 0
+      ? '<span class="tl-count">' + active + ' rezervācija' + (active===1?'':'s') + '</span>'
+      : '<span class="tl-empty-lbl">Nav rezervāciju</span>';
+
+    out += '<div class="tl-day' + (i===0?' tl-today':'') + '">'
+      + '<div class="tl-day-hdr">'
+      +   '<div class="tl-day-left">'
+      +     '<span class="tl-rel">' + dayName + '</span>'
+      +     '<span class="tl-date">' + dateStr + '</span>'
+      +   '</div>'
+      +   '<div class="tl-day-right">' + countHtml + '</div>'
+      + '</div>'
+      + '<div class="tl-cards">' + cardsHtml + '</div>'
+      + '</div>';
+  }
+
+  document.getElementById('TIMELINE_CONTENT').innerHTML = out;
 }
 
 function nowMinutes() {
