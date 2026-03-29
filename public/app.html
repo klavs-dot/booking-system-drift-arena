@@ -1819,6 +1819,20 @@ button{cursor:pointer}
 .bact-btn.btn-rek2{ color:var(--text2); }
 .bact-btn.btn-d   { background:var(--red-dim); color:var(--red); border-color:var(--red); }
 
+
+.bextra-list { margin-bottom:4px; }
+.bextra-row  { display:flex; align-items:center; justify-content:space-between; padding:3px 0; border-bottom:1px solid var(--border); }
+.bextra-name { font-size:12px; color:var(--text2); flex:1; }
+.bextra-del  { background:none; border:none; color:var(--text3); cursor:pointer; font-size:12px; padding:0 2px; line-height:1; opacity:0.5; }
+.bextra-del:hover { color:var(--red); opacity:1; }
+
+.bextra-input-row { display:flex; gap:4px; align-items:center; margin:6px 0 4px; }
+.bextra-in-name   { flex:1; padding:5px 7px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:12px; min-width:0; }
+.bextra-in-qty    { width:44px; padding:5px 4px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:12px; text-align:center; }
+.bextra-ok     { padding:5px 8px; background:#0d2e16; color:#22c55e; border:1px solid #22c55e; border-radius:var(--r); cursor:pointer; font-size:13px; font-weight:700; }
+.bextra-ok:hover { background:#22c55e; color:#000; }
+.bextra-cancel { padding:5px 8px; background:var(--card2); color:var(--text3); border:1px solid var(--border); border-radius:var(--r); cursor:pointer; font-size:12px; }
+
 </style>
 
 </head>
@@ -2548,7 +2562,92 @@ function showPinDialog(id, cl) {
 
 
 
-function bAddItem(el){editFoodDrink(el.getAttribute('data-bid'),el.getAttribute('data-bfield'));}
+function bShowInput(btn) {
+  var id    = btn.getAttribute('data-bid');
+  var field = btn.getAttribute('data-field');
+  var prefix = field === 'food' ? 'f' : 'd';
+  var inputRow = document.getElementById(prefix+'i-'+id);
+  if (!inputRow) return;
+  inputRow.style.display = 'flex';
+  btn.style.display = 'none';
+  inputRow.querySelector('.bextra-in-name').value = '';
+  inputRow.querySelector('.bextra-in-qty').value = '1';
+  inputRow.querySelector('.bextra-in-name').focus();
+  // Enter key
+  inputRow.querySelector('.bextra-in-name').onkeydown = function(e) {
+    if (e.key === 'Enter') inputRow.querySelector('.bextra-ok').click();
+  };
+  inputRow.querySelector('.bextra-in-qty').onkeydown = function(e) {
+    if (e.key === 'Enter') inputRow.querySelector('.bextra-ok').click();
+  };
+}
+
+function bCancelItem(btn) {
+  var id    = btn.getAttribute('data-bid');
+  var field = btn.getAttribute('data-field');
+  var prefix = field === 'food' ? 'f' : 'd';
+  document.getElementById(prefix+'i-'+id).style.display = 'none';
+  document.getElementById(prefix+'a-'+id).style.display = '';
+}
+
+function bConfirmItem(btn) {
+  var id    = btn.getAttribute('data-bid');
+  var field = btn.getAttribute('data-field');
+  var prefix = field === 'food' ? 'f' : 'd';
+  var inputRow = document.getElementById(prefix+'i-'+id);
+  var name = inputRow.querySelector('.bextra-in-name').value.trim();
+  var qty  = inputRow.querySelector('.bextra-in-qty').value.trim();
+  if (!name) { inputRow.querySelector('.bextra-in-name').focus(); return; }
+  var label = name + (qty && qty !== '1' ? ' x'+qty : '');
+
+  // Pievienot sarakstam vizuāli
+  var list = document.getElementById(prefix+'l-'+id);
+  var b = ALL.find(function(x){return x.id===id;});
+  var items = b ? (b[field] ? b[field].split(',').map(function(s){return s.trim();}).filter(Boolean) : []) : [];
+  var newIdx = items.length;
+  var row = document.createElement('div');
+  row.className = 'bextra-row';
+  row.innerHTML = '<span class="bextra-name">'+esc(label)+'</span>'
+    + '<button class="bextra-del" onclick="bDelItem(this)" data-bid="'+id+'" data-field="'+field+'" data-idx="'+newIdx+'" title="Noņemt">&#10005;</button>';
+  list.appendChild(row);
+
+  // Saglabāt
+  items.push(label);
+  var newVal = items.join(', ');
+  if (b) b[field] = newVal;
+  var data = {}; data[field] = newVal;
+  window.__gsr__
+    .withSuccessHandler(function(){})
+    .withFailureHandler(function(e){ toast('Kļūda: '+e.message,'err'); })
+    .sUpdate(id, data);
+
+  // Slēpt input
+  inputRow.style.display = 'none';
+  document.getElementById(prefix+'a-'+id).style.display = '';
+}
+
+function bDelItem(btn) {
+  var id    = btn.getAttribute('data-bid');
+  var field = btn.getAttribute('data-field');
+  var idx   = parseInt(btn.getAttribute('data-idx'));
+  var b = ALL.find(function(x){return x.id===id;});
+  if (!b) return;
+  var items = b[field] ? b[field].split(',').map(function(s){return s.trim();}).filter(Boolean) : [];
+  var itemName = items[idx] || '?';
+
+  showConfirm('Vai noņemt "'+itemName+'"?', function() {
+    items.splice(idx, 1);
+    var newVal = items.join(', ');
+    b[field] = newVal;
+    var data = {}; data[field] = newVal;
+    window.__gsr__
+      .withSuccessHandler(function(){ loadAll(true); })
+      .withFailureHandler(function(e){ toast('Kļūda: '+e.message,'err'); })
+      .sUpdate(id, data);
+  });
+}
+
+function bAddItem(el){bShowInput(el);}
 function editFoodDrinkBtn(btn) {
   editFoodDrink(btn.getAttribute('data-id'), btn.getAttribute('data-field'));
 }
@@ -2873,19 +2972,43 @@ function renderCard(b, nowMin) {
     + '<button class="bact-btn btn-rek2" data-fn="openRek" data-id="'+id+'" onclick="cfmAct(this)">'+(b.rekviziti?'Labot':'Pievienot')+' rekvizītus</button>'
     + '<button class="bact-btn btn-d" data-fn="openDel" data-id="'+id+'" data-cl="'+cl+'" onclick="cfmAct(this)">&#128465; Dzēst</button>';
 
-  // Ēdieni
+  // Ēdieni inline
   var foodItems = b.food ? b.food.split(',').map(function(s){return s.trim();}).filter(Boolean) : [];
-  var foodHtml = '<div class="bextra-title">&#127829; Ēdieni</div>';
-  foodHtml += foodItems.map(function(x){return '<div class="bextra-item">'+esc(x)+'</div>';}).join('');
-  if (!foodItems.length) foodHtml += '<div class="bextra-empty">—</div>';
-  foodHtml += '<button class="bextra-add" data-bid="'+id+'" data-bfield="food" onclick="bAddItem(this)">+ Pievienot</button>';
+  var foodHtml = '<div class="bextra-title">&#127829; Ēdieni</div>'
+    + '<div class="bextra-list" id="fl-'+id+'">'
+    + foodItems.map(function(x,i){
+        return '<div class="bextra-row">'
+          + '<span class="bextra-name">'+esc(x)+'</span>'
+          + '<button class="bextra-del" onclick="bDelItem(this)" data-bid="'+id+'" data-field="food" data-idx="'+i+'" title="Noņemt">&#10005;</button>'
+          + '</div>';
+      }).join('')
+    + '</div>'
+    + '<div class="bextra-input-row" id="fi-'+id+'" style="display:none;">'
+    + '<input class="bextra-in-name" placeholder="Nosaukums..." type="text">'
+    + '<input class="bextra-in-qty" placeholder="1" type="number" min="1" value="1">'
+    + '<button class="bextra-ok" onclick="bConfirmItem(this)" data-bid="'+id+'" data-field="food">&#10003;</button>'
+    + '<button class="bextra-cancel" onclick="bCancelItem(this)" data-bid="'+id+'" data-field="food">&#10005;</button>'
+    + '</div>'
+    + '<button class="bextra-add" id="fa-'+id+'" onclick="bShowInput(this)" data-bid="'+id+'" data-field="food">+ Pievienot</button>';
 
-  // Dzērieni
+  // Dzērieni inline
   var drinkItems = b.drinks ? b.drinks.split(',').map(function(s){return s.trim();}).filter(Boolean) : [];
-  var drinksHtml = '<div class="bextra-title">&#127864; Dzērieni</div>';
-  drinksHtml += drinkItems.map(function(x){return '<div class="bextra-item">'+esc(x)+'</div>';}).join('');
-  if (!drinkItems.length) drinksHtml += '<div class="bextra-empty">—</div>';
-  drinksHtml += '<button class="bextra-add" data-bid="'+id+'" data-bfield="drinks" onclick="bAddItem(this)">+ Pievienot</button>';
+  var drinksHtml = '<div class="bextra-title">&#127864; Dzērieni</div>'
+    + '<div class="bextra-list" id="dl-'+id+'">'
+    + drinkItems.map(function(x,i){
+        return '<div class="bextra-row">'
+          + '<span class="bextra-name">'+esc(x)+'</span>'
+          + '<button class="bextra-del" onclick="bDelItem(this)" data-bid="'+id+'" data-field="drinks" data-idx="'+i+'" title="Noņemt">&#10005;</button>'
+          + '</div>';
+      }).join('')
+    + '</div>'
+    + '<div class="bextra-input-row" id="di-'+id+'" style="display:none;">'
+    + '<input class="bextra-in-name" placeholder="Nosaukums..." type="text">'
+    + '<input class="bextra-in-qty" placeholder="1" type="number" min="1" value="1">'
+    + '<button class="bextra-ok" onclick="bConfirmItem(this)" data-bid="'+id+'" data-field="drinks">&#10003;</button>'
+    + '<button class="bextra-cancel" onclick="bCancelItem(this)" data-bid="'+id+'" data-field="drinks">&#10005;</button>'
+    + '</div>'
+    + '<button class="bextra-add" id="da-'+id+'" onclick="bShowInput(this)" data-bid="'+id+'" data-field="drinks">+ Pievienot</button>';
 
   // Banneri
   var nowBanner = needsAction
