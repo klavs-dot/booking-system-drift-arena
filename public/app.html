@@ -1787,6 +1787,13 @@ button{cursor:pointer}
 .bact-btn.btn-rek2{ color:var(--text2); }
 .bact-btn.btn-d   { background:var(--red-dim); color:var(--red); border-color:var(--red); }
 
+
+.bcc         { font-size:15px; font-weight:700; color:var(--text); margin-bottom:5px; }
+.bmeta-row   { margin-bottom:3px; }
+.bmeta-item  { font-size:13px; color:var(--text2); }
+.bcmt-big    { font-size:19px; color:var(--text); margin-top:8px; margin-bottom:4px; line-height:1.4; }
+.badm        { font-size:11px; color:var(--text3); margin-top:6px; }
+
 </style>
 
 </head>
@@ -2902,13 +2909,12 @@ function renderCard(b, nowMin) {
 
     // Galvenā info kolonna
     + '<div class="bcard-info">'
-    +   '<div class="bcc">'+esc(b.client||'—')+' '+bdg+'</div>'
-    +   '<div class="bcard-meta-row">'
-    +     '<span class="bmeta-item">&#128222; '+esc(b.phone||'—')+'</span>'
-    +     '<span class="bmeta-item">&#128101; '+b.people+' cilv.</span>'
-    +     (b.invoice ? '<span class="bmeta-item">&#128179; '+esc(b.invoice)+'</span>' : '')
-    +   '</div>'
-    +   (b.comment ? '<div class="bcmt">&#128172; '+esc(b.comment)+'</div>' : '')
+    +   '<div class="bcc">'+esc(b.client||'—')+'</div>'
+    +   '<div class="bmeta-row"><span class="bmeta-item">&#128222; '+esc(b.phone||'—')+'</span></div>'
+    +   '<div class="bmeta-row"><span class="bmeta-item">&#128101; '+b.people+' cilv.</span></div>'
+    +   (b.invoice ? '<div class="bmeta-row"><span class="bmeta-item">&#128179; '+esc(b.invoice)+'</span></div>' : '')
+    +   '<div class="bmeta-row">'+bdg+'</div>'
+    +   (b.comment ? '<div class="bcmt-big">&#128172; '+esc(b.comment)+'</div>' : '')
     +   (b.admin ? '<div class="badm">&#128105;&#8205;&#128188; '+esc(b.admin)+' &middot; '+esc(b.accepted)+'</div>' : '')
     + '</div>'
 
