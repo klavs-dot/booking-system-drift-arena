@@ -2515,6 +2515,10 @@ function showPinDialog(id, cl) {
 
 
 
+
+function editFoodDrinkBtn(btn) {
+  editFoodDrink(btn.getAttribute('data-id'), btn.getAttribute('data-field'));
+}
 function editFoodDrink(id, field) {
   var b = ALL.find(function(x) { return x.id === id; });
   if (!b) return;
