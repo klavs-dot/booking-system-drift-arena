@@ -1571,5 +1571,31 @@ button{cursor:pointer}
 }
 .pt-item:hover { background: var(--card2); color: var(--text); border-left-color: var(--accent); }
 .pt-item.selected { background: var(--accent-dim); color: var(--accent); border-left-color: var(--accent); font-weight: 900; }
+
+.bact-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+  flex-shrink: 0;
+}
+.bact-btn {
+  display: block;
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.bact-btn.btn-g    { background: var(--card2); color: var(--text); border-color: var(--border2); }
+.bact-btn.btn-mv   { background: #1a1a30; color: #8888ff; border-color: #3a3a70; }
+.bact-btn.btn-arr  { background: #0d2e16; color: #22c55e; border-color: #22c55e; }
+.bact-btn.btn-ok   { background: #0a2828; color: #22d3ee; border-color: #22d3ee; }
+.bact-btn.btn-rek2 { background: #1a1a1a; color: var(--text2); border-color: var(--border); }
+.bact-btn.btn-d    { background: var(--red-dim); color: var(--red); border-color: var(--red); }
 </style>
 
