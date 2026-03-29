@@ -70,7 +70,7 @@ export async function getAllBookings() {
   const sheets = await getSheets();
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A:Q`,
+    range: `${SHEET_NAME}!A:R`,
   });
   const rows = res.data.values || [];
   if (rows.length <= 1) return [];
@@ -94,7 +94,7 @@ export async function saveBooking(data) {
       id, data.date, data.timeFrom || '', data.timeTo || '',
       data.client || '', data.phone || '', data.email || '', people,
       data.invoice || 'Uz vietas', data.comment || '',
-      data.admin || '', ts, data.food || '', 'Aktīva', isClosed, isOutside, data.drinks || '',
+      data.admin || '', ts, data.food || '', 'Aktīva', isClosed, isOutside, data.drinks || '', parseInt(data.rides)||0,
     ]]},
   });
   clearCache();
@@ -104,7 +104,7 @@ export async function saveBooking(data) {
 export async function updateBooking(id, data) {
   const sheets = await getSheets();
   const res    = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID, range: `${SHEET_NAME}!A:Q`,
+    spreadsheetId: SHEET_ID, range: `${SHEET_NAME}!A:R`,
   });
   const rows = res.data.values || [];
   const idx  = rows.findIndex((r, i) => i > 0 && String(r[0]) === String(id));
@@ -132,6 +132,7 @@ export async function updateBooking(id, data) {
   if (data.closed !== undefined)  set(15, data.closed === true || data.closed === 'true');
   if (data.outside !== undefined) set(16, data.outside === true || data.outside === 'true');
   if (data.drinks !== undefined)  set(17, data.drinks);
+  if (data.rides !== undefined)   set(18, parseInt(data.rides)||0);
   if (updates.length) {
     await sheets.spreadsheets.values.batchUpdate({
       spreadsheetId: SHEET_ID,
@@ -147,7 +148,7 @@ export async function deleteBooking(id, clientName, reason) {
 
   // Iegūt rezervācijas datus pirms dzēšanas
   const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID, range: `${SHEET_NAME}!A:Q`,
+    spreadsheetId: SHEET_ID, range: `${SHEET_NAME}!A:R`,
   });
   const rows = res.data.values || [];
   const idx  = rows.findIndex((r, i) => i > 0 && String(r[0]) === String(id));

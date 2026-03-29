@@ -1788,13 +1788,14 @@ button{cursor:pointer}
 
 .bc-grid {
   display: grid;
-  grid-template-columns: 70px 240px 210px 210px 155px;
+  grid-template-columns: 70px 240px 120px 210px 210px 155px;
   gap: 16px;
   align-items: start;
   grid-auto-rows: auto;
 }
 .bc-time  { text-align:center; }
 .bc-food  { min-width:0; }
+.bc-rides { min-width:0; }
 .bc-info  { min-width:0; }
 .bc-btns  { display:flex; flex-direction:column; gap:5px; width:155px; grid-column:5; grid-row:1; }
 
@@ -1830,6 +1831,16 @@ button{cursor:pointer}
 .bextra-ok     { padding:5px 8px; background:#0d2e16; color:#22c55e; border:1px solid #22c55e; border-radius:var(--r); cursor:pointer; font-size:13px; font-weight:700; }
 .bextra-ok:hover { background:#22c55e; color:#000; }
 .bextra-cancel { padding:5px 8px; background:var(--card2); color:var(--text3); border:1px solid var(--border); border-radius:var(--r); cursor:pointer; font-size:12px; }
+
+
+.bc-rides     { text-align:center; }
+.rides-input  { width:100%; padding:10px 6px; background:var(--card2); border:2px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:28px; font-weight:700; text-align:center; margin-bottom:6px; box-sizing:border-box; }
+.rides-input:focus { border-color:var(--accent); outline:none; }
+.rides-btns   { display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-bottom:6px; }
+.rides-quick  { padding:5px 0; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text2); font-size:12px; font-weight:700; cursor:pointer; }
+.rides-quick:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+.rides-save   { width:100%; padding:6px; background:#0d2e16; color:#22c55e; border:1px solid #22c55e; border-radius:var(--r); cursor:pointer; font-size:12px; font-weight:700; }
+.rides-save:hover { background:#22c55e; color:#000; }
 
 </style>
 
