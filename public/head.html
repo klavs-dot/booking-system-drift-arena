@@ -1708,5 +1708,67 @@ button{cursor:pointer}
   justify-content: center;
   gap: 8px;
 }
+
+.cfm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(3px);
+}
+.cfm-box {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 32px 28px 24px;
+  text-align: center;
+  min-width: 300px;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  animation: cfm-in 0.18s ease-out;
+}
+@keyframes cfm-in {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+.cfm-box p {
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 20px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.cfm-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.cfm-yes {
+  padding: 11px 32px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--r);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.cfm-yes:hover { opacity: 0.85; }
+.cfm-no {
+  padding: 11px 32px;
+  background: var(--card2);
+  color: var(--text2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.cfm-no:hover { opacity: 0.85; }
 </style>
 

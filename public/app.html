@@ -1710,6 +1710,68 @@ button{cursor:pointer}
   justify-content: center;
   gap: 8px;
 }
+
+.cfm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(3px);
+}
+.cfm-box {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 32px 28px 24px;
+  text-align: center;
+  min-width: 300px;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  animation: cfm-in 0.18s ease-out;
+}
+@keyframes cfm-in {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+.cfm-box p {
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 20px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.cfm-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.cfm-yes {
+  padding: 11px 32px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--r);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.cfm-yes:hover { opacity: 0.85; }
+.cfm-no {
+  padding: 11px 32px;
+  background: var(--card2);
+  color: var(--text2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.cfm-no:hover { opacity: 0.85; }
 </style>
 
 </head>
@@ -2321,61 +2383,77 @@ function cfmAct(btn) {
   var id  = btn.getAttribute('data-id');
   var cl  = btn.getAttribute('data-cl') || '';
 
-  // Dzēst - prasa PIN kodu
+  if (fn === 'openEdit')  { openEdit(id); return; }
+  if (fn === 'openMove')  { openMove(id); return; }
+
   if (fn === 'openDel') {
-    var ov = document.createElement('div');
-    ov.className = 'cfm-overlay';
-    ov.innerHTML = '<div class="cfm-box">'
-      + '<p style="color:var(--red);font-size:13px;margin-bottom:8px;">Rezervāciju dzēst var tikai vadība.</p>'
-      + '<p style="margin-bottom:16px;">Pin kods:</p>'
-      + '<input id="del-pin" type="password" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;" style="width:100%;padding:10px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:18px;text-align:center;margin-bottom:16px;">'
-      + '<div class="cfm-btns"><button class="cfm-yes" id="cfm-del-ok">Dzēst</button><button class="cfm-no" id="cfm-del-no">Atcelt</button></div>'
-      + '</div>';
-    document.body.appendChild(ov);
-    ov.querySelector('#del-pin').focus();
-    ov.querySelector('#cfm-del-ok').onclick = function() {
-      var pin = ov.querySelector('#del-pin').value;
-      if (pin === '31593') {
-        ov.remove();
-        openDel(id, cl);
-      } else {
-        ov.querySelector('#del-pin').style.borderColor = 'var(--red)';
-        ov.querySelector('#del-pin').value = '';
-        ov.querySelector('#del-pin').placeholder = 'Nepareizs PIN!';
-      }
-    };
-    ov.querySelector('#del-pin').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') ov.querySelector('#cfm-del-ok').click();
-    });
-    ov.querySelector('#cfm-del-no').onclick = function() { ov.remove(); };
+    showPinDialog(id, cl);
     return;
   }
 
-  // Pārcelt - tieši atvērt bez confirm
-  if (fn === 'openMove') { openMove(id); return; }
-
-  // Labot - tieši atvērt bez confirm
-  if (fn === 'openEdit') { openEdit(id); return; }
-
-  // Pārējās - confirm dialogs
   var msgMap = {
     markArrived: 'Atzīmēt kā ieradušies?',
     markDone:    'Atzīmēt kā notikušu?',
     openRek:     'Atvērt rekvizītus?'
   };
   var msg = msgMap[fn] || 'Vai esi pārliecināts?';
-  var ov2 = document.createElement('div');
-  ov2.className = 'cfm-overlay';
-  ov2.innerHTML = '<div class="cfm-box"><p>'+msg+'</p><div class="cfm-btns"><button class="cfm-yes">Jā</button><button class="cfm-no">Nē</button></div></div>';
-  document.body.appendChild(ov2);
-  ov2.querySelector('.cfm-yes').onclick = function() {
-    ov2.remove();
+  showConfirm(msg, function() {
     if (fn === 'markArrived') markArrived(id);
     else if (fn === 'markDone') markDone(id);
     else if (fn === 'openRek') openRek(id);
+  });
+}
+
+function showConfirm(msg, onYes) {
+  var ov = document.createElement('div');
+  ov.className = 'cfm-overlay';
+  ov.innerHTML = '<div class="cfm-box"><p>'+msg+'</p><div class="cfm-btns"><button class="cfm-yes">Jā</button><button class="cfm-no">Nē</button></div></div>';
+  document.body.appendChild(ov);
+  ov.querySelector('.cfm-yes').onclick = function() { ov.remove(); onYes(); };
+  ov.querySelector('.cfm-no').onclick  = function() { ov.remove(); };
+  ov.onclick = function(e) { if (e.target === ov) ov.remove(); };
+}
+
+function showPinDialog(id, cl) {
+  var ov = document.createElement('div');
+  ov.className = 'cfm-overlay';
+  ov.innerHTML = [
+    '<div class="cfm-box" style="max-width:340px;">',
+    '<div style="font-size:28px;margin-bottom:8px;">🔒</div>',
+    '<p style="font-size:15px;font-weight:700;margin-bottom:6px;">Rezervāciju dzēst var tikai vadība.</p>',
+    '<p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Ievadi PIN kodu, lai turpinātu:</p>',
+    '<input id="pin-input" type="password" maxlength="10" ',
+    'style="width:100%;padding:12px;background:var(--card2);border:2px solid var(--border2);',
+    'border-radius:var(--r);color:var(--text);font-size:22px;text-align:center;',
+    'letter-spacing:6px;box-sizing:border-box;margin-bottom:6px;" placeholder="• • • • •">',
+    '<p id="pin-err" style="color:var(--red);font-size:12px;height:18px;margin-bottom:12px;"></p>',
+    '<div class="cfm-btns">',
+    '<button class="cfm-yes" id="pin-ok">Dzēst</button>',
+    '<button class="cfm-no" id="pin-cancel">Atcelt</button>',
+    '</div></div>'
+  ].join('');
+  document.body.appendChild(ov);
+  var inp = ov.querySelector('#pin-input');
+  var err = ov.querySelector('#pin-err');
+  inp.focus();
+  ov.querySelector('#pin-ok').onclick = function() {
+    if (inp.value === '31593') {
+      ov.remove();
+      openDel(id, cl);
+    } else {
+      inp.style.borderColor = 'var(--red)';
+      inp.value = '';
+      err.textContent = 'Nepareizs PIN kods. Mēģini vēlreiz.';
+      inp.focus();
+    }
   };
-  ov2.querySelector('.cfm-no').onclick = function() { ov2.remove(); };
-  ov2.onclick = function(e) { if (e.target === ov2) ov2.remove(); };
+  ov.querySelector('#pin-cancel').onclick = function() { ov.remove(); };
+  inp.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') ov.querySelector('#pin-ok').click();
+    inp.style.borderColor = '';
+    err.textContent = '';
+  });
+  ov.onclick = function(e) { if (e.target === ov) ov.remove(); };
 }
 
 
@@ -2638,7 +2716,7 @@ function renderCard(b, nowMin) {
   }
   var arrivedBanner = (b.status === 'Ieradušies') ? '<div class="bnow"><span class="bnow-dot"></span>Ir ieradusies!<span class="bnow-dot"></span></div>' : '';
   var closedBanner  = b.closed  ? '<div class="bclosed"><span class="bnow-dot" style="background:var(--accent)"></span>Slegtais pasakums<span class="bnow-dot" style="background:var(--accent)"></span></div>' : '';
-  var outsideBanner = b.outside ? '<div class="boutside"><span class="bnow-dot" style="background:var(--accent)"></span>&#127749; Ārpus darba laika<span class="bnow-dot" style="background:var(--accent)"></span></div>' : '';
+  var outsideBanner = (b.outside === true || b.outside === 'true' || b.outside === 'TRUE') ? '<div class="boutside"><span class="bnow-dot" style="background:var(--accent)"></span>&#127749; Ārpus darba laika<span class="bnow-dot" style="background:var(--accent)"></span></div>' : '';
   return '<div class="bcard '+sc+' '+timeClass+'">'
     + '<div class="bcard-inner">'
     + '<div class="bcard-time"><div class="btime">'+tf+'</div><div class="bsep">|</div><div class="btime2">'+tt+'</div></div>'
