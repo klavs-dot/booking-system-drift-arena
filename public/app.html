@@ -2359,18 +2359,33 @@ function renderToday() {
   const ac = tb.filter(b=>b.status!=='Atcelta').length;
   document.getElementById('TD_COUNT').textContent =
     `${ac} aktīva rezervācija${ac===1?'':'s'}`;
+  // Padodam nowMin lai renderCard zina kuras notiek/pagājušas
+  const nowMin = nowMinutes();
   document.getElementById('TD_LIST').innerHTML =
-    tb.length ? tb.map(renderCard).join('') : emptyEl('Šodien nav rezervāciju');
+    tb.length ? tb.map(b=>renderCard(b, nowMin)).join('') : emptyEl('Šodien nav rezervāciju');
   document.getElementById('TM_LIST').innerHTML =
-    tmb.length ? tmb.map(renderCard).join('') : emptyEl('Rīt nav rezervāciju');
+    tmb.length ? tmb.map(b=>renderCard(b, -1)).join('') : emptyEl('Rīt nav rezervāciju');
+}
+
+function nowMinutes() {
+  const now = new Date();
+  return now.getHours() * 60 + now.getMinutes();
 }
 
 // ================================================================
 // REZERVĀCIJAS KARTĪTE
 // Rāda TIKAI HH:MM — nekādas timezone/GMT/angļu datumu virknes
 // ================================================================
-function renderCard(b) {
+function renderCard(b, nowMin) {
+  // Aprēķināt vai rezervācija notiek tagad vai ir pagājusi (tikai šodienai)
+  const bFrom = tmin(b.timeFrom);
+  const bTo   = tmin(b.timeTo);
+  const isNow  = nowMin !== undefined && nowMin >= 0 && nowMin >= bFrom && nowMin < bTo;
+  const isPast = nowMin !== undefined && nowMin >= 0 && nowMin >= bTo;
+  const needsAction = isNow && b.status === 'Aktīva'; // notiek bet admins vēl nav atzīmējis
+
   const sc = b.status==='Notikusi'?'sdone':b.status==='Atcelta'?'scanc':b.status==='Ieradušies'?'sarrived':'';
+  const timeClass = isNow ? 'is-now' : (isPast && b.status==='Aktīva' ? 'is-past' : '');
   const bdg = b.status==='Notikusi'
     ?`<span class="badge bd">✓ Notikusi</span>`
     :b.status==='Atcelta'
@@ -2396,7 +2411,15 @@ function renderCard(b) {
     ? `<div class="boutside"><span class="bnow-dot" style="background:var(--accent)"></span>Ārpus darba laika<span class="bnow-dot" style="background:var(--accent)"></span></div>`
     : '';
 
-  return `<div class="bcard ${sc}">
+  const nowBanner = needsAction
+    ? `<div style="padding:8px 12px 4px;"><button class="btn-notiek" onclick="markArrived('${b.id}')">⚡ Rezervācija NOTIEK — atzīmēt ierašanos!</button></div>`
+    : (isNow && b.status==='Ieradušies'
+      ? ''
+      : (isPast && b.status==='Aktīva'
+        ? `<div style="padding:6px 12px 2px;display:flex;gap:6px;"><button class="btn btn-ok btn-sm" onclick="markDone('${b.id}')">✓ Atzīmēt kā notikušu</button></div>`
+        : ''));
+
+  return `<div class="bcard ${sc} ${timeClass}">
     <div>
       <div class="btime">${tf}</div>
       <div class="bsep">↓</div>
@@ -2422,6 +2445,7 @@ function renderCard(b) {
       <button class="btn-rek" onclick="openRek('${b.id}')">${b.rekviziti ? '📋 Labot rekvizītus' : '📋 Pievienot rekvizītus'}</button>
       <button class="btn btn-d btn-sm" onclick="openDel('${b.id}','${esc(b.client||'')}')">🗑️ Dzēst</button>
     </div>
+    ${nowBanner}
     ${arrivedBanner}
     ${closedBanner}
     ${outsideBanner}
