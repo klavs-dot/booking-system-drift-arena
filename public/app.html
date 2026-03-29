@@ -2904,9 +2904,6 @@ function renderCard(b, nowMin) {
     +   '<div style="margin-top:8px;">'+bdg+'</div>'
     + '</div>'
 
-    + '<div class="bc-food">'+foodHtml+'</div>'
-    + '<div class="bc-food">'+drinksHtml+'</div>'
-
     + '<div class="bc-info">'
     +   '<div class="bcc">'+esc(b.client||'—')+'</div>'
     +   '<div class="bmeta-r">&#128222; '+esc(b.phone||'—')+'</div>'
@@ -2915,6 +2912,9 @@ function renderCard(b, nowMin) {
     +   (b.comment ? '<div class="bcmt-s">'+esc(b.comment)+'</div>' : '')
     +   (b.admin ? '<div class="badm">&#128105;&#8205;&#128188; '+esc(b.admin)+' &middot; '+esc(b.accepted)+'</div>' : '')
     + '</div>'
+
+    + '<div class="bc-food">'+foodHtml+'</div>'
+    + '<div class="bc-food">'+drinksHtml+'</div>'
 
     + '<div class="bc-btns">'+btns+'</div>'
 
