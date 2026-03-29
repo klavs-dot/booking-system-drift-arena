@@ -21,6 +21,23 @@ async function getSheets() {
   return google.sheets({ version: 'v4', auth });
 }
 
+function isOutsideHours(dateStr, timeFrom, timeTo) {
+  if (!dateStr || !timeFrom || !timeTo) return false;
+  const WORK_HOURS = {
+    1:{open:'11:00',close:'22:00'},2:{open:'11:00',close:'22:00'},
+    3:{open:'11:00',close:'22:00'},4:{open:'11:00',close:'22:00'},
+    5:{open:'11:00',close:'23:00'},6:{open:'10:00',close:'23:00'},
+    0:{open:'10:00',close:'22:00'},
+  };
+  try {
+    const [y,m,d] = dateStr.split('-').map(Number);
+    const dow = new Date(y,m-1,d).getDay();
+    const wh = WORK_HOURS[dow] || {open:'11:00',close:'22:00'};
+    const toMin = t => { const p=String(t).match(/(\d{1,2}):(\d{2})/); return p?parseInt(p[1])*60+parseInt(p[2]):0; };
+    return toMin(timeFrom) < toMin(wh.open) || toMin(timeTo) > toMin(wh.close);
+  } catch(e) { return false; }
+}
+
 function rowToBooking(r) {
   return {
     id:       String(r[0] || ''),
@@ -38,7 +55,8 @@ function rowToBooking(r) {
     food:     String(r[12] || ''),
     status:   String(r[13] || 'Aktīva'),
     closed:   r[14] === true || r[14] === 'TRUE' || r[14] === 'true',
-    outside:  r[15] === true || r[15] === 'TRUE' || r[15] === 'true',
+    outside:  r[15] === true || r[15] === 'TRUE' || r[15] === 'true' || String(r[15]).toUpperCase() === 'TRUE'
+            || isOutsideHours(r[1] ? String(r[1]).substring(0,10) : '', String(r[2]||''), String(r[3]||'')),
   };
 }
 
