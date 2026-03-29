@@ -2573,7 +2573,7 @@ function renderCard(b, nowMin) {
   if (needsAction) {
     nowBanner = '<button class="btn-notiek" data-fn="markArrived" data-id="'+id+'" onclick="cfmAct(this)">&#9889; REZERVACIJA NOTIEK</button>';
   } else if (isPast && b.status === 'Aktīva') {
-    nowBanner = '<button class="btn-mark-done" data-fn="markDone" data-id="'+id+'" onclick="cfmAct(this)">&#10003; Atzimejiet ka notikusi</button>';
+    nowBanner = '<button class="btn-mark-done" data-fn="markDone" data-id="'+id+'" onclick="cfmAct(this)">&#10003; Atzimejiet ? Lūdzu atzīmē vai rezervācija ir ieradušies vai jau notikusi</button>';
   }
   var arrivedBanner = (b.status === 'Ieradušies') ? '<div class="bnow"><span class="bnow-dot"></span>Ir ieradusies!<span class="bnow-dot"></span></div>' : '';
   var closedBanner  = b.closed  ? '<div class="bclosed"><span class="bnow-dot" style="background:var(--accent)"></span>Slegtais pasakums<span class="bnow-dot" style="background:var(--accent)"></span></div>' : '';
