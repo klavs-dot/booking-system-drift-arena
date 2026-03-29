@@ -56,6 +56,7 @@ function rowToBooking(r) {
     food:     String(r[12] || ''),
     status:   String(r[13] || 'Aktīva'),
     closed:   r[14] === true || r[14] === 'TRUE' || r[14] === 'true',
+    outside:  r[15] === true || r[15] === 'TRUE' || r[15] === 'true',
   };
 }
 
@@ -66,7 +67,7 @@ export async function getAllBookings() {
   const sheets = await getSheets();
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A:O`,
+    range: `${SHEET_NAME}!A:P`,
   });
   const rows = res.data.values || [];
   if (rows.length <= 1) return [];
@@ -102,7 +103,7 @@ export async function updateBooking(id, data) {
   const sheets = await getSheets();
   const res    = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A:O`,
+    range: `${SHEET_NAME}!A:P`,
   });
   const rows = res.data.values || [];
   const idx  = rows.findIndex((r, i) => i > 0 && String(r[0]) === String(id));
