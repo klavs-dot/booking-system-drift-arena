@@ -813,7 +813,33 @@ button{cursor:pointer}
 .bcmt{margin-top:7px;font-size:14px;color:var(--text);font-weight:500}
 .bfood{margin-top:5px;font-size:14px;color:var(--yellow);font-weight:600}
 .badm{margin-top:4px;font-size:11px;color:var(--text3)}
-.bacts{display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+.bacts{display:none}
+.bacts-bottom{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  padding:14px 0 4px;
+  border-top:1px solid var(--border);
+  margin-top:14px;
+  justify-content:center;
+}
+.bacts-bottom .btn{
+  flex:1 1 130px;
+  max-width:200px;
+  padding:12px 10px;
+  font-size:13px;
+  font-weight:700;
+  text-align:center;
+  border-radius:var(--r);
+  cursor:pointer;
+  transition:opacity 0.15s,transform 0.1s;
+}
+.bacts-bottom .btn:active{transform:scale(0.97)}
+.bacts-bottom .btn-g  {background:var(--card2);color:var(--text);border:1px solid var(--border2)}
+.bacts-bottom .btn-mv {background:#1e1e35;color:#8888ff;border:1px solid #3a3a70}
+.bacts-bottom .btn-arr{background:#0d2e16;color:#22c55e;border:2px solid #22c55e;font-size:14px}
+.bacts-bottom .btn-ok {background:#0d2828;color:#22d3ee;border:1px solid #22d3ee}
+.bacts-bottom .btn-d  {background:var(--red-dim);color:var(--red);border:1px solid var(--red)}
 
 /* Section separator */
 .ssep {
@@ -3451,29 +3477,19 @@ function toast(msg, type) {
   t._t = setTimeout(() => t.classList.remove('on'), 4500);
 }
 </script>
-
 <script>
-window.__gsr__ = {
-  withSuccessHandler: function(fn) {
-    return {
-      withFailureHandler: function(fe) {
-        return {
-          sGetAll:       () => fetch('/api/bookings').then(r=>r.json()).then(d=>fn(JSON.stringify(d.bookings||[]))).catch(fe),
-          sSave:         (data) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'save',...data})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
-          sUpdate:       (id,data) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'update',id,...data})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
-          sDelete:       (id) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'delete',id})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
-          sSetStatus:    (id,s) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'status',id,status:s})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
-          sOccupancy:    (dt,f,t) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'occupancy',date:dt,from:f,to:t})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||0))).catch(fe),
-          sOccExclude:   (dt,f,t,ex) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'occupancy',date:dt,from:f,to:t,excludeId:ex})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||0))).catch(fe),
-          sAlternatives: (dt,n) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'alternatives',date:dt,people:n})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||[]))).catch(fe),
-          sAltExclude:   (dt,n,ex) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'alternatives',date:dt,people:n,excludeId:ex})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||[]))).catch(fe),
-          sWorkHours:    (dt) => fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'workhours',date:dt})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||{}))).catch(fe),
-        };
-      }
-    };
-  }
-};
-window.google = { script: { run: window.__gsr__ } };
-</script>
-</body>
+window.__gsr__={withSuccessHandler:function(fn){return{withFailureHandler:function(fe){return{
+  sGetAll:()=>fetch('/api/bookings').then(r=>r.json()).then(d=>fn(JSON.stringify(d.bookings||[]))).catch(fe),
+  sSave:(data)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'save',...data})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
+  sUpdate:(id,data)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'update',id,...data})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
+  sDelete:(id)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'delete',id})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
+  sSetStatus:(id,s)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'status',id,status:s})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
+  sOccupancy:(dt,f,t)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'occupancy',date:dt,from:f,to:t})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||0))).catch(fe),
+  sOccExclude:(dt,f,t,ex)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'occupancy',date:dt,from:f,to:t,excludeId:ex})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||0))).catch(fe),
+  sAlternatives:(dt,n)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'alternatives',date:dt,people:n})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||[]))).catch(fe),
+  sAltExclude:(dt,n,ex)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'alternatives',date:dt,people:n,excludeId:ex})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||[]))).catch(fe),
+  sWorkHours:(dt)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'workhours',date:dt})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||{}))).catch(fe),
+}}}}}};
+window.google={script:{run:window.__gsr__}};
+</script></body>
 </html>
