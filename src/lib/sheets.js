@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import { getCache, setCache, clearCache } from './cache.js';
 
 const SHEET_ID   = process.env.SHEET_ID;
 const SHEET_NAME = 'Rezervacijas';
@@ -59,6 +60,9 @@ function rowToBooking(r) {
 }
 
 export async function getAllBookings() {
+  const cached = getCache();
+  if (cached) return cached;
+
   const sheets = await getSheets();
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
@@ -66,7 +70,9 @@ export async function getAllBookings() {
   });
   const rows = res.data.values || [];
   if (rows.length <= 1) return [];
-  return rows.slice(1).filter(r => r[0]).map(rowToBooking);
+  const bookings = rows.slice(1).filter(r => r[0]).map(rowToBooking);
+  setCache(bookings);
+  return bookings;
 }
 
 export async function saveBooking(data) {
@@ -88,6 +94,7 @@ export async function saveBooking(data) {
     ]]},
   });
 
+  clearCache();
   return { ok: true, id };
 }
 
@@ -130,6 +137,7 @@ export async function updateBooking(id, data) {
       resource: { valueInputOption: 'USER_ENTERED', data: updates },
     });
   }
+  clearCache();
   return { ok: true };
 }
 
@@ -152,6 +160,7 @@ export async function deleteBooking(id) {
       range: { sheetId, dimension: 'ROWS', startIndex: idx, endIndex: idx + 1 }
     }}]},
   });
+  clearCache();
   return { ok: true };
 }
 
