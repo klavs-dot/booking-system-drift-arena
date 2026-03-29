@@ -2516,6 +2516,7 @@ function showPinDialog(id, cl) {
 
 
 
+function bAddItem(el){editFoodDrink(el.getAttribute('data-bid'),el.getAttribute('data-bfield'));}
 function editFoodDrinkBtn(btn) {
   editFoodDrink(btn.getAttribute('data-id'), btn.getAttribute('data-field'));
 }
@@ -2859,7 +2860,7 @@ function renderCard(b, nowMin) {
     foodHtml += '<div class="bcard-item">'+esc(foodItems[fi2])+'</div>';
   }
   if (!foodItems.length) foodHtml += '<div class="bcard-item-empty">—</div>';
-  foodHtml += '<button class="bcard-add-btn" onclick="editFoodDrink(''+id+'','food')">+ Pievienot</button>';
+  foodHtml += '<button class="bcard-add-btn" data-bid="'+id+'" data-bfield="food" onclick="bAddItem(this)">+ Pievienot</button>';
 
   // Dzērieni kolonna
   var drinkItems = [];
@@ -2875,7 +2876,7 @@ function renderCard(b, nowMin) {
     drinksHtml += '<div class="bcard-item">'+esc(drinkItems[di2])+'</div>';
   }
   if (!drinkItems.length) drinksHtml += '<div class="bcard-item-empty">—</div>';
-  drinksHtml += '<button class="bcard-add-btn" onclick="editFoodDrink(''+id+'','drinks')">+ Pievienot</button>';
+  drinksHtml += '<button class="bcard-add-btn" data-bid="'+id+'" data-bfield="drinks" onclick="bAddItem(this)">+ Pievienot</button>';
 
   // Banneri
   var nowBanner = '';
