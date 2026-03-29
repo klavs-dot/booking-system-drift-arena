@@ -528,7 +528,7 @@ button{cursor:pointer}
 }
 .cnbtn:hover{color:var(--text);background:var(--accent);border-color:var(--accent)}
 
-.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cgrid{display:grid;grid-template-columns: 70px 240px 120px 210px 210px 155px;gap:4px}
 .chdr {
   text-align:center;
   font-family:var(--font-head);
@@ -1799,7 +1799,7 @@ button{cursor:pointer}
 .bc-food  { min-width:0; }
 .bc-rides { min-width:0; }
 .bc-info  { min-width:0; }
-.bc-btns  { display:flex; flex-direction:column; gap:5px; width:155px; grid-column:5; grid-row:1; }
+.bc-btns  { display:flex; flex-direction:column; gap:5px; width:155px; flex-shrink:0; }
 
 .bextra-title { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; }
 .bextra-item  { font-size:12px; color:var(--text2); padding:2px 0; border-bottom:1px solid var(--border); }
@@ -3027,10 +3027,8 @@ function renderCard(b, nowMin) {
     : b.status==='Atcelta' ? '<span class="badge bc">Atcelta</span>'
     : b.status==='Ieradušies' ? '<span class="badge bd">Ieradušies</span>'
     : '<span class="badge ba">Aktīva</span>';
-  var tf = cleanT(b.timeFrom);
-  var tt = cleanT(b.timeTo);
-  var id = b.id;
-  var cl = esc(b.client || '');
+  var tf = cleanT(b.timeFrom), tt = cleanT(b.timeTo);
+  var id = b.id, cl = esc(b.client || '');
 
   // Pogas
   var btns = '<button class="bact-btn btn-g" data-fn="openEdit" data-id="'+id+'" onclick="cfmAct(this)">&#9998; Labot</button>'
@@ -3040,41 +3038,41 @@ function renderCard(b, nowMin) {
     + '<button class="bact-btn btn-rek2" data-fn="openRek" data-id="'+id+'" onclick="cfmAct(this)">'+(b.rekviziti?'Labot':'Pievienot')+' rekvizītus</button>'
     + '<button class="bact-btn btn-d" data-fn="openDel" data-id="'+id+'" data-cl="'+cl+'" onclick="cfmAct(this)">&#128465; Dzēst</button>';
 
-  // Ēdieni inline - ar atsevišķu skaitu
-  var foodItems = b.food ? b.food.split(',').map(function(s){return s.trim();}).filter(Boolean) : [];
+  // Ēdieni
+  var fItems = b.food ? b.food.split(',').map(function(s){return s.trim();}).filter(Boolean) : [];
   var foodHtml = '<div class="bextra-title">&#127829; Ēdieni</div>'
     + '<div class="bextra-list" id="fl-'+id+'">'
-    + foodItems.map(function(x,i){
-        return '<div class="bextra-row">'
+    + fItems.map(function(x,i2){
+        return '<div class="bextra-row" data-idx="'+i2+'">'
           + '<span class="bextra-name">'+esc(x)+'</span>'
-          + '<button class="bextra-edit" onclick="bEditItem(this)" data-bid="'+id+'" data-field="food" data-idx="'+i+'" title="Labot">&#9998;</button>'
-          + '<button class="bextra-del" onclick="bDelItem(this)" data-bid="'+id+'" data-field="food" data-idx="'+i+'" title="Noņemt">&#10005;</button>'
+          + '<button class="bextra-edit" onclick="bEditItem(this)" data-bid="'+id+'" data-field="food" data-idx="'+i2+'">&#9998;</button>'
+          + '<button class="bextra-del" onclick="bDelItem(this)" data-bid="'+id+'" data-field="food" data-idx="'+i2+'">&#10005;</button>'
           + '</div>';
       }).join('')
     + '</div>'
     + '<div class="bextra-input-row" id="fi-'+id+'" style="display:none;">'
     + '<input class="bextra-in-name" placeholder="Nosaukums..." type="text">'
-    + '<input class="bextra-in-qty" placeholder="skaits" type="number" min="1" value="1">'
+    + '<input class="bextra-in-qty" placeholder="1" type="number" min="1" value="1">'
     + '<button class="bextra-ok" onclick="bConfirmItem(this)" data-bid="'+id+'" data-field="food">&#10003;</button>'
     + '<button class="bextra-cancel" onclick="bCancelItem(this)" data-bid="'+id+'" data-field="food">&#10005;</button>'
     + '</div>'
     + '<button class="bextra-add" id="fa-'+id+'" onclick="bShowInput(this)" data-bid="'+id+'" data-field="food">+ Pievienot</button>';
 
-  // Dzērieni inline - ar atsevišķu skaitu
-  var drinkItems = b.drinks ? b.drinks.split(',').map(function(s){return s.trim();}).filter(Boolean) : [];
+  // Dzērieni
+  var dItems = b.drinks ? b.drinks.split(',').map(function(s){return s.trim();}).filter(Boolean) : [];
   var drinksHtml = '<div class="bextra-title">&#127864; Dzērieni</div>'
     + '<div class="bextra-list" id="dl-'+id+'">'
-    + drinkItems.map(function(x,i){
-        return '<div class="bextra-row">'
+    + dItems.map(function(x,i2){
+        return '<div class="bextra-row" data-idx="'+i2+'">'
           + '<span class="bextra-name">'+esc(x)+'</span>'
-          + '<button class="bextra-edit" onclick="bEditItem(this)" data-bid="'+id+'" data-field="drinks" data-idx="'+i+'" title="Labot">&#9998;</button>'
-          + '<button class="bextra-del" onclick="bDelItem(this)" data-bid="'+id+'" data-field="drinks" data-idx="'+i+'" title="Noņemt">&#10005;</button>'
+          + '<button class="bextra-edit" onclick="bEditItem(this)" data-bid="'+id+'" data-field="drinks" data-idx="'+i2+'">&#9998;</button>'
+          + '<button class="bextra-del" onclick="bDelItem(this)" data-bid="'+id+'" data-field="drinks" data-idx="'+i2+'">&#10005;</button>'
           + '</div>';
       }).join('')
     + '</div>'
     + '<div class="bextra-input-row" id="di-'+id+'" style="display:none;">'
     + '<input class="bextra-in-name" placeholder="Nosaukums..." type="text">'
-    + '<input class="bextra-in-qty" placeholder="skaits" type="number" min="1" value="1">'
+    + '<input class="bextra-in-qty" placeholder="1" type="number" min="1" value="1">'
     + '<button class="bextra-ok" onclick="bConfirmItem(this)" data-bid="'+id+'" data-field="drinks">&#10003;</button>'
     + '<button class="bextra-cancel" onclick="bCancelItem(this)" data-bid="'+id+'" data-field="drinks">&#10005;</button>'
     + '</div>'
@@ -3088,16 +3086,22 @@ function renderCard(b, nowMin) {
   var closedBanner  = b.closed ? '<div class="bclosed"><span class="bnow-dot" style="background:var(--red)"></span>Slēgtais pasākums<span class="bnow-dot" style="background:var(--red)"></span></div>' : '';
   var outsideBanner = (b.outside===true||b.outside==='true'||b.outside==='TRUE') ? '<div class="boutside"><span class="bnow-dot" style="background:#3b82f6"></span>Ārpus darba laika<span class="bnow-dot" style="background:#3b82f6"></span></div>' : '';
 
+  // Braucieni
+  var ridesHtml = '<div class="bextra-title">&#127937; Braucieni</div>'
+    + '<input class="rides-input" id="ri-'+id+'" type="number" min="0" value="'+(b.rides||0)+'" oninput="bRidesChange(this,\''+id+'\')">'
+    + '<div class="rides-btns">'
+    + '<button class="rides-quick" onclick="bRidesAdd(this,1)" data-bid="'+id+'">+1</button>'
+    + '<button class="rides-quick" onclick="bRidesAdd(this,2)" data-bid="'+id+'">+2</button>'
+    + '<button class="rides-quick" onclick="bRidesAdd(this,5)" data-bid="'+id+'">+5</button>'
+    + '<button class="rides-quick" onclick="bRidesAdd(this,10)" data-bid="'+id+'">+10</button>'
+    + '</div>'
+    + '<button class="rides-save" id="rs-'+id+'" onclick="bRidesSave(this)" data-bid="'+id+'" style="display:none;">&#10003; Saglabāt</button>';
+
+  // HTML secība: laiks | info | braucieni | ēdieni | dzērieni | pogas
+  // SVARĪGI: bc-btns BEZ grid-column — lai iet secīgi
   return '<div class="bcard '+sc+' '+timeClass+'">'
     + '<div class="bc-grid">'
-
-    + '<div class="bc-time">'
-    +   '<div class="btime">'+tf+'</div>'
-    +   '<div class="bsep">|</div>'
-    +   '<div class="btime2">'+tt+'</div>'
-    +   '<div style="margin-top:8px;">'+bdg+'</div>'
-    + '</div>'
-
+    + '<div class="bc-time"><div class="btime">'+tf+'</div><div class="bsep">|</div><div class="btime2">'+tt+'</div><div style="margin-top:8px;">'+bdg+'</div></div>'
     + '<div class="bc-info">'
     +   '<div class="bcc">'+esc(b.client||'—')+'</div>'
     +   '<div class="bmeta-r">&#128222; '+esc(b.phone||'—')+'</div>'
@@ -3106,24 +3110,10 @@ function renderCard(b, nowMin) {
     +   (b.comment ? '<div class="bcmt-s">&#128172; '+esc(b.comment)+'</div>' : '')
     +   (b.admin ? '<div class="badm">&#128105;&#8205;&#128188; '+esc(b.admin)+' &middot; '+esc(b.accepted)+'</div>' : '')
     + '</div>'
-
-    + '<div class="bc-rides">'
-    +   '<div class="bextra-title">&#127955; Braucieni</div>'
-    +   '<input class="rides-input" id="ri-'+id+'" type="number" min="0" value="'+(b.rides||0)+'" onchange="bRidesChange(this,\''+id+'\')">'
-    +   '<div class="rides-btns">'
-    +     '<button class="rides-quick" onclick="bRidesAdd(this,1)" data-bid="'+id+'">+1</button>'
-    +     '<button class="rides-quick" onclick="bRidesAdd(this,2)" data-bid="'+id+'">+2</button>'
-    +     '<button class="rides-quick" onclick="bRidesAdd(this,5)" data-bid="'+id+'">+5</button>'
-    +     '<button class="rides-quick" onclick="bRidesAdd(this,10)" data-bid="'+id+'">+10</button>'
-    +   '</div>'
-    +   '<button class="rides-save" id="rs-'+id+'" onclick="bRidesSave(this)" data-bid="'+id+'" style="display:none;">&#10003; Saglabāt</button>'
-    + '</div>'
-
+    + '<div class="bc-rides">'+ridesHtml+'</div>'
     + '<div class="bc-food">'+foodHtml+'</div>'
     + '<div class="bc-food">'+drinksHtml+'</div>'
-
     + '<div class="bc-btns">'+btns+'</div>'
-
     + '</div>'
     + nowBanner + arrivedBanner + closedBanner + outsideBanner
     + '</div>';
