@@ -2420,30 +2420,31 @@ function renderCard(b, nowMin) {
         : ''));
 
   return `<div class="bcard ${sc} ${timeClass}">
-    <div>
-      <div class="btime">${tf}</div>
-      <div class="bsep">↓</div>
-      <div class="btime2">${tt}</div>
-    </div>
-    <div>
-      <div class="bcc">${esc(b.client||'—')}</div>
-      <div class="bmeta">
-        <span>👥 <b>${b.people}</b> cilv.</span>
-        ${b.phone   ? '<span>📞 ' + esc(b.phone) + '</span>'   : ''}
-        ${b.invoice ? '<span>💳 ' + esc(b.invoice) + '</span>' : ''}
-        ${bdg}
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div style="min-width:70px;text-align:center;">
+        <div class="btime">${tf}</div>
+        <div class="bsep">↓</div>
+        <div class="btime2">${tt}</div>
       </div>
-      ${b.comment  ? '<div class="bcmt">💬 ' + esc(b.comment) + '</div>'  : ''}
-      ${b.food     ? '<div class="bfood">🍕 ' + esc(b.food) + '</div>'    : ''}
-      ${b.admin    ? '<div class="badm">👩‍💼 ' + esc(b.admin) + ' · ' + esc(b.accepted) + '</div>' : ''}
+      <div style="flex:1;">
+        <div class="bcc">${esc(b.client||'—')}</div>
+        <div class="bmeta">
+          <span>👥 <b>${b.people}</b> cilv.</span>
+          ${b.phone   ? '<span>📞 ' + esc(b.phone) + '</span>'   : ''}
+          ${b.invoice ? '<span>💳 ' + esc(b.invoice) + '</span>' : ''}
+          ${bdg}
+        </div>
+        ${b.comment  ? '<div class="bcmt">💬 ' + esc(b.comment) + '</div>'  : ''}
+        ${b.food     ? '<div class="bfood">🍕 ' + esc(b.food) + '</div>'    : ''}
+        ${b.admin    ? '<div class="badm">👩‍💼 ' + esc(b.admin) + ' · ' + esc(b.accepted) + '</div>' : ''}
+      </div>
     </div>
-    <div class="bacts">
-      <button class="btn btn-g btn-sm" onclick="openEdit('${b.id}')">✏️ Labot</button>
-      <button class="btn btn-mv btn-sm" onclick="openMove('${b.id}')">📅 Pārcelt</button>
-      ${b.status==='Aktīva' ? '<button class="btn btn-arr btn-sm" onclick="markArrived(\'' + b.id + '\')">✅ Ieradušies</button>' : ''}
-      ${b.status!=='Notikusi' && b.status!=='Ieradušies' ? '<button class="btn btn-ok btn-sm" onclick="markDone(\'' + b.id + '\')">✓ Notikusi</button>' : b.status==='Ieradušies' ? '<button class="btn btn-ok btn-sm" onclick="markDone(\'' + b.id + '\')">✓ Pabeigt</button>' : ''}
-      <button class="btn-rek" onclick="openRek('${b.id}')">${b.rekviziti ? '📋 Labot rekvizītus' : '📋 Pievienot rekvizītus'}</button>
-      <button class="btn btn-d btn-sm" onclick="openDel('${b.id}','${esc(b.client||'')}')">🗑️ Dzēst</button>
+    <div class="bacts-bottom">
+      <button class="btn btn-g" onclick="openEdit('${b.id}')">✏️ Labot</button>
+      <button class="btn btn-mv" onclick="openMove('${b.id}')">📅 Pārcelt</button>
+      ${b.status==='Aktīva' ? '<button class="btn btn-arr" onclick="markArrived(\'' + b.id + '\')">✅ Ieradušies</button>' : ''}
+      ${b.status!=='Notikusi' && b.status!=='Ieradušies' ? '<button class="btn btn-ok" onclick="markDone(\'' + b.id + '\')">✓ Notikusi</button>' : b.status==='Ieradušies' ? '<button class="btn btn-ok" onclick="markDone(\'' + b.id + '\')">✓ Pabeigt</button>' : ''}
+      <button class="btn btn-d" onclick="openDel('${b.id}','${esc(b.client||'')}')">🗑️ Dzēst</button>
     </div>
     ${nowBanner}
     ${arrivedBanner}
