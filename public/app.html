@@ -1689,6 +1689,27 @@ button{cursor:pointer}
   gap: 8px;
 }
 
+
+@keyframes pulse-blue {
+  0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(59,130,246,0.4); }
+  50%      { opacity:0.9; box-shadow:0 0 16px 6px rgba(59,130,246,0.2); }
+}
+.boutside {
+  margin-top: 10px;
+  padding: 12px 20px;
+  background: #030d1a;
+  color: #60a5fa;
+  border: 2px solid #2563eb;
+  border-radius: var(--r);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  animation: pulse-blue 1.8s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
 </style>
 
 </head>
@@ -2577,7 +2598,7 @@ function renderCard(b, nowMin) {
   }
   var arrivedBanner = (b.status === 'Ieradušies') ? '<div class="bnow"><span class="bnow-dot"></span>Ir ieradusies!<span class="bnow-dot"></span></div>' : '';
   var closedBanner  = b.closed  ? '<div class="bclosed"><span class="bnow-dot" style="background:var(--accent)"></span>Slegtais pasakums<span class="bnow-dot" style="background:var(--accent)"></span></div>' : '';
-  var outsideBanner = b.outside ? '<div class="boutside"><span class="bnow-dot" style="background:var(--accent)"></span>Arpus darba laika<span class="bnow-dot" style="background:var(--accent)"></span></div>' : '';
+  var outsideBanner = b.outside ? '<div class="boutside"><span class="bnow-dot" style="background:var(--accent)"></span>&#127749; Ārpus darba laika<span class="bnow-dot" style="background:var(--accent)"></span></div>' : '';
   return '<div class="bcard '+sc+' '+timeClass+'">'
     + '<div class="bcard-inner">'
     + '<div class="bcard-time"><div class="btime">'+tf+'</div><div class="bsep">|</div><div class="btime2">'+tt+'</div></div>'

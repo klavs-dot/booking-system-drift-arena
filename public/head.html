@@ -1687,5 +1687,26 @@ button{cursor:pointer}
   gap: 8px;
 }
 
+
+@keyframes pulse-blue {
+  0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(59,130,246,0.4); }
+  50%      { opacity:0.9; box-shadow:0 0 16px 6px rgba(59,130,246,0.2); }
+}
+.boutside {
+  margin-top: 10px;
+  padding: 12px 20px;
+  background: #030d1a;
+  color: #60a5fa;
+  border: 2px solid #2563eb;
+  border-radius: var(--r);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  animation: pulse-blue 1.8s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
 </style>
 
