@@ -1,11 +1,15 @@
 import { getAllBookings, saveBooking, updateBooking, deleteBooking, setStatus } from '@/lib/sheets';
 import { NextResponse } from 'next/server';
 
+// Vercel max timeout
+export const maxDuration = 30;
+
 export async function GET() {
   try {
     const bookings = await getAllBookings();
     return NextResponse.json({ ok: true, bookings });
   } catch (e) {
+    console.error('GET error:', e.message);
     return NextResponse.json({ ok: false, error: e.message }, { status: 500 });
   }
 }
@@ -45,6 +49,7 @@ export async function POST(req) {
 
     return NextResponse.json({ ok: false, error: 'Unknown action' }, { status: 400 });
   } catch (e) {
+    console.error('POST error:', e.message);
     return NextResponse.json({ ok: false, error: e.message }, { status: 500 });
   }
 }
@@ -54,7 +59,6 @@ function toMin(t) {
   const m = String(t).match(/(\d{1,2}):(\d{2})/);
   return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : 0;
 }
-
 function p2(n) { return String(n).padStart(2,'0'); }
 
 const WORK_HOURS = {
@@ -71,41 +75,40 @@ function calcWorkHours(dateStr) {
 }
 
 function calcOccupancy(bookings, dateStr, from, to, excludeId) {
-  const CAP_MAX = 90;
+  const CAP = 90;
   const rel = bookings.filter(b =>
-    b.date === dateStr && b.status !== 'Atcelta' &&
-    String(b.id) !== String(excludeId||'') &&
-    toMin(b.timeFrom) < toMin(to) && toMin(b.timeTo) > toMin(from)
+    b.date===dateStr && b.status!=='Atcelta' &&
+    String(b.id)!==String(excludeId||'') &&
+    toMin(b.timeFrom)<toMin(to) && toMin(b.timeTo)>toMin(from)
   );
   if (!rel.length) return 0;
-  if (rel.some(b => b.closed)) return CAP_MAX;
+  if (rel.some(b=>b.closed)) return CAP;
   const pts = new Set([toMin(from),toMin(to)]);
-  rel.forEach(b => { pts.add(toMin(b.timeFrom)); pts.add(toMin(b.timeTo)); });
-  const sorted = [...pts].sort((a,b)=>a-b);
-  let max = 0;
-  for (let i=0;i<sorted.length-1;i++) {
+  rel.forEach(b=>{pts.add(toMin(b.timeFrom));pts.add(toMin(b.timeTo));});
+  const sorted=[...pts].sort((a,b)=>a-b);
+  let max=0;
+  for(let i=0;i<sorted.length-1;i++){
     const mid=(sorted[i]+sorted[i+1])/2;
     const occ=rel.filter(b=>toMin(b.timeFrom)<=mid&&toMin(b.timeTo)>mid).reduce((s,b)=>s+b.people,0);
-    if (occ>max) max=occ;
+    if(occ>max)max=occ;
   }
   return max;
 }
 
 function calcAlternatives(bookings, dateStr, neededPeople, excludeId) {
-  const CAP_MAX = 90;
-  const wh = calcWorkHours(dateStr);
-  const openMin = toMin(wh.open), closeMin = toMin(wh.close);
-  const results = [];
-  for (let start=openMin; start<=closeMin-60; start+=15) {
-    const end = start+3*60;
-    if (end>closeMin) break;
-    const from = p2(Math.floor(start/60))+':'+p2(start%60);
-    const to   = p2(Math.floor(end/60))+':'+p2(end%60);
-    const occ  = calcOccupancy(bookings, dateStr, from, to, excludeId);
-    const free = CAP_MAX-occ;
-    if (free>=neededPeople) {
-      results.push({from,to,occupied:occ,free});
-      if (results.length>=6) break;
+  const CAP=90;
+  const wh=calcWorkHours(dateStr);
+  const openMin=toMin(wh.open),closeMin=toMin(wh.close);
+  const results=[];
+  for(let start=openMin;start<=closeMin-60;start+=15){
+    const end=start+3*60;
+    if(end>closeMin)break;
+    const from=p2(Math.floor(start/60))+':'+p2(start%60);
+    const to=p2(Math.floor(end/60))+':'+p2(end%60);
+    const occ=calcOccupancy(bookings,dateStr,from,to,excludeId);
+    if(CAP-occ>=neededPeople){
+      results.push({from,to,occupied:occ,free:CAP-occ});
+      if(results.length>=6)break;
     }
   }
   return results;
