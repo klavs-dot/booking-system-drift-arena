@@ -1794,6 +1794,10 @@ button{cursor:pointer}
 .bcmt-big    { font-size:19px; color:var(--text); margin-top:8px; margin-bottom:4px; line-height:1.4; }
 .badm        { font-size:11px; color:var(--text3); margin-top:6px; }
 
+
+.bcard-status { margin-top:8px; }
+.bcard-status .badge { font-size:10px; padding:3px 7px; display:inline-block; }
+
 </style>
 
 </head>
@@ -2905,6 +2909,7 @@ function renderCard(b, nowMin) {
     +   '<div class="btime">'+tf+'</div>'
     +   '<div class="bsep">|</div>'
     +   '<div class="btime2">'+tt+'</div>'
+    +   '<div class="bcard-status">'+bdg+'</div>'
     + '</div>'
 
     // Galvenā info kolonna
@@ -2913,7 +2918,7 @@ function renderCard(b, nowMin) {
     +   '<div class="bmeta-row"><span class="bmeta-item">&#128222; '+esc(b.phone||'—')+'</span></div>'
     +   '<div class="bmeta-row"><span class="bmeta-item">&#128101; '+b.people+' cilv.</span></div>'
     +   (b.invoice ? '<div class="bmeta-row"><span class="bmeta-item">&#128179; '+esc(b.invoice)+'</span></div>' : '')
-    +   '<div class="bmeta-row">'+bdg+'</div>'
+    +   ''
     +   (b.comment ? '<div class="bcmt-big">&#128172; '+esc(b.comment)+'</div>' : '')
     +   (b.admin ? '<div class="badm">&#128105;&#8205;&#128188; '+esc(b.admin)+' &middot; '+esc(b.accepted)+'</div>' : '')
     + '</div>'
