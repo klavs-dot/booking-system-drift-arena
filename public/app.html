@@ -1868,6 +1868,11 @@ button{cursor:pointer}
 .rek-sug-item { padding:8px 12px; cursor:pointer; border-bottom:1px solid var(--border); font-size:12px; }
 .rek-sug-item:hover { background:var(--card2); }
 
+
+.bextra-qty  { font-size:11px; color:var(--accent); font-weight:700; margin:0 4px; min-width:22px; transition:color 0.3s; }
+.bextra-q    { padding:2px 5px; background:var(--card2); border:1px solid var(--border2); border-radius:4px; color:var(--text2); font-size:11px; font-weight:700; cursor:pointer; }
+.bextra-q:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+
 </style>
 
 </head>
@@ -2796,6 +2801,41 @@ function bEditItem(btn) {
   };
 }
 
+function bQuickAdd(btn) {
+  var id    = btn.getAttribute('data-bid');
+  var field = btn.getAttribute('data-field');
+  var idx   = parseInt(btn.getAttribute('data-idx'));
+  var add   = parseInt(btn.getAttribute('data-add'));
+  var b = ALL.find(function(x){return x.id===id;});
+  if (!b) return;
+  var items = b[field] ? b[field].split(',').map(function(s){return s.trim();}).filter(Boolean) : [];
+  var cur = items[idx] || '';
+  var qm = cur.match(/^(.+?)\s+x(\d+)$/);
+  var nm = qm ? qm[1] : cur;
+  var qt = qm ? parseInt(qm[2]) : 1;
+  var newQt = qt + add;
+  var newLabel = nm + ' x' + newQt;
+  items[idx] = newLabel;
+
+  // Atjaunot UI uzreiz
+  var row = btn.closest('.bextra-row');
+  if (row) {
+    row.querySelector('.bextra-qty').textContent = 'x' + newQt;
+    // Flash efekts
+    row.querySelector('.bextra-qty').style.color = '#22c55e';
+    setTimeout(function(){ row.querySelector('.bextra-qty').style.color = ''; }, 600);
+  }
+
+  // Saglabāt
+  var newVal = items.join(', ');
+  b[field] = newVal;
+  var data = {}; data[field] = newVal;
+  window.__gsr__
+    .withSuccessHandler(function(){})
+    .withFailureHandler(function(e){ toast('Kļūda: '+e.message,'err'); })
+    .sUpdate(id, data);
+}
+
 function bShowInput(btn) {
   var id    = btn.getAttribute('data-bid');
   var field = btn.getAttribute('data-field');
@@ -3210,8 +3250,14 @@ function renderCard(b, nowMin) {
   var foodHtml = '<div class="bextra-title">&#127829; Ēdieni</div>'
     + '<div class="bextra-list" id="fl-'+id+'">'
     + fItems.map(function(x,i2){
+        var qm = x.match(/^(.+?)\s+x(\d+)$/);
+        var nm = qm ? qm[1] : x;
+        var qt = qm ? parseInt(qm[2]) : 1;
         return '<div class="bextra-row" data-idx="'+i2+'">'
-          + '<span class="bextra-name">'+esc(x)+'</span>'
+          + '<span class="bextra-name">'+esc(nm)+'</span>'
+          + '<span class="bextra-qty">x'+qt+'</span>'
+          + '<button class="bextra-q" data-bid="'+id+'" data-field="food" data-idx="'+i2+'" data-add="1" onclick="bQuickAdd(this)">+1</button>'
+          + '<button class="bextra-q" data-bid="'+id+'" data-field="food" data-idx="'+i2+'" data-add="2" onclick="bQuickAdd(this)">+2</button>'
           + '<button class="bextra-edit" onclick="bEditItem(this)" data-bid="'+id+'" data-field="food" data-idx="'+i2+'">&#9998;</button>'
           + '<button class="bextra-del" onclick="bDelItem(this)" data-bid="'+id+'" data-field="food" data-idx="'+i2+'">&#10005;</button>'
           + '</div>';
@@ -3230,8 +3276,14 @@ function renderCard(b, nowMin) {
   var drinksHtml = '<div class="bextra-title">&#127864; Dzērieni</div>'
     + '<div class="bextra-list" id="dl-'+id+'">'
     + dItems.map(function(x,i2){
+        var qm = x.match(/^(.+?)\s+x(\d+)$/);
+        var nm = qm ? qm[1] : x;
+        var qt = qm ? parseInt(qm[2]) : 1;
         return '<div class="bextra-row" data-idx="'+i2+'">'
-          + '<span class="bextra-name">'+esc(x)+'</span>'
+          + '<span class="bextra-name">'+esc(nm)+'</span>'
+          + '<span class="bextra-qty">x'+qt+'</span>'
+          + '<button class="bextra-q" data-bid="'+id+'" data-field="drinks" data-idx="'+i2+'" data-add="1" onclick="bQuickAdd(this)">+1</button>'
+          + '<button class="bextra-q" data-bid="'+id+'" data-field="drinks" data-idx="'+i2+'" data-add="2" onclick="bQuickAdd(this)">+2</button>'
           + '<button class="bextra-edit" onclick="bEditItem(this)" data-bid="'+id+'" data-field="drinks" data-idx="'+i2+'">&#9998;</button>'
           + '<button class="bextra-del" onclick="bDelItem(this)" data-bid="'+id+'" data-field="drinks" data-idx="'+i2+'">&#10005;</button>'
           + '</div>';
