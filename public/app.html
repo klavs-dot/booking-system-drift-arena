@@ -813,33 +813,8 @@ button{cursor:pointer}
 .bcmt{margin-top:7px;font-size:14px;color:var(--text);font-weight:500}
 .bfood{margin-top:5px;font-size:14px;color:var(--yellow);font-weight:600}
 .badm{margin-top:4px;font-size:11px;color:var(--text3)}
-.bacts{display:none}
-.bacts-bottom{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  padding:14px 0 4px;
-  border-top:1px solid var(--border);
-  margin-top:14px;
-  justify-content:center;
-}
-.bacts-bottom .btn{
-  flex:1 1 130px;
-  max-width:200px;
-  padding:12px 10px;
-  font-size:13px;
-  font-weight:700;
-  text-align:center;
-  border-radius:var(--r);
-  cursor:pointer;
-  transition:opacity 0.15s,transform 0.1s;
-}
-.bacts-bottom .btn:active{transform:scale(0.97)}
-.bacts-bottom .btn-g  {background:var(--card2);color:var(--text);border:1px solid var(--border2)}
-.bacts-bottom .btn-mv {background:#1e1e35;color:#8888ff;border:1px solid #3a3a70}
-.bacts-bottom .btn-arr{background:#0d2e16;color:#22c55e;border:2px solid #22c55e;font-size:14px}
-.bacts-bottom .btn-ok {background:#0d2828;color:#22d3ee;border:1px solid #22d3ee}
-.bacts-bottom .btn-d  {background:var(--red-dim);color:var(--red);border:1px solid var(--red)}
+.bacts{display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+
 
 /* Section separator */
 .ssep {
@@ -2446,26 +2421,31 @@ function renderCard(b, nowMin) {
         : ''));
 
   return `<div class="bcard ${sc} ${timeClass}">
-    <div style="display:flex;align-items:center;gap:16px;">
-      <div style="min-width:70px;text-align:center;">
-        <div class="btime">${tf}</div>
-        <div class="bsep">↓</div>
-        <div class="btime2">${tt}</div>
-      </div>
-      <div style="flex:1;">
-        <div class="bcc">${esc(b.client||'—')}</div>
-        <div class="bmeta">
-          <span>👥 <b>${b.people}</b> cilv.</span>
-          ${b.phone   ? '<span>📞 ' + esc(b.phone) + '</span>'   : ''}
-          ${b.invoice ? '<span>💳 ' + esc(b.invoice) + '</span>' : ''}
-          ${bdg}
-        </div>
-        ${b.comment  ? '<div class="bcmt">💬 ' + esc(b.comment) + '</div>'  : ''}
-        ${b.food     ? '<div class="bfood">🍕 ' + esc(b.food) + '</div>'    : ''}
-        ${b.admin    ? '<div class="badm">👩‍💼 ' + esc(b.admin) + ' · ' + esc(b.accepted) + '</div>' : ''}
-      </div>
+    <div>
+      <div class="btime">${tf}</div>
+      <div class="bsep">↓</div>
+      <div class="btime2">${tt}</div>
     </div>
-    <div class="bacts-bottom">
+    <div>
+      <div class="bcc">${esc(b.client||'—')}</div>
+      <div class="bmeta">
+        <span>👥 <b>${b.people}</b> cilv.</span>
+        ${b.phone   ? '<span>📞 ' + esc(b.phone) + '</span>'   : ''}
+        ${b.invoice ? '<span>💳 ' + esc(b.invoice) + '</span>' : ''}
+        ${bdg}
+      </div>
+      ${b.comment  ? '<div class="bcmt">💬 ' + esc(b.comment) + '</div>'  : ''}
+      ${b.food     ? '<div class="bfood">🍕 ' + esc(b.food) + '</div>'    : ''}
+      ${b.admin    ? '<div class="badm">👩‍💼 ' + esc(b.admin) + ' · ' + esc(b.accepted) + '</div>' : ''}
+    </div>
+    <div class="bacts">
+      <button class="btn btn-g btn-sm" onclick="openEdit('${b.id}')">✏️ Labot</button>
+      <button class="btn btn-mv btn-sm" onclick="openMove('${b.id}')">📅 Pārcelt</button>
+      ${b.status==='Aktīva' ? '<button class="btn btn-arr btn-sm" onclick="markArrived(\'' + b.id + '\')">✅ Ieradušies</button>' : ''}
+      ${b.status!=='Notikusi' && b.status!=='Ieradušies' ? '<button class="btn btn-ok btn-sm" onclick="markDone(\'' + b.id + '\')">✓ Notikusi</button>' : b.status==='Ieradušies' ? '<button class="btn btn-ok btn-sm" onclick="markDone(\'' + b.id + '\')">✓ Pabeigt</button>' : ''}
+      <button class="btn-rek" onclick="openRek('${b.id}')">${b.rekviziti ? '📋 Labot rekvizītus' : '📋 Pievienot rekvizītus'}</button>
+      <button class="btn btn-d btn-sm" onclick="openDel('${b.id}','${esc(b.client||'')}')">🗑️ Dzēst</button>
+    </div>
       <button class="btn btn-g" onclick="openEdit('${b.id}')">✏️ Labot</button>
       <button class="btn btn-mv" onclick="openMove('${b.id}')">📅 Pārcelt</button>
       ${b.status==='Aktīva' ? '<button class="btn btn-arr" onclick="markArrived(\'' + b.id + '\')">✅ Ieradušies</button>' : ''}
@@ -3480,8 +3460,8 @@ function toast(msg, type) {
 <script>
 window.__gsr__={withSuccessHandler:function(fn){return{withFailureHandler:function(fe){return{
   sGetAll:()=>fetch('/api/bookings').then(r=>r.json()).then(d=>fn(JSON.stringify(d.bookings||[]))).catch(fe),
-  sSave:(data)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'save',...data})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
-  sUpdate:(id,data)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'update',id,...data})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
+  sSave:(d)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'save',...d})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
+  sUpdate:(id,d)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'update',id,...d})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
   sDelete:(id)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'delete',id})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
   sSetStatus:(id,s)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'status',id,status:s})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d))).catch(fe),
   sOccupancy:(dt,f,t)=>fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'occupancy',date:dt,from:f,to:t})}).then(r=>r.json()).then(d=>fn(JSON.stringify(d.result||0))).catch(fe),
