@@ -1785,7 +1785,7 @@ window.__gsr__={
           sGetAll:function(){fetch('/api/bookings').then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.bookings||[]))}).catch(fe)},
           sSave:function(d){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({_action:'save'},d))}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d))}).catch(fe)},
           sUpdate:function(id,d){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({_action:'update',id:id},d))}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d))}).catch(fe)},
-          sDelete:function(id){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'delete',id:id})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d))}).catch(fe)},
+          sDelete:function(id,cl,reason){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'delete',id:id,clientName:cl,reason:reason})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d))}).catch(fe)},
           sSetStatus:function(id,s){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'status',id:id,status:s})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d))}).catch(fe)},
           sOccupancy:function(dt,f,t){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'occupancy',date:dt,from:f,to:t})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||0))}).catch(fe)},
           sOccExclude:function(dt,f,t,ex){fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_action:'occupancy',date:dt,from:f,to:t,excludeId:ex})}).then(function(r){return r.json()}).then(function(d){fn(JSON.stringify(d.result||0))}).catch(fe)},
@@ -2418,41 +2418,67 @@ function showPinDialog(id, cl) {
   var ov = document.createElement('div');
   ov.className = 'cfm-overlay';
   ov.innerHTML = [
-    '<div class="cfm-box" style="max-width:340px;">',
-    '<div style="font-size:28px;margin-bottom:8px;">🔒</div>',
-    '<p style="font-size:15px;font-weight:700;margin-bottom:6px;">Rezervāciju dzēst var tikai vadība.</p>',
-    '<p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Ievadi PIN kodu, lai turpinātu:</p>',
+    '<div class="cfm-box" style="max-width:360px;">',
+    '<div style="font-size:32px;margin-bottom:10px;">🔒</div>',
+    '<p style="font-size:15px;font-weight:700;margin-bottom:4px;">Rezervāciju dzēst var tikai vadība.</p>',
+    '<p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Ievadi PIN kodu:</p>',
     '<input id="pin-input" type="password" maxlength="10" ',
     'style="width:100%;padding:12px;background:var(--card2);border:2px solid var(--border2);',
     'border-radius:var(--r);color:var(--text);font-size:22px;text-align:center;',
-    'letter-spacing:6px;box-sizing:border-box;margin-bottom:6px;" placeholder="• • • • •">',
-    '<p id="pin-err" style="color:var(--red);font-size:12px;height:18px;margin-bottom:12px;"></p>',
+    'letter-spacing:6px;box-sizing:border-box;margin-bottom:4px;">',
+    '<p id="pin-err" style="color:var(--red);font-size:12px;height:18px;margin-bottom:10px;"></p>',
+    '<div id="pin-step2" style="display:none;">',
+    '<p style="font-size:13px;color:var(--text2);margin-bottom:8px;text-align:left;">Kāds ir iemesls dzēšanai?</p>',
+    '<textarea id="pin-reason" rows="3" placeholder="Ievadi iemeslu..." ',
+    'style="width:100%;padding:10px;background:var(--card2);border:1px solid var(--border2);',
+    'border-radius:var(--r);color:var(--text);font-size:13px;box-sizing:border-box;',
+    'resize:none;margin-bottom:10px;"></textarea>',
+    '</div>',
     '<div class="cfm-btns">',
-    '<button class="cfm-yes" id="pin-ok">Dzēst</button>',
+    '<button class="cfm-yes" id="pin-ok">Tālāk</button>',
     '<button class="cfm-no" id="pin-cancel">Atcelt</button>',
     '</div></div>'
   ].join('');
   document.body.appendChild(ov);
-  var inp = ov.querySelector('#pin-input');
-  var err = ov.querySelector('#pin-err');
+
+  var inp    = ov.querySelector('#pin-input');
+  var err    = ov.querySelector('#pin-err');
+  var step2  = ov.querySelector('#pin-step2');
+  var okBtn  = ov.querySelector('#pin-ok');
+  var pinOk  = false;
+
   inp.focus();
-  ov.querySelector('#pin-ok').onclick = function() {
-    if (inp.value === '31593') {
-      ov.remove();
-      openDel(id, cl);
+
+  okBtn.onclick = function() {
+    if (!pinOk) {
+      if (inp.value === '31593') {
+        pinOk = true;
+        inp.style.borderColor = '#22c55e';
+        err.textContent = '';
+        inp.disabled = true;
+        step2.style.display = 'block';
+        okBtn.textContent = 'Dzēst';
+        okBtn.style.background = 'var(--red)';
+        ov.querySelector('#pin-reason').focus();
+      } else {
+        inp.style.borderColor = 'var(--red)';
+        inp.value = '';
+        err.textContent = 'Nepareizs PIN kods.';
+        inp.focus();
+      }
     } else {
-      inp.style.borderColor = 'var(--red)';
-      inp.value = '';
-      err.textContent = 'Nepareizs PIN kods. Mēģini vēlreiz.';
-      inp.focus();
+      var reason = ov.querySelector('#pin-reason').value.trim();
+      ov.remove();
+      openDelWithReason(id, cl, reason);
     }
   };
-  ov.querySelector('#pin-cancel').onclick = function() { ov.remove(); };
+
   inp.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') ov.querySelector('#pin-ok').click();
-    inp.style.borderColor = '';
-    err.textContent = '';
+    if (e.key === 'Enter') okBtn.click();
+    if (!pinOk) { inp.style.borderColor = ''; err.textContent = ''; }
   });
+
+  ov.querySelector('#pin-cancel').onclick = function() { ov.remove(); };
   ov.onclick = function(e) { if (e.target === ov) ov.remove(); };
 }
 
@@ -2769,6 +2795,23 @@ function openDel(id, name) {
   document.getElementById('DEL_NAME').textContent = name;
   openM('M_DEL');
 }
+function openDelWithReason(id, cl, reason) {
+  ovl('Dzēš rezervāciju...');
+  window.__gsr__
+    .withSuccessHandler(function(r) {
+      var res = JSON.parse(r);
+      hovl();
+      if (res.ok) {
+        toast('Rezervācija dzēsta', 'ok');
+        loadAll(true);
+      } else {
+        toast('Kļūda: ' + (res.reason || ''), 'err');
+      }
+    })
+    .withFailureHandler(function(e) { hovl(); toast('Kļūda: ' + e.message, 'err'); })
+    .sDelete(id, cl, reason);
+}
+
 function confirmDel() {
   closeM('M_DEL');
   ovl('Dzēš...');

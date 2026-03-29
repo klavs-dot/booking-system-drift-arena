@@ -27,7 +27,7 @@ export async function POST(req) {
       return NextResponse.json(await updateBooking(id, rest));
     }
     if (_action === 'delete') {
-      return NextResponse.json(await deleteBooking(data.id));
+      return NextResponse.json(await deleteBooking(data.id, data.clientName, data.reason));
     }
     if (_action === 'status') {
       return NextResponse.json(await setStatus(data.id, data.status));

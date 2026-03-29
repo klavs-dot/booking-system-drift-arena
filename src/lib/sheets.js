@@ -3,19 +3,13 @@ import { getCache, setCache, clearCache } from './cache.js';
 
 const SHEET_ID   = process.env.SHEET_ID;
 const SHEET_NAME = 'Rezervacijas';
+const DELETED_SHEET = 'Dzēstās rezervācijas';
 
 function getAuth() {
   let credentials = process.env.GOOGLE_SERVICE_ACCOUNT;
   if (!credentials) throw new Error('GOOGLE_SERVICE_ACCOUNT nav iestatīts');
-  
-  // Parse JSON
   const creds = JSON.parse(credentials);
-  
-  // Izlabot private_key - Vercel var sabojāt \n
-  if (creds.private_key) {
-    creds.private_key = creds.private_key.replace(/\\n/g, '\n');
-  }
-  
+  if (creds.private_key) creds.private_key = creds.private_key.replace(/\\n/g, '\n');
   return new google.auth.GoogleAuth({
     credentials: creds,
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
@@ -25,18 +19,6 @@ function getAuth() {
 async function getSheets() {
   const auth = getAuth();
   return google.sheets({ version: 'v4', auth });
-}
-
-function toMin(t) {
-  if (!t) return 0;
-  const m = String(t).match(/(\d{1,2}):(\d{2})/);
-  return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : 0;
-}
-
-function p2(n) { return String(n).padStart(2, '0'); }
-
-function nowRiga() {
-  return new Date().toLocaleString('lv-LV', { timeZone: 'Europe/Riga' });
 }
 
 function rowToBooking(r) {
@@ -60,10 +42,13 @@ function rowToBooking(r) {
   };
 }
 
+function nowRiga() {
+  return new Date().toLocaleString('lv-LV', { timeZone: 'Europe/Riga' });
+}
+
 export async function getAllBookings() {
   const cached = getCache();
   if (cached) return cached;
-
   const sheets = await getSheets();
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
@@ -79,22 +64,21 @@ export async function getAllBookings() {
 export async function saveBooking(data) {
   const people   = parseInt(data.people) || 0;
   const isClosed = data.closed === true || data.closed === 'true';
+  const isOutside = data.outside === true || data.outside === 'true';
   const sheets   = await getSheets();
   const id       = 'R' + Date.now();
   const ts       = nowRiga();
-
   await sheets.spreadsheets.values.append({
     spreadsheetId:    SHEET_ID,
-    range:            `${SHEET_NAME}!A:O`,
+    range:            `${SHEET_NAME}!A:P`,
     valueInputOption: 'USER_ENTERED',
     resource: { values: [[
       id, data.date, data.timeFrom || '', data.timeTo || '',
       data.client || '', data.phone || '', data.email || '', people,
       data.invoice || 'Uz vietas', data.comment || '',
-      data.admin || '', ts, data.food || '', 'Aktīva', isClosed,
+      data.admin || '', ts, data.food || '', 'Aktīva', isClosed, isOutside,
     ]]},
   });
-
   clearCache();
   return { ok: true, id };
 }
@@ -102,13 +86,11 @@ export async function saveBooking(data) {
 export async function updateBooking(id, data) {
   const sheets = await getSheets();
   const res    = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A:P`,
+    spreadsheetId: SHEET_ID, range: `${SHEET_NAME}!A:P`,
   });
   const rows = res.data.values || [];
   const idx  = rows.findIndex((r, i) => i > 0 && String(r[0]) === String(id));
   if (idx === -1) return { ok: false, reason: 'not_found' };
-
   const rowNum = idx + 1;
   const updates = [];
   const col = (c) => String.fromCharCode(64 + c);
@@ -116,10 +98,9 @@ export async function updateBooking(id, data) {
     if (val !== undefined && val !== null)
       updates.push({ range: `${SHEET_NAME}!${col(c)}${rowNum}`, values: [[val]] });
   };
-
-  if (data.date)     set(2, data.date);
-  if (data.timeFrom) set(3, data.timeFrom);
-  if (data.timeTo)   set(4, data.timeTo);
+  if (data.date)              set(2, data.date);
+  if (data.timeFrom)          set(3, data.timeFrom);
+  if (data.timeTo)            set(4, data.timeTo);
   if (data.client !== undefined)  set(5, data.client);
   if (data.phone !== undefined)   set(6, data.phone);
   if (data.email !== undefined)   set(7, data.email);
@@ -131,7 +112,7 @@ export async function updateBooking(id, data) {
   if (data.food !== undefined)    set(13, data.food);
   if (data.status !== undefined)  set(14, data.status);
   if (data.closed !== undefined)  set(15, data.closed === true || data.closed === 'true');
-
+  if (data.outside !== undefined) set(16, data.outside === true || data.outside === 'true');
   if (updates.length) {
     await sheets.spreadsheets.values.batchUpdate({
       spreadsheetId: SHEET_ID,
@@ -142,25 +123,59 @@ export async function updateBooking(id, data) {
   return { ok: true };
 }
 
-export async function deleteBooking(id) {
-  const sheets    = await getSheets();
-  const res       = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: `${SHEET_NAME}!A:A`,
+export async function deleteBooking(id, clientName, reason) {
+  const sheets = await getSheets();
+
+  // Iegūt rezervācijas datus pirms dzēšanas
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID, range: `${SHEET_NAME}!A:P`,
   });
   const rows = res.data.values || [];
   const idx  = rows.findIndex((r, i) => i > 0 && String(r[0]) === String(id));
   if (idx === -1) return { ok: false, reason: 'not_found' };
 
-  const meta    = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
-  const sheetId = meta.data.sheets.find(s => s.properties.title === SHEET_NAME)?.properties.sheetId;
+  const deletedRow = rows[idx];
 
+  // Saglabāt dzēstajā lapā
+  try {
+    const meta = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
+    const sheetExists = meta.data.sheets.some(s => s.properties.title === DELETED_SHEET);
+    if (!sheetExists) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: SHEET_ID,
+        resource: { requests: [{ addSheet: { properties: { title: DELETED_SHEET } } }] }
+      });
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SHEET_ID,
+        range: `${DELETED_SHEET}!A1`,
+        valueInputOption: 'USER_ENTERED',
+        resource: { values: [['ID','Datums','No','Līdz','Klients','Telefons','E-pasts','Cilvēki','Maks.','Komentāri','Admin','Pieņemts','Ēdieni','Statuss','Slēgts','Ārpus','Dzēšanas datums','Iemesls']] }
+      });
+    }
+    const now = nowRiga();
+    const rowData = [...(deletedRow.slice(0, 16))];
+    while (rowData.length < 16) rowData.push('');
+    rowData.push(now, reason || '');
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: `${DELETED_SHEET}!A:R`,
+      valueInputOption: 'USER_ENTERED',
+      resource: { values: [rowData] }
+    });
+  } catch(e) {
+    console.error('Nevar saglabāt dzēsto:', e.message);
+  }
+
+  // Dzēst no galvenās lapas
+  const sheetMeta = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
+  const sheetId   = sheetMeta.data.sheets.find(s => s.properties.title === SHEET_NAME)?.properties.sheetId;
   await sheets.spreadsheets.batchUpdate({
     spreadsheetId: SHEET_ID,
     resource: { requests: [{ deleteDimension: {
       range: { sheetId, dimension: 'ROWS', startIndex: idx, endIndex: idx + 1 }
-    }}]},
+    }}] }
   });
+
   clearCache();
   return { ok: true };
 }
