@@ -2317,25 +2317,65 @@ function nearestQuarter(t) {
 
 // Confirm dialogs
 function cfmAct(btn) {
-  var msg = btn.getAttribute('data-msg');
   var fn  = btn.getAttribute('data-fn');
   var id  = btn.getAttribute('data-id');
   var cl  = btn.getAttribute('data-cl') || '';
-  var ov  = document.createElement('div');
-  ov.className = 'cfm-overlay';
-  ov.innerHTML = '<div class="cfm-box"><p>'+msg+'</p><div class="cfm-btns"><button class="cfm-yes">J&#257;</button><button class="cfm-no">N&#275;</button></div></div>';
-  document.body.appendChild(ov);
-  ov.querySelector('.cfm-yes').onclick = function() {
-    ov.remove();
-    if (fn==='openEdit') openEdit(id);
-    else if (fn==='openMove') openMove(id);
-    else if (fn==='markArrived') markArrived(id);
-    else if (fn==='markDone') markDone(id);
-    else if (fn==='openRek') openRek(id);
-    else if (fn==='openDel') openDel(id, cl);
+
+  // Dzēst - prasa PIN kodu
+  if (fn === 'openDel') {
+    var ov = document.createElement('div');
+    ov.className = 'cfm-overlay';
+    ov.innerHTML = '<div class="cfm-box">'
+      + '<p style="color:var(--red);font-size:13px;margin-bottom:8px;">Rezervāciju dzēst var tikai vadība.</p>'
+      + '<p style="margin-bottom:16px;">Pin kods:</p>'
+      + '<input id="del-pin" type="password" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;" style="width:100%;padding:10px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:18px;text-align:center;margin-bottom:16px;">'
+      + '<div class="cfm-btns"><button class="cfm-yes" id="cfm-del-ok">Dzēst</button><button class="cfm-no" id="cfm-del-no">Atcelt</button></div>'
+      + '</div>';
+    document.body.appendChild(ov);
+    ov.querySelector('#del-pin').focus();
+    ov.querySelector('#cfm-del-ok').onclick = function() {
+      var pin = ov.querySelector('#del-pin').value;
+      if (pin === '31593') {
+        ov.remove();
+        openDel(id, cl);
+      } else {
+        ov.querySelector('#del-pin').style.borderColor = 'var(--red)';
+        ov.querySelector('#del-pin').value = '';
+        ov.querySelector('#del-pin').placeholder = 'Nepareizs PIN!';
+      }
+    };
+    ov.querySelector('#del-pin').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') ov.querySelector('#cfm-del-ok').click();
+    });
+    ov.querySelector('#cfm-del-no').onclick = function() { ov.remove(); };
+    return;
+  }
+
+  // Pārcelt - tieši atvērt bez confirm
+  if (fn === 'openMove') { openMove(id); return; }
+
+  // Labot - tieši atvērt bez confirm
+  if (fn === 'openEdit') { openEdit(id); return; }
+
+  // Pārējās - confirm dialogs
+  var msgMap = {
+    markArrived: 'Atzīmēt kā ieradušies?',
+    markDone:    'Atzīmēt kā notikušu?',
+    openRek:     'Atvērt rekvizītus?'
   };
-  ov.querySelector('.cfm-no').onclick = function() { ov.remove(); };
-  ov.onclick = function(e) { if (e.target===ov) ov.remove(); };
+  var msg = msgMap[fn] || 'Vai esi pārliecināts?';
+  var ov2 = document.createElement('div');
+  ov2.className = 'cfm-overlay';
+  ov2.innerHTML = '<div class="cfm-box"><p>'+msg+'</p><div class="cfm-btns"><button class="cfm-yes">Jā</button><button class="cfm-no">Nē</button></div></div>';
+  document.body.appendChild(ov2);
+  ov2.querySelector('.cfm-yes').onclick = function() {
+    ov2.remove();
+    if (fn === 'markArrived') markArrived(id);
+    else if (fn === 'markDone') markDone(id);
+    else if (fn === 'openRek') openRek(id);
+  };
+  ov2.querySelector('.cfm-no').onclick = function() { ov2.remove(); };
+  ov2.onclick = function(e) { if (e.target === ov2) ov2.remove(); };
 }
 
 
