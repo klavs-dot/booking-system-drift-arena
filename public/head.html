@@ -526,7 +526,7 @@ button{cursor:pointer}
 }
 .cnbtn:hover{color:var(--text);background:var(--accent);border-color:var(--accent)}
 
-.cgrid{display:grid;grid-template-columns: 70px 240px 120px 210px 210px 155px;gap:4px}
+.cgrid{display:grid;grid-template-columns: 70px 240px 120px 210px 210px 180px 155px;gap:4px}
 .chdr {
   text-align:center;
   font-family:var(--font-head);
@@ -1788,7 +1788,7 @@ button{cursor:pointer}
 
 .bc-grid {
   display: grid;
-  grid-template-columns: 70px 240px 120px 210px 210px 155px;
+  grid-template-columns: 70px 240px 120px 210px 210px 180px 155px;
   gap: 16px;
   align-items: start;
   grid-auto-rows: auto;
@@ -1848,6 +1848,23 @@ button{cursor:pointer}
 
 .bc-info-actions { display:flex; flex-direction:column; gap:4px; margin-bottom:10px; }
 .bc-info-actions .bact-btn { width:100%; text-align:center; }
+
+
+.bc-rek       { min-width:0; }
+.rek-summary  { margin-bottom:6px; }
+.rek-row      { font-size:11px; color:var(--text2); padding:1px 0; }
+.rek-telpa    { color:#22c55e; font-size:11px; }
+.rek-form     { }
+.rek-field-group { margin-bottom:12px; }
+.rek-label    { display:block; font-size:12px; color:var(--text3); font-weight:600; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.4px; }
+.rek-input    { width:100%; padding:9px 10px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:13px; box-sizing:border-box; }
+.rek-input:focus { border-color:var(--accent); outline:none; }
+.rek-note     { font-size:11px; color:var(--text3); margin-top:4px; line-height:1.4; }
+.rek-search-btn { padding:8px 12px; background:var(--card2); border:1px solid var(--accent); border-radius:var(--r); color:var(--accent); font-size:12px; cursor:pointer; white-space:nowrap; flex-shrink:0; }
+.rek-search-btn:hover { background:var(--accent); color:#fff; }
+.rek-suggest  { position:absolute; top:100%; left:0; right:0; background:var(--card); border:1px solid var(--border2); border-radius:var(--r); z-index:100; box-shadow:0 8px 24px rgba(0,0,0,0.4); max-height:200px; overflow-y:auto; }
+.rek-sug-item { padding:8px 12px; cursor:pointer; border-bottom:1px solid var(--border); font-size:12px; }
+.rek-sug-item:hover { background:var(--card2); }
 
 </style>
 
