@@ -1848,8 +1848,8 @@ button{cursor:pointer}
 .bextra-edit:hover { color:#22d3ee; opacity:1; }
 
 
-.bc-info-actions { display:flex; flex-direction:column; gap:4px; margin-bottom:8px; }
-.bc-info-actions .bact-btn { width:100%; text-align:left; }
+.bc-info-actions { display:flex; flex-direction:column; gap:4px; margin-bottom:10px; }
+.bc-info-actions .bact-btn { width:100%; text-align:center; }
 
 </style>
 
@@ -3035,9 +3035,7 @@ function renderCard(b, nowMin) {
   var id = b.id, cl = esc(b.client || '');
 
   // Pogas
-  var btns = '<button class="bact-btn btn-g" data-fn="openEdit" data-id="'+id+'" onclick="cfmAct(this)">&#9998; Labot</button>'
-    + '<button class="bact-btn btn-mv" data-fn="openMove" data-id="'+id+'" onclick="cfmAct(this)">&#128197; Pārcelt</button>'
-    + (b.status==='Aktīva' ? '<button class="bact-btn btn-arr" data-fn="markArrived" data-id="'+id+'" onclick="cfmAct(this)">&#10003; Ieradušies</button>' : '')
+  var btns = (b.status==='Aktīva' ? '<button class="bact-btn btn-arr" data-fn="markArrived" data-id="'+id+'" onclick="cfmAct(this)">&#10003; Ieradušies</button>' : '')
     + (b.status!=='Notikusi' ? '<button class="bact-btn btn-ok" data-fn="markDone" data-id="'+id+'" onclick="cfmAct(this)">&#10003; Notikusi</button>' : '')
     + '<button class="bact-btn btn-rek2" data-fn="openRek" data-id="'+id+'" onclick="cfmAct(this)">'+(b.rekviziti?'Labot':'Pievienot')+' rekvizītus</button>'
     + '<button class="bact-btn btn-d" data-fn="openDel" data-id="'+id+'" data-cl="'+cl+'" onclick="cfmAct(this)">&#128465; Dzēst</button>';
