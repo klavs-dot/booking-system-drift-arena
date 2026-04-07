@@ -4299,13 +4299,16 @@ function renderCard(b, nowMin) {
     + '<button class="bextra-add" id="da-'+id+'" onclick="bShowInput(this)" data-bid="'+id+'" data-field="drinks">+ Pievienot</button>';
 
   // Rekvizīti
-  var rek = b.rekviziti ? (function() {
-    try { return JSON.parse(b.rekviziti); } catch(e) { return null; }
-  })() : null;
-  var rekHtml = '<div class="bextra-title">&#128196; Rekvizīti</div>';
   var rek = null;
   try { rek = b.rekviziti ? JSON.parse(b.rekviziti) : null; } catch(e) {}
-  if (rek && (rek.name || rek.reg)) {
+  var rekHtml = '<div class="bextra-title">&#128196; Rekvizīti</div>';
+  if (rek && rek.later) {
+    // Rekvizīti vēlāk — brīdinājums
+    rekHtml += '<div style="padding:6px 8px;background:#2d1e03;border:1px solid #854d0e;border-radius:4px;margin-bottom:6px;">'
+      + '<div style="font-size:12px;font-weight:700;color:#facc15;">⚠️ NOSKAIDROT REKVIZĪTUS</div>'
+      + '</div>';
+    rekHtml += '<button class="bextra-add brek-open" data-bid="'+id+'">+ Pievienot rekvizītus</button>';
+  } else if (rek && (rek.name || rek.reg)) {
     rekHtml += '<div class="rek-summary">'
       + (rek.name ? '<div class="rek-row"><b>'+esc(rek.name)+'</b></div>' : '')
       + (rek.reg  ? '<div class="rek-row">Reģ: '+esc(rek.reg)+'</div>' : '')
@@ -4354,6 +4357,7 @@ function renderCard(b, nowMin) {
     +   (b.email ? '<div class="bmeta-r">&#128231; '+esc(b.email)+'</div>' : '')
     +   '<div class="bmeta-r" style="font-size:17px;font-weight:700;color:#fff;">&#128101; '+b.people+' cilv.</div>'
     +   (b.invoice ? '<div class="bmeta-r">&#128179; '+esc(b.invoice)+'</div>' : '')
+    +   (b.invEmail ? '<div class="bmeta-r" style="color:var(--yellow);">&#128231; Rēķins: '+esc(b.invEmail)+'</div>' : '')
     +   (b.comment ? '<div class="bcmt-s">&#128172; '+esc(b.comment)+'</div>' : '')
     +   (b.admin ? '<div class="badm">&#128105;&#8205;&#128188; '+esc(b.admin)+' &middot; '+esc(b.accepted)+'</div>' : '')
     + '</div>'
@@ -5141,10 +5145,10 @@ function submitNew() {
 
   // Būvēt rekvizītu JSON no formas laukiem
   if (wInv.includes('rēķin')) {
-    const wIE = document.getElementById('w_inv_email').value.trim();
-    if (!wIE) { toast('🧾 Ievadi e-pastu rēķinam!', 'warn'); return; }
-    const isForeign = document.getElementById('w_rek_foreign')?.checked || false;
     const rekLater = document.getElementById('w_rek_later')?.checked || false;
+    const wIE = document.getElementById('w_inv_email').value.trim();
+    if (!rekLater && !wIE) { toast('🧾 Ievadi e-pastu rēķinam!', 'warn'); return; }
+    const isForeign = document.getElementById('w_rek_foreign')?.checked || false;
     if (!rekLater) {
       var rekName, rekReg, rekPvn, rekAddr;
       if (isForeign) {
