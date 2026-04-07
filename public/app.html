@@ -2185,7 +2185,13 @@ window.google={script:{run:window.__gsr__}};
 
 <!-- TOPBAR -->
 <header class="topbar">
-  <div class="logo">DA<span>MARSHAL</span></div>
+  <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;">
+    <div class="logo" style="margin:0;">DA<span>MARSHAL</span></div>
+    <div class="cap-pill" style="display:flex;align-items:center;gap:6px;font-size:11px;padding:2px 0;border:none;background:none;">
+      Kapacitāte: <b id="cap-pill-val">90</b>
+      <button onclick="editCapacity()" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:3px;padding:1px 5px;cursor:pointer;font-size:9px;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">✎</button>
+    </div>
+  </div>
   <nav class="nav">
     <button class="nb" id="nb-calendar" onclick="goNav('calendar',this)">📅 Pārskats</button>
     <button class="nb active" id="nb-today" onclick="goNav('today',this)">📅 Timeline</button>
@@ -2199,11 +2205,6 @@ window.google={script:{run:window.__gsr__}};
       <button class="nb nb-new" id="nb-new" onclick="goNav('new',this)">＋ Jauna rezervācija</button>
     </div>
   </nav>
-  <!-- STATISTIKAS PANELIS -->
-  <div class="cap-pill" style="display:flex;align-items:center;gap:8px;">
-    Kapacitāte: <b id="cap-pill-val">90</b>
-    <button onclick="editCapacity()" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:3px;padding:2px 6px;cursor:pointer;font-size:10px;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">✎ Labot</button>
-  </div>
 </header>
 
 <main class="main">
