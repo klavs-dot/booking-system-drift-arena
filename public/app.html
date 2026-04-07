@@ -3274,7 +3274,7 @@ function renderCard(b, nowMin) {
   // Pogas
   var btns = (b.status==='Aktīva' ? '<button class="bact-btn btn-arr" data-fn="markArrived" data-id="'+id+'" onclick="cfmAct(this)">&#10003; Ieradušies</button>' : '')
     + (b.status!=='Notikusi' ? '<button class="bact-btn btn-ok" data-fn="markDone" data-id="'+id+'" onclick="cfmAct(this)">&#10003; Notikusi</button>' : '')
-    + '<button class="bact-btn btn-rek2" data-fn="openRek" data-id="'+id+'" onclick="cfmAct(this)">'+(b.rekviziti?'Labot':'Pievienot')+' rekvizītus</button>'
+
     + '<button class="bact-btn btn-d" data-fn="openDel" data-id="'+id+'" data-cl="'+cl+'" onclick="cfmAct(this)">&#128465; Dzēst</button>';
 
   // Ēdieni
