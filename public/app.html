@@ -2294,11 +2294,18 @@ window.google={script:{run:window.__gsr__}};
             </div>
           </div>
         </div>
-        <label class="wcheck wcheck-outside" style="margin-top:6px;">
-          <input type="checkbox" id="w_outside" onchange="toggleOutsideHours(this.checked)">
-          <span class="chk"></span>
-          <span>⚠️ Ārpus darba laika</span>
-        </label>
+        <div style="display:flex;gap:20px;margin-top:6px;flex-wrap:wrap;">
+          <label class="wcheck wcheck-outside">
+            <input type="checkbox" id="w_outside" onchange="toggleOutsideHours(this.checked)">
+            <span class="chk"></span>
+            <span>⚠️ Ārpus darba laika</span>
+          </label>
+          <label class="wcheck">
+            <input type="checkbox" id="w_closed">
+            <span class="chk"></span>
+            <span>🔒 Slēgtais pasākums</span>
+          </label>
+        </div>
         <div id="outside-times-hint" style="display:none;" class="outside-times-hint">
           <span class="oht-label">Pieejamie laiki ārpus darba laika:</span>
           <div class="oht-times" id="outside-times-list"></div>
@@ -2362,22 +2369,16 @@ window.google={script:{run:window.__gsr__}};
         </div>
       </div>
 
-      <!-- BLOKS 3: Maksājums un admin -->
+      <!-- BLOKS 3: Maksājums -->
       <div class="wiz-block">
         <div class="wiz-block-title">💳 Maksājums</div>
-        <div class="wform-row2">
-          <div class="field">
-            <label>Maksāšanas veids</label>
-            <select id="w_inv" onchange="toggleInvFields('w'); wValidate();">
-              <option>Uz vietas</option>
-              <option>Ar rēķinu - pēcapmaksa</option>
-              <option>Ar rēķinu - priekšapmaksa</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Administrators <span class="req">*</span></label>
-            <input type="text" id="w_admin" placeholder="Vārds" oninput="wValidate()">
-          </div>
+        <div class="field">
+          <label>Maksāšanas veids</label>
+          <select id="w_inv" onchange="toggleInvFields('w'); wValidate();">
+            <option>Uz vietas</option>
+            <option>Ar rēķinu - pēcapmaksa</option>
+            <option>Ar rēķinu - priekšapmaksa</option>
+          </select>
         </div>
         <!-- Rēķina lauki - tikai ja rēķins -->
         <div id="w_inv_email_wrap" style="display:none;margin-top:14px;">
@@ -2550,16 +2551,19 @@ window.google={script:{run:window.__gsr__}};
       <!-- BLOKS 5: Papildus -->
       <div class="wiz-block">
         <div class="wiz-block-title">📝 Papildus informācija</div>
-        <div class="field" style="margin-bottom:14px;">
+        <div class="field">
           <label>Komentāri</label>
           <textarea id="w_cmt" placeholder="Dzimšanas diena, īpašas vēlmes..."></textarea>
         </div>
-        <div class="wform-checks">
-          <label class="wcheck">
-            <input type="checkbox" id="w_closed">
-            <span class="chk"></span>
-            <span>🔒 Slēgtais pasākums</span>
-          </label>
+      </div>
+
+      <!-- Administrators -->
+      <div class="wiz-block">
+        <div class="wiz-block-title">👩‍💼 Administrators</div>
+        <div class="field">
+          <label>Kurš pieņēma rezervāciju? <span class="req">*</span></label>
+          <input type="text" id="w_admin" placeholder="Tavs vārds" oninput="wValidate()"
+            style="font-size:16px;padding:12px;">
         </div>
       </div>
 
