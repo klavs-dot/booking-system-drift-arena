@@ -1957,5 +1957,45 @@ button{cursor:pointer}
 .bfd-call    { background:#1a1400; color:#facc15; border:1px solid #854d0e; }
 .bfd-onsite  { background:#0d2e16; color:#22c55e; border:1px solid #166534; }
 
+
+/* Sidebar */
+.wiz { max-width:100%; }
+.new-layout { display:grid; grid-template-columns:1fr 300px; gap:20px; align-items:start; }
+.wiz-sidebar { display:flex; flex-direction:column; gap:12px; position:sticky; top:80px; }
+.wsb-card { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:14px 16px; }
+.wsb-title { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
+.wsb-hint { font-size:12px; color:var(--text3); }
+.wsb-hours-val { font-size:18px; font-weight:700; color:var(--text); }
+.wsb-cap-row { display:flex; align-items:baseline; gap:4px; margin-bottom:6px; }
+.wsb-cap-num { font-size:36px; font-weight:800; font-family:var(--font-head); }
+.wsb-cap-of  { font-size:14px; color:var(--text3); }
+.wsb-bar-wrap { height:6px; background:var(--border); border-radius:3px; margin-bottom:6px; overflow:hidden; }
+.wsb-bar-fill { height:100%; border-radius:3px; transition:width 0.3s; }
+.wsb-cap-sub { font-size:11px; color:var(--text3); }
+.wsb-warn { font-size:12px; color:var(--red); font-weight:700; margin-top:6px; }
+.wsb-slot-row { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+.wsb-slot-lbl { font-size:10px; color:var(--text3); width:36px; flex-shrink:0; }
+.wsb-slot-bar { flex:1; height:10px; background:var(--border); border-radius:2px; overflow:hidden; }
+.wsb-slot-num { font-size:10px; color:var(--text2); width:24px; text-align:right; }
+
+/* Darba laika badge */
+.work-hours-badge { margin-top:6px; font-size:12px; color:#22c55e; background:#0d2e16; border:1px solid #166534; border-radius:4px; padding:4px 8px; }
+
+/* Obligāto lauku kļūda */
+.field-error input, .field-error textarea, .field-error select {
+  border-color: var(--red) !important;
+  box-shadow: 0 0 0 2px rgba(239,68,68,0.25) !important;
+}
+.field-error label { color: var(--red) !important; }
+
+/* Rides upsell */
+.rides-upsell-hint { margin-top:8px; padding:10px 12px; background:#0a1628; border:1px solid #1d4ed8; border-radius:var(--r); font-size:12px; color:var(--text2); }
+.rides-upsell-btn { padding:5px 12px; border-radius:var(--r); cursor:pointer; font-size:12px; font-weight:700; border:1px solid; }
+.rides-upsell-btn.yes { background:#0d2e16; color:#22c55e; border-color:#22c55e; }
+.rides-upsell-btn.no  { background:var(--card2); color:var(--text3); border-color:var(--border); }
+
+/* Kids Sunday */
+.kids-sunday-hint { margin-top:8px; padding:10px 12px; background:#1a0f00; border:1px solid #92400e; border-radius:var(--r); font-size:12px; color:var(--text2); }
+
 </style>
 

@@ -1959,6 +1959,46 @@ button{cursor:pointer}
 .bfd-call    { background:#1a1400; color:#facc15; border:1px solid #854d0e; }
 .bfd-onsite  { background:#0d2e16; color:#22c55e; border:1px solid #166534; }
 
+
+/* Sidebar */
+.wiz { max-width:100%; }
+.new-layout { display:grid; grid-template-columns:1fr 300px; gap:20px; align-items:start; }
+.wiz-sidebar { display:flex; flex-direction:column; gap:12px; position:sticky; top:80px; }
+.wsb-card { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:14px 16px; }
+.wsb-title { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
+.wsb-hint { font-size:12px; color:var(--text3); }
+.wsb-hours-val { font-size:18px; font-weight:700; color:var(--text); }
+.wsb-cap-row { display:flex; align-items:baseline; gap:4px; margin-bottom:6px; }
+.wsb-cap-num { font-size:36px; font-weight:800; font-family:var(--font-head); }
+.wsb-cap-of  { font-size:14px; color:var(--text3); }
+.wsb-bar-wrap { height:6px; background:var(--border); border-radius:3px; margin-bottom:6px; overflow:hidden; }
+.wsb-bar-fill { height:100%; border-radius:3px; transition:width 0.3s; }
+.wsb-cap-sub { font-size:11px; color:var(--text3); }
+.wsb-warn { font-size:12px; color:var(--red); font-weight:700; margin-top:6px; }
+.wsb-slot-row { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+.wsb-slot-lbl { font-size:10px; color:var(--text3); width:36px; flex-shrink:0; }
+.wsb-slot-bar { flex:1; height:10px; background:var(--border); border-radius:2px; overflow:hidden; }
+.wsb-slot-num { font-size:10px; color:var(--text2); width:24px; text-align:right; }
+
+/* Darba laika badge */
+.work-hours-badge { margin-top:6px; font-size:12px; color:#22c55e; background:#0d2e16; border:1px solid #166534; border-radius:4px; padding:4px 8px; }
+
+/* Obligāto lauku kļūda */
+.field-error input, .field-error textarea, .field-error select {
+  border-color: var(--red) !important;
+  box-shadow: 0 0 0 2px rgba(239,68,68,0.25) !important;
+}
+.field-error label { color: var(--red) !important; }
+
+/* Rides upsell */
+.rides-upsell-hint { margin-top:8px; padding:10px 12px; background:#0a1628; border:1px solid #1d4ed8; border-radius:var(--r); font-size:12px; color:var(--text2); }
+.rides-upsell-btn { padding:5px 12px; border-radius:var(--r); cursor:pointer; font-size:12px; font-weight:700; border:1px solid; }
+.rides-upsell-btn.yes { background:#0d2e16; color:#22c55e; border-color:#22c55e; }
+.rides-upsell-btn.no  { background:var(--card2); color:var(--text3); border-color:var(--border); }
+
+/* Kids Sunday */
+.kids-sunday-hint { margin-top:8px; padding:10px 12px; background:#1a0f00; border:1px solid #92400e; border-radius:var(--r); font-size:12px; color:var(--text2); }
+
 </style>
 
 </head>
@@ -2125,6 +2165,7 @@ window.google={script:{run:window.__gsr__}};
               <div class="pdcal" id="dp_cal"></div>
             </div>
           </div>
+          <div id="w_workhours_info" style="display:none;" class="work-hours-badge"></div>
         </div>
         <div class="field">
           <label>🕐 Sākums <span class="req">*</span></label>
@@ -2212,8 +2253,8 @@ window.google={script:{run:window.__gsr__}};
           </select>
         </div>
         <div class="field">
-          <label>👩‍💼 Administrators</label>
-          <input type="text" id="w_admin" placeholder="Vārds">
+          <label>👩‍💼 Administrators <span class="req">*</span></label>
+          <input type="text" id="w_admin" placeholder="Vārds" oninput="wValidate()">
         </div>
       </div>
 
@@ -2310,10 +2351,44 @@ window.google={script:{run:window.__gsr__}};
         <textarea id="w_cmt" placeholder="Dzimšanas diena, braucieni, īpašas vēlmes..."></textarea>
       </div>
 
+      <!-- Plānotie braucieni + Bērnu ballīte -->
+      <div class="wform-row2" style="margin-bottom:14px;">
+        <div class="field">
+          <label>🏁 Plānotais braucienu skaits</label>
+          <input type="number" id="w_rides" min="0" placeholder="Nav obligāts"
+            class="rides-input" style="font-size:20px;padding:8px;width:100%;box-sizing:border-box;"
+            oninput="wCheckRides(this.value)">
+          <div id="w_rides_hint" style="display:none;" class="rides-upsell-hint">
+            💡 <b>Vai piedāvāji ņemt vairāk braucienus, jo lētāk?</b>
+            <div style="display:flex;gap:8px;margin-top:6px;">
+              <button type="button" class="rides-upsell-btn yes" onclick="wRidesUpsell(true)">✓ Jā, piedāvāju</button>
+              <button type="button" class="rides-upsell-btn no" onclick="wRidesUpsell(false)">✗ Nē</button>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>🎈 Bērnu ballīte?</label>
+          <label class="wcheck" style="margin-top:8px;">
+            <input type="checkbox" id="w_kids_party" onchange="wKidsParty(this.checked)">
+            <span>Jā, bērnu ballīte</span>
+          </label>
+          <div id="w_kids_sunday_hint" style="display:none;" class="kids-sunday-hint">
+            🧃 Svētdienās bezmaksas PEPSI! Pārcelt uz svētdienu?
+            <div style="display:flex;gap:8px;margin-top:6px;">
+              <button type="button" class="rides-upsell-btn yes" onclick="wSuggestSunday()">📅 Pārcelt</button>
+              <button type="button" class="rides-upsell-btn no" onclick="document.getElementById('w_kids_sunday_hint').style.display='none'">Palikt šajā</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Checkboxes -->
       <div class="wform-checks">
         <label class="wcheck">
           <input type="checkbox" id="w_closed"> 🔒 Slēgtais pasākums
+        </label>
+        <label class="wcheck">
+          <input type="checkbox" id="w_outside" onchange="toggleOutsideHours(this.checked)"> ⚠️ Ārpus darba laika
         </label>
       </div>
 
@@ -2323,6 +2398,31 @@ window.google={script:{run:window.__gsr__}};
     </div>
 
   </div>
+  <!-- ══ LABĀ PUSE: Noslodze + Info ══ -->
+  <div class="wiz-sidebar" id="wiz-sidebar">
+
+    <!-- Darba laiks -->
+    <div class="wsb-card" id="wsb-hours" style="display:none;">
+      <div class="wsb-title">🕐 Darba laiks šajā dienā</div>
+      <div class="wsb-hours-val" id="wsb-hours-val">—</div>
+    </div>
+
+    <!-- Noslodze -->
+    <div class="wsb-card">
+      <div class="wsb-title">📊 Noslodze izvēlētajā laikā</div>
+      <div id="wsb-cap-content">
+        <div class="wsb-hint">Izvēlies datumu un laiku</div>
+      </div>
+    </div>
+
+    <!-- Stundu slodze pēc cilvēku skaita -->
+    <div class="wsb-card" id="wsb-slots-card" style="display:none;">
+      <div class="wsb-title">👥 Slodze šajā dienā pa stundām</div>
+      <div id="wsb-slots-content"></div>
+    </div>
+
+  </div>
+
   </div>
 </div>
 
@@ -2604,6 +2704,8 @@ function applyWorkHours(dateStr, fromSelId, toSelId, defaultFrom, defaultTo) {
   buildTimeSel(fromSelId, defaultFrom || null, openMin, closeMin);
   buildTimeSel(toSelId,   defaultTo   || null, openMin, closeMin);
   return wh;
+  wSidebarUpdate();
+  wValidate();
 }
 
 // Noapaļo laiku uz tuvāko 15min soli lejup
@@ -3271,6 +3373,165 @@ function wFdRender(field) {
     list.appendChild(row);
   });
 }
+
+
+// ── Sidebar noslodze ──
+function wSidebarUpdate() {
+  var date = (document.getElementById('w_date')||{}).value||'';
+  var from = (document.getElementById('w_from')||{}).value||'';
+  var to   = (document.getElementById('w_to')||{}).value||'';
+  var ppl  = parseInt((document.getElementById('w_ppl')||{}).value||0);
+
+  // Darba laiks
+  if (date) {
+    var WORK_HOURS = {1:{o:'11:00',c:'22:00'},2:{o:'11:00',c:'22:00'},3:{o:'11:00',c:'22:00'},
+      4:{o:'11:00',c:'22:00'},5:{o:'11:00',c:'23:00'},6:{o:'10:00',c:'23:00'},0:{o:'10:00',c:'22:00'}};
+    var parts = date.split('-').map(Number);
+    var dow = new Date(parts[0],parts[1]-1,parts[2]).getDay();
+    var wh = WORK_HOURS[dow]||{o:'11:00',c:'22:00'};
+    var hwEl = document.getElementById('wsb-hours');
+    var hwVal = document.getElementById('wsb-hours-val');
+    var whBadge = document.getElementById('w_workhours_info');
+    if (hwEl) hwEl.style.display='block';
+    if (hwVal) hwVal.textContent = wh.o + ' – ' + wh.c;
+    if (whBadge) { whBadge.style.display='block'; whBadge.textContent='🕐 Darba laiks: '+wh.o+' – '+wh.c; }
+  }
+
+  // Noslodze izvēlētajā laikā
+  if (!date || !from || !to) {
+    var el = document.getElementById('wsb-cap-content');
+    if (el) el.innerHTML='<div class="wsb-hint">Izvēlies datumu un laiku</div>';
+    return;
+  }
+  var fromMin = tmin(from), toMin = tmin(to);
+  var dayBookings = (ALL||[]).filter(function(b){return b.date===date && b.status!=='Atcelta';});
+  // Kapacitāte izvēlētajā laikā
+  var overlap = dayBookings.filter(function(b){
+    return tmin(b.timeFrom)<toMin && tmin(b.timeTo)>fromMin;
+  });
+  var used = overlap.reduce(function(s,b){return s+b.people;},0);
+  var total = 90;
+  var pct = Math.round(used/total*100);
+  var newTotal = used + ppl;
+  var newPct = Math.round(newTotal/total*100);
+  var color = newTotal>90?'var(--red)':newTotal>60?'#f59e0b':'#22c55e';
+
+  var el = document.getElementById('wsb-cap-content');
+  if (el) el.innerHTML = '<div class="wsb-cap-row">'
+    + '<span class="wsb-cap-num" style="color:'+color+'">'+newTotal+'</span>'
+    + '<span class="wsb-cap-of"> / '+total+' cilv.</span>'
+    + '</div>'
+    + '<div class="wsb-bar-wrap"><div class="wsb-bar-fill" style="width:'+Math.min(100,newPct)+'%;background:'+color+'"></div></div>'
+    + '<div class="wsb-cap-sub">'+(used>0?'Jau rezervēti: '+used+' cilv.':'Brīvi')+(ppl>0?' + '+ppl+' jauni':'')+'</div>'
+    + (newTotal>90?'<div class="wsb-warn">⚠️ Pārsniedz kapacitāti!</div>':'');
+
+  // Stundu slodze visa diena
+  if (ppl > 0) wSidebarSlots(date, ppl);
+}
+
+function wSidebarSlots(date, newPpl) {
+  var card = document.getElementById('wsb-slots-card');
+  var content = document.getElementById('wsb-slots-content');
+  if (!card || !content) return;
+  card.style.display = 'block';
+  var dayBookings = (ALL||[]).filter(function(b){return b.date===date && b.status!=='Atcelta';});
+  var html = '';
+  for (var h = 8; h < 24; h++) {
+    var slotFrom = h*60, slotTo = (h+1)*60;
+    var overlap = dayBookings.filter(function(b){return tmin(b.timeFrom)<slotTo && tmin(b.timeTo)>slotFrom;});
+    var used = overlap.reduce(function(s,b){return s+b.people;},0);
+    if (used === 0 && newPpl === 0) continue;
+    var total = 90;
+    var pct = Math.min(100, Math.round(used/total*100));
+    var color = used>60?'var(--red)':used>40?'#f59e0b':used>0?'#22c55e':'var(--border)';
+    html += '<div class="wsb-slot-row">'
+      + '<span class="wsb-slot-lbl">'+p2(h)+':00</span>'
+      + '<div class="wsb-slot-bar"><div style="width:'+pct+'%;background:'+color+';height:100%;border-radius:2px;"></div></div>'
+      + '<span class="wsb-slot-num" style="color:'+color+'">'+(used||'')+'</span>'
+      + '</div>';
+  }
+  content.innerHTML = html || '<div class="wsb-hint">Nav rezervāciju šajā dienā</div>';
+}
+
+// ── Rides upsell ──
+var _ridesUpsellAnswered = false;
+function wCheckRides(val) {
+  var n = parseInt(val||0);
+  var hint = document.getElementById('w_rides_hint');
+  if (!hint) return;
+  if (n > 0 && !_ridesUpsellAnswered) hint.style.display='block';
+  else hint.style.display='none';
+}
+function wRidesUpsell(yes) {
+  _ridesUpsellAnswered = true;
+  document.getElementById('w_rides_hint').style.display='none';
+}
+
+// ── Bērnu ballīte ──
+function wKidsParty(checked) {
+  var hint = document.getElementById('w_kids_sunday_hint');
+  if (!hint) return;
+  if (!checked) { hint.style.display='none'; return; }
+  var date = (document.getElementById('w_date')||{}).value||'';
+  if (!date) { hint.style.display='none'; return; }
+  var parts = date.split('-').map(Number);
+  var dow = new Date(parts[0],parts[1]-1,parts[2]).getDay();
+  hint.style.display = (dow !== 0) ? 'block' : 'none'; // Rāda tikai ja nav svētdiena
+}
+function wSuggestSunday() {
+  var date = (document.getElementById('w_date')||{}).value||'';
+  if (!date) return;
+  var d = new Date(date.split('-')[0], date.split('-')[1]-1, date.split('-')[2]);
+  var daysToSunday = (7 - d.getDay()) % 7 || 7;
+  d.setDate(d.getDate() + daysToSunday);
+  var newDate = d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+  document.getElementById('w_date').value = newDate;
+  var parts = newDate.split('-');
+  var label = parseInt(parts[2])+'. '+MLV[parseInt(parts[1])-1]+' '+parts[0];
+  var btn = document.getElementById('dp_btn');
+  var lbl = document.getElementById('dp_label');
+  if (btn) btn.classList.remove('empty-val');
+  if (lbl) lbl.textContent = label;
+  document.getElementById('w_kids_sunday_hint').style.display='none';
+  wValidate();
+  toast('Pārcelt uz svētdienu '+label, 'ok');
+}
+
+// ── Sarkanie obligātie lauki pie submit ──
+function wHighlightRequired() {
+  var required = [
+    {id:'w_client', check: function(el){return el.value.trim();}},
+    {id:'w_phone',  check: function(el){return el.value.trim();}},
+    {id:'w_admin',  check: function(el){return el.value.trim();}},
+    {id:'w_ppl',    check: function(el){return parseInt(el.value)>0;}},
+    {id:'w_date',   check: function(el){return el.value;}},
+    {id:'w_from',   check: function(el){return el.value;}},
+    {id:'w_to',     check: function(el){return el.value;}},
+  ];
+  var allOk = true;
+  required.forEach(function(f) {
+    var el = document.getElementById(f.id);
+    if (!el) return;
+    var ok = f.check(el);
+    // Vizuāls indikators - border uz field parent
+    var fieldEl = el.closest('.field') || el.parentElement;
+    if (!ok) {
+      fieldEl.classList.add('field-error');
+      // Speciāli pickers
+      if (f.id === 'w_date') { var btn=document.getElementById('dp_btn'); if(btn) btn.style.borderColor='var(--red)'; }
+      if (f.id === 'w_from') { var btn=document.getElementById('fp_btn'); if(btn) btn.style.borderColor='var(--red)'; }
+      if (f.id === 'w_to')   { var btn=document.getElementById('tp_btn'); if(btn) btn.style.borderColor='var(--red)'; }
+      allOk = false;
+    } else {
+      fieldEl.classList.remove('field-error');
+      if (f.id === 'w_date') { var btn=document.getElementById('dp_btn'); if(btn) btn.style.borderColor=''; }
+      if (f.id === 'w_from') { var btn=document.getElementById('fp_btn'); if(btn) btn.style.borderColor=''; }
+      if (f.id === 'w_to')   { var btn=document.getElementById('tp_btn'); if(btn) btn.style.borderColor=''; }
+    }
+  });
+  return allOk;
+}
+
 
 window.onload = function() {
   document.addEventListener('click', function(e) {
@@ -4173,13 +4434,17 @@ function s1val() { wValidate(); }
 function wValidate() {
   const client = (document.getElementById('w_client')?.value || '').trim();
   const phone  = (document.getElementById('w_phone')?.value  || '').trim();
+  const admin  = (document.getElementById('w_admin')?.value  || '').trim();
   const ppl    = parseInt(document.getElementById('w_ppl')?.value  || 0);
   const date   = (document.getElementById('w_date')?.value   || '').trim();
   const from   = (document.getElementById('w_from')?.value   || '').trim();
   const to     = (document.getElementById('w_to')?.value     || '').trim();
-  const ok = client && phone && ppl > 0 && ppl <= 90 && date && from && to;
+  const ok = client && phone && admin && ppl > 0 && ppl <= 90 && date && from && to;
   const btn = document.getElementById('btn_s1');
   if (btn) btn.disabled = !ok;
+  // Atjaunināt sidebar
+  wSidebarUpdate();
+  return ok;
 }
 
 function gotoStep(n) {
@@ -4385,6 +4650,7 @@ function buildS3() {
 }
 
 function submitNew() {
+  if (!wHighlightRequired()) { toast('Lūdzu aizpildi visus obligātos laukus!', 'warn'); return; }
   const client = document.getElementById('w_client').value.trim();
   const phone  = document.getElementById('w_phone').value.trim();
   const admin  = document.getElementById('w_admin').value.trim();
@@ -4412,6 +4678,9 @@ function submitNew() {
     invoice:  document.getElementById('w_inv').value,
     comment:  document.getElementById('w_cmt').value,
     food:     document.getElementById('w_food').value,
+    drinks:   document.getElementById('w_drinks')?.value||'',
+    rides:    parseInt(document.getElementById('w_rides')?.value||0)||0,
+    kids_party: document.getElementById('w_kids_party')?.checked||false,
     drinks:   document.getElementById('w_drinks').value,
     admin,
     closed:    document.getElementById('w_closed').checked,
