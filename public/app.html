@@ -5057,7 +5057,7 @@ function submitNew() {
     document.getElementById('w_rekviziti').value = '';
   }
 
-  const btn = document.getElementById('btn_save');
+  const btn = document.getElementById('btn_s1');
   btn.disabled = true; btn.textContent = '⏳ Saglabā...';
 
   const data = {
@@ -5083,7 +5083,7 @@ function submitNew() {
 
   window.__gsr__
     .withSuccessHandler(r => {
-      btn.disabled = false; btn.textContent = '💾 Saglabāt rezervāciju';
+      btn.disabled = false; btn.textContent = '✓ Pieņemt rezervāciju';
       const res = JSON.parse(r);
       if (res.ok) {
         toast(`✅ Rezervācija saglabāta! ID: ${res.id}`, 'ok');
@@ -5103,7 +5103,7 @@ function submitNew() {
       }
     })
     .withFailureHandler(e => {
-      btn.disabled = false; btn.textContent = '💾 Saglabāt rezervāciju';
+      btn.disabled = false; btn.textContent = '✓ Pieņemt rezervāciju';
       toast('Kļūda: ' + e.message, 'err');
     })
     .sSave(data);
