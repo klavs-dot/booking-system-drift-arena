@@ -3727,10 +3727,30 @@ function wKidsParty(checked) {
   if (!hint) return;
   if (!checked) { hint.style.display='none'; return; }
   var date = (document.getElementById('w_date')||{}).value||'';
-  if (!date) { hint.style.display='none'; return; }
+  if (!date) {
+    // Nav datuma — piedāvā svētdienu
+    hint.innerHTML = '🧃 Piedāvā svētdienu — bezmaksas PEPSI!'
+      + '<div style="display:flex;gap:8px;margin-top:4px;">'
+      + '<button type="button" class="rides-upsell-btn yes" onclick="wSuggestSunday()">📅 Izvēlēties svētdienu</button>'
+      + '</div>';
+    hint.style.display='block';
+    return;
+  }
   var parts = date.split('-').map(Number);
   var dow = new Date(parts[0],parts[1]-1,parts[2]).getDay();
-  hint.style.display = (dow !== 0) ? 'block' : 'none'; // Rāda tikai ja nav svētdiena
+  if (dow === 0) {
+    // Jau svētdiena — atgādinājums
+    hint.innerHTML = '🧃 Atceries, ka bezmaksas PEPSI šajā dienā. Piesaki klientam, lai zin!';
+    hint.style.display='block';
+  } else {
+    // Nav svētdiena — piedāvā pārcelt
+    hint.innerHTML = '🧃 Svētdienās bezmaksas PEPSI!'
+      + '<div style="display:flex;gap:8px;margin-top:4px;">'
+      + '<button type="button" class="rides-upsell-btn yes" onclick="wSuggestSunday()">📅 Pārcelt uz svētdienu</button>'
+      + '<button type="button" class="rides-upsell-btn no" onclick="document.getElementById(\'w_kids_sunday_hint\').style.display=\'none\'">Palikt</button>'
+      + '</div>';
+    hint.style.display='block';
+  }
 }
 function wSuggestSunday() {
   var date = (document.getElementById('w_date')||{}).value||'';
@@ -4763,18 +4783,9 @@ function onDateChange() {
   document.getElementById('btn_s2').disabled = true;
   _capOk = false;
   renderDLP(date);
-  // Paslēpt bērnu ballītes opciju ja svētdiena (nav jāpiedāvā pārcelt)
-  var parts = date.split('-').map(Number);
-  var dow = new Date(parts[0],parts[1]-1,parts[2]).getDay();
-  var kidsWrap = document.getElementById('w_kids_party_wrap');
-  if (kidsWrap) kidsWrap.style.display = (dow === 0) ? 'none' : '';
-  // Reset kids party checkbox ja paslēpj
-  if (dow === 0) {
-    var kp = document.getElementById('w_kids_party');
-    if (kp) kp.checked = false;
-    var kh = document.getElementById('w_kids_sunday_hint');
-    if (kh) kh.style.display = 'none';
-  }
+  // Ja bērnu ballīte jau atzīmēta — atjaunot hint (svētdiena/ne-svētdiena)
+  var kp = document.getElementById('w_kids_party');
+  if (kp && kp.checked) wKidsParty(true);
 }
 
 // ── Dienas noslodzes tabula ──────────────────────────────────────
