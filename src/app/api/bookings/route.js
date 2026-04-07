@@ -75,14 +75,13 @@ function calcWorkHours(dateStr) {
 }
 
 function calcOccupancy(bookings, dateStr, from, to, excludeId) {
-  const CAP = 90;
   const rel = bookings.filter(b =>
     b.date===dateStr && b.status!=='Atcelta' &&
     String(b.id)!==String(excludeId||'') &&
     toMin(b.timeFrom)<toMin(to) && toMin(b.timeTo)>toMin(from)
   );
   if (!rel.length) return 0;
-  if (rel.some(b=>b.closed)) return CAP;
+  if (rel.some(b=>b.closed)) return 9999;
   const pts = new Set([toMin(from),toMin(to)]);
   rel.forEach(b=>{pts.add(toMin(b.timeFrom));pts.add(toMin(b.timeTo));});
   const sorted=[...pts].sort((a,b)=>a-b);
