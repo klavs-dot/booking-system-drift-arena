@@ -4766,20 +4766,10 @@ function resetWiz() {
   document.getElementById('w_from').value = '';
   document.getElementById('w_to').value   = '';
   document.getElementById('w_closed').checked = false;
-  document.getElementById('closed_toggle').classList.remove('active');
   _dpYear = null; _dpMonth = null;
   _outsideHours = false;
   const ow = document.getElementById('OUTSIDE_WARN');
   if (ow) ow.classList.remove('show');
-}
-
-function toggleClosed() {
-  const cb = document.getElementById('w_closed');
-  const tg = document.getElementById('closed_toggle');
-  // Nākamā tika notiks pēc noklusētā checkbox toggle, tāpēc lasām pēc notikuma
-  setTimeout(() => {
-    tg.classList.toggle('active', cb.checked);
-  }, 0);
 }
 
 function showStep(n) {
