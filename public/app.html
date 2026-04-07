@@ -2363,51 +2363,92 @@ window.google={script:{run:window.__gsr__}};
           </div>
         </div>
         <!-- Rēķina lauki - tikai ja rēķins -->
-        <div id="w_inv_email_wrap" style="display:none;">
+        <div id="w_inv_email_wrap" style="display:none;margin-top:14px;">
           <div class="wform-row2" style="margin-bottom:10px;">
             <div class="field">
               <label>E-pasts rēķinam <span class="req">*</span></label>
               <input type="email" id="w_inv_email" placeholder="invoice@company.lv">
             </div>
-            <div class="field">
-              <label>Uzņēmuma nosaukums (UR.gov)</label>
-              <div style="position:relative;">
-                <input type="text" id="w_rek_name" placeholder="SIA Uzņēmums..." autocomplete="off" oninput="wUrSearch(this.value)">
-                <div id="w_rek_suggest" class="rek-suggest" style="display:none;"></div>
-              </div>
-            </div>
-          </div>
-          <div class="wform-row2" style="margin-bottom:10px;">
-            <div class="field">
-              <label>Reģistrācijas numurs</label>
-              <div style="display:flex;gap:8px;">
-                <input type="text" id="w_rek_reg" placeholder="40001234567" style="flex:1;">
-                <button type="button" class="rek-search-btn" onclick="wUrSearchByReg()">🔍 UR.gov</button>
-              </div>
-            </div>
-            <div class="field">
-              <label>Juridiskā adrese</label>
-              <input type="text" id="w_rek_addr" placeholder="Rīga, Brīvības iela 1">
-            </div>
-          </div>
-          <div class="wform-row2" style="margin-bottom:8px;">
-            <div class="field">
-              <label>PVN numurs <span style="color:var(--text3);font-weight:400;">(neobligāts — pārbaudīt <a href="https://lursoft.lv" target="_blank" style="color:var(--accent)">Lursoft.lv</a>)</span></label>
-              <input type="text" id="w_rek_pvn" placeholder="LV40001234567">
-            </div>
-            <div class="field" style="display:flex;align-items:flex-end;padding-bottom:8px;">
+            <div class="field" style="display:flex;align-items:flex-end;padding-bottom:2px;">
               <label class="wcheck">
-                <input type="checkbox" id="w_rek_telpa">
-                <span>Rēķins par telpu nomu prezentācijām</span>
+                <input type="checkbox" id="w_rek_foreign" onchange="wToggleForeign(this.checked)">
+                <span>🌍 Ārvalstu kompānija</span>
               </label>
             </div>
           </div>
-          <div id="w_ur_status" style="font-size:12px;color:#22c55e;min-height:14px;margin-bottom:6px;"></div>
-          <label class="wcheck" style="font-size:12px;color:var(--text3);margin-bottom:8px;">
-            <input type="checkbox" id="w_rek_later" onchange="wRekLater(this.checked)">
-            <span>⏰ Rekvizītus ievadīšu vēlāk</span>
-          </label>
+
+          <!-- Latvijas uzņēmums — ar UR.gov meklēšanu -->
+          <div id="w_rek_lv_wrap">
+            <div class="wform-row2" style="margin-bottom:10px;">
+              <div class="field">
+                <label>Nosaukums</label>
+                <div style="position:relative;">
+                  <input type="text" id="w_rek_name" placeholder="SIA Uzņēmums..." autocomplete="off" oninput="wUrSearch(this.value)">
+                  <div id="w_rek_suggest" class="rek-suggest" style="display:none;"></div>
+                </div>
+              </div>
+              <div class="field">
+                <label>Reģistrācijas numurs</label>
+                <div style="display:flex;gap:8px;">
+                  <input type="text" id="w_rek_reg" placeholder="40001234567" style="flex:1;">
+                  <button type="button" class="rek-search-btn" onclick="wUrSearchByReg()">🔍 UR.gov</button>
+                </div>
+              </div>
+            </div>
+            <div class="wform-row2" style="margin-bottom:10px;">
+              <div class="field">
+                <label>PVN numurs <span style="color:var(--text3);font-weight:400;">(nav obligāts)</span></label>
+                <input type="text" id="w_rek_pvn" placeholder="LV40001234567">
+              </div>
+              <div class="field">
+                <label>Juridiskā adrese</label>
+                <input type="text" id="w_rek_addr" placeholder="Rīga, Brīvības iela 1">
+              </div>
+            </div>
+            <div id="w_ur_status" style="font-size:12px;color:#22c55e;min-height:14px;margin-bottom:6px;"></div>
+          </div>
+
+          <!-- Ārvalstu kompānija — manuāla ievade -->
+          <div id="w_rek_foreign_wrap" style="display:none;">
+            <div class="wform-row2" style="margin-bottom:10px;">
+              <div class="field">
+                <label>Nosaukums</label>
+                <input type="text" id="w_rek_f_name" placeholder="Company Ltd.">
+              </div>
+              <div class="field">
+                <label>Reg. nr.</label>
+                <input type="text" id="w_rek_f_reg" placeholder="Registration number">
+              </div>
+            </div>
+            <div class="wform-row2" style="margin-bottom:10px;">
+              <div class="field">
+                <label>PVN Nr. <span style="color:var(--text3);font-weight:400;">(nav obligāts)</span></label>
+                <input type="text" id="w_rek_f_pvn" placeholder="VAT number">
+              </div>
+              <div class="field">
+                <label>Juridiskā adrese</label>
+                <input type="text" id="w_rek_f_addr" placeholder="Full legal address">
+              </div>
+            </div>
+          </div>
+
+          <!-- Kopīgie lauki -->
+          <div class="wform-row2" style="margin-bottom:8px;">
+            <div class="field" style="display:flex;align-items:center;padding-bottom:4px;">
+              <label class="wcheck">
+                <input type="checkbox" id="w_rek_telpa">
+                <span>🏢 Telpu noma prezentācijām</span>
+              </label>
+            </div>
+            <div class="field" style="display:flex;align-items:center;padding-bottom:4px;">
+              <label class="wcheck" style="font-size:12px;color:var(--text3);">
+                <input type="checkbox" id="w_rek_later" onchange="wRekLater(this.checked)">
+                <span>⏰ Rekvizītus ievadīšu vēlāk</span>
+              </label>
+            </div>
+          </div>
         </div>
+        <input type="hidden" id="w_rekviziti" value="">
       </div>
 
       <!-- BLOKS 4: Ēdieni un dzērieni -->
@@ -3392,11 +3433,19 @@ function wUrFill(name,reg,addr) {
   if(st){st.textContent='✓ Dati aizpildīti no UR.gov';st.style.color='#22c55e';}
 }
 function wRekLater(checked) {
-  var fields = ['w_rek_name','w_rek_reg','w_rek_addr','w_rek_pvn','w_inv_email'];
+  var fields = ['w_rek_name','w_rek_reg','w_rek_addr','w_rek_pvn','w_inv_email',
+                'w_rek_f_name','w_rek_f_reg','w_rek_f_addr','w_rek_f_pvn'];
   fields.forEach(function(id){
     var el=document.getElementById(id);
     if(el) el.disabled=checked;
   });
+}
+
+function wToggleForeign(isForeign) {
+  var lvWrap = document.getElementById('w_rek_lv_wrap');
+  var fWrap  = document.getElementById('w_rek_foreign_wrap');
+  if (lvWrap) lvWrap.style.display = isForeign ? 'none' : '';
+  if (fWrap)  fWrap.style.display  = isForeign ? '' : 'none';
 }
 
 // ── Ēdienu/dzērienu modes ──
@@ -4906,11 +4955,36 @@ function submitNew() {
   if (!client || !phone) { toast('Ievadi vārdu un telefonu!', 'warn'); return; }
   if (!admin)            { toast('Ievadi administratora vārdu!', 'warn'); return; }
   const wInv = document.getElementById('w_inv').value;
+
+  // Būvēt rekvizītu JSON no formas laukiem
   if (wInv.includes('rēķin')) {
     const wIE = document.getElementById('w_inv_email').value.trim();
-    const wRk = document.getElementById('w_rekviziti').value.trim();
     if (!wIE) { toast('🧾 Ievadi e-pastu rēķinam!', 'warn'); return; }
-    if (!wRk) { toast('🧾 Ievadi rekvizītus!', 'warn'); return; }
+    const isForeign = document.getElementById('w_rek_foreign')?.checked || false;
+    const rekLater = document.getElementById('w_rek_later')?.checked || false;
+    if (!rekLater) {
+      var rekName, rekReg, rekPvn, rekAddr;
+      if (isForeign) {
+        rekName = (document.getElementById('w_rek_f_name')?.value||'').trim();
+        rekReg  = (document.getElementById('w_rek_f_reg')?.value||'').trim();
+        rekPvn  = (document.getElementById('w_rek_f_pvn')?.value||'').trim();
+        rekAddr = (document.getElementById('w_rek_f_addr')?.value||'').trim();
+      } else {
+        rekName = (document.getElementById('w_rek_name')?.value||'').trim();
+        rekReg  = (document.getElementById('w_rek_reg')?.value||'').trim();
+        rekPvn  = (document.getElementById('w_rek_pvn')?.value||'').trim();
+        rekAddr = (document.getElementById('w_rek_addr')?.value||'').trim();
+      }
+      if (!rekName && !rekReg) { toast('🧾 Ievadi uzņēmuma nosaukumu vai reģ. nr.!', 'warn'); return; }
+      var rekObj = {name:rekName, reg:rekReg, pvn:rekPvn, addr:rekAddr,
+                    telpa: document.getElementById('w_rek_telpa')?.checked||false,
+                    foreign: isForeign};
+      document.getElementById('w_rekviziti').value = JSON.stringify(rekObj);
+    } else {
+      document.getElementById('w_rekviziti').value = JSON.stringify({later:true});
+    }
+  } else {
+    document.getElementById('w_rekviziti').value = '';
   }
 
   const btn = document.getElementById('btn_save');
@@ -5220,9 +5294,7 @@ function toggleInvFields(prefix) {
   if (!sel) return;
   const isInv = sel.value.includes('rēķin');
   const eWrap = document.getElementById(prefix + '_inv_email_wrap');
-  const rWrap = document.getElementById(prefix === 'w' ? 'w_rekviziti_wrap' : 'e_rekviziti_wrap');
-  if (eWrap) eWrap.classList.toggle('show', isInv);
-  if (rWrap) rWrap.classList.toggle('show', isInv);
+  if (eWrap) eWrap.style.display = isInv ? 'block' : 'none';
 }
 
 // ================================================================
