@@ -1823,8 +1823,8 @@ button{cursor:pointer}
 .bextra-del:hover { color:var(--red); opacity:1; }
 
 .bextra-input-row { display:flex; gap:4px; align-items:center; margin:6px 0 4px; }
-.bextra-in-name   { flex:1; padding:5px 7px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:12px; min-width:0; }
-.bextra-in-qty    { width:44px; padding:5px 4px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:12px; text-align:center; }
+.bextra-in-name   { flex:1; min-width:0; padding:7px 9px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:13px; }
+.bextra-in-qty    { width:52px; flex-shrink:0; padding:7px 4px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:13px; text-align:center; }
 .bextra-ok     { padding:5px 8px; background:#0d2e16; color:#22c55e; border:1px solid #22c55e; border-radius:var(--r); cursor:pointer; font-size:13px; font-weight:700; }
 .bextra-ok:hover { background:#22c55e; color:#000; }
 .bextra-cancel { padding:5px 8px; background:var(--card2); color:var(--text3); border:1px solid var(--border); border-radius:var(--r); cursor:pointer; font-size:12px; }
@@ -2062,6 +2062,11 @@ button{cursor:pointer}
 
 .fd-mode-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
 .fd-opt { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--text2); cursor:pointer; }
+
+
+.fd-mode-checks { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
+.fd-mode-check { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text2); cursor:pointer; user-select:none; }
+.fd-mode-check input[type=checkbox] { width:15px; height:15px; cursor:pointer; flex-shrink:0; accent-color:var(--accent); }
 
 </style>
 
@@ -2356,10 +2361,19 @@ window.google={script:{run:window.__gsr__}};
           <!-- ĒDIENI — tāds pats kā kartītē -->
           <div class="field">
             <div class="bextra-title">🍕 Ēdieni</div>
-            <div class="fd-mode-row">
-              <label class="fd-opt"><input type="radio" name="w_food_mode" value="later" checked onchange="wFoodMode('food',this.value)"> 📞 Precizēs</label>
-              <label class="fd-opt"><input type="radio" name="w_food_mode" value="onsite" onchange="wFoodMode('food',this.value)"> 🙋 Uz vietas</label>
-              <label class="fd-opt"><input type="radio" name="w_food_mode" value="now" onchange="wFoodMode('food',this.value)"> ✏️ Tagad</label>
+            <div class="fd-mode-checks">
+              <label class="fd-mode-check">
+                <input type="checkbox" id="w_food_later" checked onchange="wFoodModeCheck('food','later',this.checked)">
+                <span>📞 Precizēs</span>
+              </label>
+              <label class="fd-mode-check">
+                <input type="checkbox" id="w_food_onsite" onchange="wFoodModeCheck('food','onsite',this.checked)">
+                <span>🙋 Uz vietas</span>
+              </label>
+              <label class="fd-mode-check">
+                <input type="checkbox" id="w_food_now" onchange="wFoodModeCheck('food','now',this.checked)">
+                <span>✏️ Tagad</span>
+              </label>
             </div>
             <div id="w_food_input" style="display:none;margin-top:6px;">
               <div class="bextra-list" id="w_food_list"></div>
@@ -2378,10 +2392,19 @@ window.google={script:{run:window.__gsr__}};
           <!-- DZĒRIENI — tāds pats kā kartītē -->
           <div class="field">
             <div class="bextra-title">🍸 Dzērieni</div>
-            <div class="fd-mode-row">
-              <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="later" checked onchange="wFoodMode('drinks',this.value)"> 📞 Precizēs</label>
-              <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="onsite" onchange="wFoodMode('drinks',this.value)"> 🙋 Uz vietas</label>
-              <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="now" onchange="wFoodMode('drinks',this.value)"> ✏️ Tagad</label>
+            <div class="fd-mode-checks">
+              <label class="fd-mode-check">
+                <input type="checkbox" id="w_drinks_later" checked onchange="wFoodModeCheck('drinks','later',this.checked)">
+                <span>📞 Precizēs</span>
+              </label>
+              <label class="fd-mode-check">
+                <input type="checkbox" id="w_drinks_onsite" onchange="wFoodModeCheck('drinks','onsite',this.checked)">
+                <span>🙋 Uz vietas</span>
+              </label>
+              <label class="fd-mode-check">
+                <input type="checkbox" id="w_drinks_now" onchange="wFoodModeCheck('drinks','now',this.checked)">
+                <span>✏️ Tagad</span>
+              </label>
             </div>
             <div id="w_drinks_input" style="display:none;margin-top:6px;">
               <div class="bextra-list" id="w_drinks_list"></div>
@@ -3344,6 +3367,26 @@ function wRekLater(checked) {
 
 // ── Ēdienu/dzērienu modes ──
 var wFdItems = {food:[], drinks:[]};
+function wFoodModeCheck(field, mode, checked) {
+  // Checkboxu loģika - tikai viens var būt aktīvs
+  var modes = ['later', 'onsite', 'now'];
+  if (checked) {
+    // Atķeksēt pārējos
+    modes.forEach(function(m) {
+      if (m !== mode) {
+        var el = document.getElementById('w_'+field+'_'+m);
+        if (el) el.checked = false;
+      }
+    });
+    wFoodMode(field, mode);
+  } else {
+    // Ja atķeksē - atgriežas uz "later"
+    var laterEl = document.getElementById('w_'+field+'_later');
+    if (laterEl) laterEl.checked = true;
+    wFoodMode(field, 'later');
+  }
+}
+
 function wFoodMode(field, mode) {
   var inputDiv = document.getElementById('w_'+field+'_input');
   var hidden   = document.getElementById('w_'+field);
