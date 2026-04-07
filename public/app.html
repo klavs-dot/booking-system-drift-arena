@@ -2566,6 +2566,29 @@ window.google={script:{run:window.__gsr__}};
         </div>
       </div>
 
+      <!-- Kapacitātes pārbaude -->
+      <div class="wiz-block">
+        <div class="wiz-block-title">📊 Kapacitātes pārbaude</div>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+          <button type="button" class="btn btn-s" id="btn_s2" onclick="checkCap()" disabled style="padding:8px 16px;">🔍 Pārbaudīt kapacitāti</button>
+          <span style="font-size:11px;color:var(--text3);">Obligāti pirms saglabāšanas</span>
+        </div>
+        <div id="CAP_RES"></div>
+        <!-- Dienas noslodzes tabula -->
+        <div style="margin-top:12px;">
+          <div id="DLP_DATE" style="font-size:12px;color:var(--text3);margin-bottom:6px;"></div>
+          <div id="DLP_LEG" style="font-size:10px;color:var(--text3);margin-bottom:4px;"></div>
+          <div id="DLP_BODY"></div>
+        </div>
+        <!-- Kopsavilkums -->
+        <div id="S3SUM" style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:13px;color:var(--text2);"></div>
+      </div>
+
+      <!-- Ārpus darba laika brīdinājums -->
+      <div id="OUTSIDE_WARN" class="outside-warn-banner">
+        ⚠️ Rezervācija ir ārpus darba laika
+      </div>
+
       <!-- Kļūda un poga -->
       <div class="err-msg" id="W_ERR"></div>
       <button class="btn btn-p" id="btn_s1" onclick="submitNew()" disabled>✓ Pieņemt rezervāciju</button>
@@ -4874,6 +4897,9 @@ function wValidate() {
   const ok = client && phone && admin && ppl > 0 && ppl <= 90 && date && from && to;
   const btn = document.getElementById('btn_s1');
   if (btn) btn.disabled = !ok;
+  // Iespējot kapacitātes pārbaudi kad ir datums + laiks
+  const btn2 = document.getElementById('btn_s2');
+  if (btn2) btn2.disabled = !(date && from && to);
   // Atjaunināt sidebar
   wSidebarUpdate();
   return ok;
