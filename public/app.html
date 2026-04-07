@@ -4296,7 +4296,16 @@ function renderCard(b, nowMin) {
     + '<button class="bextra-ok" onclick="bConfirmItem(this)" data-bid="'+id+'" data-field="drinks">&#10003;</button>'
     + '<button class="bextra-cancel" onclick="bCancelItem(this)" data-bid="'+id+'" data-field="drinks">&#10005;</button>'
     + '</div>'
-    + '<button class="bextra-add" id="da-'+id+'" onclick="bShowInput(this)" data-bid="'+id+'" data-field="drinks">+ Pievienot</button>';
+    + '<button class="bextra-add" id="da-'+id+'" onclick="bShowInput(this)" data-bid="'+id+'" data-field="drinks">+ Pievienot</button>'
+    + (function(){
+        // Pepsi GIF svētdienām
+        try {
+          var pts = b.date.split('-').map(Number);
+          var dow = new Date(pts[0],pts[1]-1,pts[2]).getDay();
+          if (dow === 0) return '<div style="margin-top:8px;text-align:center;"><img src="/pepsi.gif" style="width:60px;height:60px;border-radius:50%;" title="Bezmaksas PEPSI svētdienā!"><div style="font-size:10px;color:#3b82f6;font-weight:700;margin-top:2px;">BEZMAKSAS PEPSI</div></div>';
+        } catch(e) {}
+        return '';
+      })();
 
   // Rekvizīti
   var rek = null;
