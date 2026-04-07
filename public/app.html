@@ -1892,6 +1892,14 @@ button{cursor:pointer}
 .tl-cards .bcard { border-left-color: #3b82f6; }
 .tl-today .tl-cards .bcard { }
 
+
+.wform-row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:16px; }
+.wform-row4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:14px; margin-bottom:16px; }
+.wform-row2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
+.wform-checks { display:flex; gap:24px; margin-bottom:16px; flex-wrap:wrap; }
+.wcheck { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text2); cursor:pointer; }
+.wcheck input { width:16px; height:16px; cursor:pointer; }
+
 </style>
 
 </head>
@@ -2033,42 +2041,23 @@ window.google={script:{run:window.__gsr__}};
 <div class="view" id="view-new">
   <div class="phdr">
     <div class="ptitle">JAUNA REZERVĀCIJA</div>
-    <div class="psub">3 soļi · kapacitāte pārbaudīta automātiski</div>
+    <div class="psub">Aizpildi visus laukus vienā solī</div>
     <div class="outside-warn-banner" id="OUTSIDE_WARN">
       <span class="outside-warn-dot"></span>
       Ārpus darba laika rezervācija
       <span class="outside-warn-dot"></span>
     </div>
   </div>
+
   <div class="new-layout">
   <div class="wiz">
-    <div class="sbar">
-      <div class="si active" id="si1"><span class="snum">1</span>Skaits</div>
-      <div class="si" id="si2"><span class="snum">2</span>Laiks</div>
-      <div class="si" id="si3"><span class="snum">3</span>Detaļas</div>
-    </div>
 
-    <!-- 1. solis: cilvēku skaits -->
     <div class="spanel active card" id="sp1">
-      <div class="field">
-        <label>👥 Cilvēku skaits <span class="req">*</span></label>
-        <input type="number" id="w_ppl" min="1" max="90" placeholder="Cik cilvēku?" oninput="s1val()">
-        <div class="hint">Maks. 90 cilvēki vienlaicīgi arēnā</div>
-      </div>
-      <button class="btn btn-p" id="btn_s1" onclick="gotoStep(2)" disabled>Tālāk →</button>
-    </div>
-
-    <!-- 2. solis: datums un laiks (dropdown) -->
-    <div class="spanel card" id="sp2">
-      <!-- Slēptie lauki — JS tos lasa kā parasti -->
-      <input type="hidden" id="w_date">
-      <select id="w_from" style="display:none"></select>
-      <select id="w_to"   style="display:none"></select>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
-        <!-- Datuma picker -->
+      <!-- Rinda 1: Datums + Laiks -->
+      <div class="wform-row3">
         <div class="field">
           <label>📅 Datums <span class="req">*</span></label>
+          <input type="hidden" id="w_date">
           <div class="picker-wrap" id="dp_wrap">
             <button type="button" class="picker-btn empty-val" id="dp_btn" onclick="togglePicker('dp')">
               <span id="dp_label">Izvēlies datumu</span>
@@ -2079,123 +2068,119 @@ window.google={script:{run:window.__gsr__}};
             </div>
           </div>
         </div>
-        <!-- Sākuma laiks -->
         <div class="field">
           <label>🕐 Sākums <span class="req">*</span></label>
+          <select id="w_from" style="display:none"></select>
           <div class="picker-wrap" id="fp_wrap">
             <button type="button" class="picker-btn empty-val" id="fp_btn" onclick="togglePicker('fp')">
               <span id="fp_label">Izvēlies sākuma laiku</span>
               <span class="pb-arrow">▼</span>
             </button>
             <div class="picker-drop" id="fp_drop">
-              <div class="ptlist" id="fp_list"></div>
+              <div id="fp_list" class="ptime-list"></div>
             </div>
           </div>
         </div>
-        <!-- Beigu laiks -->
         <div class="field">
-          <label>🕐 Beigas <span class="req">*</span></label>
+          <label>🕑 Beigas <span class="req">*</span></label>
+          <select id="w_to" style="display:none"></select>
           <div class="picker-wrap" id="tp_wrap">
             <button type="button" class="picker-btn empty-val" id="tp_btn" onclick="togglePicker('tp')">
               <span id="tp_label">Izvēlies beigu laiku</span>
               <span class="pb-arrow">▼</span>
             </button>
             <div class="picker-drop" id="tp_drop">
-              <div class="ptlist" id="tp_list"></div>
+              <div id="tp_list" class="ptime-list"></div>
             </div>
           </div>
         </div>
       </div>
-      <div id="HOURS_INFO" style="font-size:12px;color:var(--text2);margin:8px 0 4px;font-family:var(--font-head);letter-spacing:.8px"></div>
-      <div id="CAP_RES"></div>
-      <div style="display:flex;gap:10px;margin-top:16px">
-        <button class="btn btn-s" onclick="gotoStep(1)">← Atpakaļ</button>
-        <button class="btn btn-p" id="btn_s2" onclick="gotoStep(3)" disabled>Turpināt →</button>
-      </div>
-    </div>
 
-    <!-- 3. solis: klienta dati -->
-    <div class="spanel card" id="sp3">
-      <div id="S3SUM" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--text2);display:flex;gap:16px;flex-wrap:wrap"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <!-- Kapacitātes indikators -->
+      <div id="HOURS_INFO" class="hours-info"></div>
+      <div class="cap-bar-wrap" id="CAP_BAR_WRAP" style="display:none">
+        <div class="cap-bar-label">
+          <span>Noslogojums izvēlētajā laikā</span>
+          <span id="CAP_BAR_PCT">0%</span>
+        </div>
+        <div class="cap-bar-track">
+          <div class="cap-bar-fill" id="CAP_BAR_FILL" style="width:0%"></div>
+        </div>
+        <div class="cap-bar-sub" id="CAP_BAR_SUB"></div>
+      </div>
+
+      <!-- Rinda 2: Klients + Telefons + E-pasts + Cilvēki -->
+      <div class="wform-row4">
         <div class="field">
           <label>👤 Vārds / Uzņēmums <span class="req">*</span></label>
-          <input type="text" id="w_client" placeholder="Jānis Bērziņš vai SIA XYZ">
+          <input type="text" id="w_client" placeholder="Jānis Bērziņš vai SIA XYZ" oninput="wValidate()">
         </div>
         <div class="field">
           <label>📞 Telefons <span class="req">*</span></label>
-          <input type="tel" id="w_phone" placeholder="2XXXXXXX">
+          <input type="tel" id="w_phone" placeholder="2XXXXXXX" oninput="wValidate()">
         </div>
         <div class="field">
           <label>✉️ E-pasts</label>
           <input type="email" id="w_email" placeholder="nav obligāts">
         </div>
         <div class="field">
+          <label>👥 Cilvēku skaits <span class="req">*</span></label>
+          <input type="number" id="w_ppl" min="1" max="90" placeholder="Cik?" oninput="wValidate()">
+          <div class="hint">Maks. 90</div>
+        </div>
+      </div>
+
+      <!-- Rinda 3: Maksājums + Komentārs -->
+      <div class="wform-row2">
+        <div class="field">
           <label>💳 Maksāšanas veids</label>
-          <select id="w_inv" onchange="toggleInvFields('w')">
+          <select id="w_inv" onchange="toggleInvFields('w'); wValidate()">
             <option>Uz vietas</option>
             <option>Ar rēķinu - pēcapmaksa</option>
             <option>Ar rēķinu - priekšapmaksa</option>
           </select>
         </div>
-        <!-- Rēķina lauki — rādās tikai ja izvēlēts rēķins -->
-        <div class="field inv-req-field" id="w_inv_email_wrap">
-          <label>📧 E-pasts rēķinam <span class="req" id="w_inv_email_req">*</span></label>
+        <div class="field">
+          <label>👩‍💼 Administrators</label>
+          <input type="text" id="w_admin" placeholder="Vārds">
+        </div>
+      </div>
+
+      <!-- Rēķina lauki -->
+      <div class="wform-row2 inv-req-field" id="w_inv_email_wrap" style="display:none">
+        <div class="field">
+          <label>📧 E-pasts rēķinam <span class="req">*</span></label>
           <input type="email" id="w_inv_email" placeholder="invoice@company.lv">
         </div>
-        <div class="field inv-req-field" id="w_rekviziti_wrap" style="grid-column:1/-1">
-          <label>🏢 Rekvizīti <span class="req" id="w_rek_req">*</span></label>
-          <textarea id="w_rekviziti" placeholder="Uzņēmuma nosaukums, reģ. nr., PVN nr., juridiskā adrese..." style="min-height:72px"></textarea>
+        <div class="field" id="w_rekviziti_wrap">
+          <label>🏢 Rekvizīti</label>
+          <textarea id="w_rekviziti" placeholder="Uzņēmuma nosaukums, reģ. nr., PVN nr., juridiskā adrese..." style="min-height:60px"></textarea>
         </div>
-        <div class="field" style="grid-column:1/-1">
-          <label>📝 Komentāri</label>
-          <textarea id="w_cmt" placeholder="Dzimšanas diena, braucieni, īpašas vēlmes..."></textarea>
-        </div>
-        <div class="field" style="grid-column:1/-1">
-          <label>🍕 Ēdieni</label>
-          <textarea id="w_food" placeholder="Komplekts, picas vai 'precizēs'" style="min-height:56px"></textarea>
-        </div>
-        <div class="field" style="grid-column:1/-1">
-          <label>👩‍💼 Administrators <span class="req">*</span></label>
-          <input type="text" id="w_admin" placeholder="Tavs vārds (datums un laiks tiks fiksēts automātiski)">
-          <div class="hint">📌 Datums un laiks tiks ierakstīts automātiski pēc Rīgas laika</div>
-        </div>
-        <!-- SLĒGTAIS PASĀKUMS -->
-        <label class="closed-toggle" id="closed_toggle" onclick="toggleClosed()">
-          <input type="checkbox" id="w_closed" onclick="event.stopPropagation();toggleClosed()">
-          <div>
-            <div class="closed-toggle-lbl">🔒 Slēgtais pasākums</div>
-            <div class="closed-toggle-sub">Šajā laikā citas rezervācijas netiks pieņemtas neatkarīgi no brīvajām vietām</div>
-          </div>
+      </div>
+
+      <!-- Rinda 4: Komentārs -->
+      <div class="field">
+        <label>📝 Komentāri</label>
+        <textarea id="w_cmt" placeholder="Dzimšanas diena, braucieni, īpašas vēlmes..."></textarea>
+      </div>
+
+      <!-- Checkboxes -->
+      <div class="wform-checks">
+        <label class="wcheck">
+          <input type="checkbox" id="w_closed"> 🔒 Slēgtais pasākums
+        </label>
+        <label class="wcheck" id="w_outside_wrap">
+          <input type="checkbox" id="w_outside"> ⚠️ Pieņemt ārpus darba laika
         </label>
       </div>
-      <div style="display:flex;gap:10px;margin-top:8px">
-        <button class="btn btn-s" onclick="gotoStep(2)">← Atpakaļ</button>
-        <button class="btn btn-p btn-full" id="btn_save" onclick="submitNew()" style="flex:1">
-          💾 Saglabāt rezervāciju
-        </button>
-      </div>
-    </div>
-  </div><!-- /wiz -->
 
-  <!-- LABĀ PUSE — dienas noslodzes tabula -->
-  <div class="day-load-panel" id="DLP">
-    <div class="dlp-hdr">
-      <span>Dienas noslodze</span>
-      <span class="dlp-date" id="DLP_DATE">— izvēlies datumu —</span>
+      <!-- Kļūda un poga -->
+      <div class="err-msg" id="W_ERR"></div>
+      <button class="btn btn-p" id="btn_s1" onclick="submitNew()" disabled>✓ Pieņemt rezervāciju</button>
     </div>
-    <div id="DLP_BODY">
-      <div class="dlp-empty">📅 Izvēlies datumu,<br>lai redzētu noslodzi</div>
-    </div>
-    <div class="dlp-legend" id="DLP_LEG" style="display:none">
-      <span class="dlp-li"><span class="dlp-ld" style="background:var(--border)"></span>Brīvs</span>
-      <span class="dlp-li"><span class="dlp-ld" style="background:var(--accent)"></span>&lt;25%</span>
-      <span class="dlp-li"><span class="dlp-ld" style="background:var(--yellow)"></span>25–60%</span>
-      <span class="dlp-li"><span class="dlp-ld" style="background:var(--green)"></span>60–85%</span>
-      <span class="dlp-li"><span class="dlp-ld" style="background:var(--red)"></span>85%+</span>
-    </div>
+
   </div>
-  </div><!-- /new-layout -->
+  </div>
 </div>
 
 <!-- ══ RĒĶINI ══ -->
@@ -3845,9 +3830,17 @@ function showStep(n) {
   if (n===3) buildS3();
 }
 
-function s1val() {
-  const v = parseInt(document.getElementById('w_ppl').value);
-  document.getElementById('btn_s1').disabled = !(v > 0 && v <= 90);
+function s1val() { wValidate(); }
+function wValidate() {
+  const client = (document.getElementById('w_client')?.value || '').trim();
+  const phone  = (document.getElementById('w_phone')?.value  || '').trim();
+  const ppl    = parseInt(document.getElementById('w_ppl')?.value  || 0);
+  const date   = (document.getElementById('w_date')?.value   || '').trim();
+  const from   = (document.getElementById('w_from')?.value   || '').trim();
+  const to     = (document.getElementById('w_to')?.value     || '').trim();
+  const ok = client && phone && ppl > 0 && ppl <= 90 && date && from && to;
+  const btn = document.getElementById('btn_s1');
+  if (btn) btn.disabled = !ok;
 }
 
 function gotoStep(n) {
@@ -4082,7 +4075,7 @@ function submitNew() {
     food:     document.getElementById('w_food').value,
     admin,
     closed:    document.getElementById('w_closed').checked,
-    outside:   _outsideHours,
+    outside:   document.getElementById('w_outside')?.checked || _outsideHours,
     invEmail:  document.getElementById('w_inv_email').value,
     rekviziti: document.getElementById('w_rekviziti').value,
     status:    'Aktīva',
