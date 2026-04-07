@@ -2278,7 +2278,6 @@ window.google={script:{run:window.__gsr__}};
             </div>
           </div>
         </div>
-        <div id="HOURS_INFO" class="hours-info"></div>
         <label class="wcheck wcheck-outside" style="margin-top:6px;">
           <input type="checkbox" id="w_outside" onchange="toggleOutsideHours(this.checked)">
           <span>⚠️ Ārpus darba laika</span>
@@ -2330,8 +2329,9 @@ window.google={script:{run:window.__gsr__}};
           </div>
           <div class="field" id="w_kids_party_wrap">
             <label>🎈 Bērnu ballīte?</label>
-            <label class="wcheck" style="margin-top:8px;">
+            <label class="fd-mode-check" style="margin-top:8px;">
               <input type="checkbox" id="w_kids_party" onchange="wKidsParty(this.checked)">
+              <span class="chk"></span>
               <span>Jā, bērnu ballīte</span>
             </label>
             <div id="w_kids_sunday_hint" style="display:none;" class="kids-sunday-hint">
@@ -3998,7 +3998,6 @@ function newForDate() {
   _dpYear  = parseInt(y);
   _dpMonth = parseInt(m) - 1;
   applyWorkHours(_dayDate, 'w_from', 'w_to', null, null);
-  updateHoursInfo(_dayDate);
 }
 
 // ================================================================
@@ -4575,12 +4574,6 @@ function goNavOutside() {
   // Iestata _outsideHours režīmu — checkCap ignorēs darba laika pārbaudi
   _outsideHours = true;
   document.getElementById('OUTSIDE_WARN').classList.add('show');
-  // Vizuāls indikators HOURS_INFO
-  setTimeout(() => {
-    const hi = document.getElementById('HOURS_INFO');
-    if (hi) hi.innerHTML =
-      `⚠️ <span style="color:var(--yellow);font-weight:900">Ārpus darba laika režīms</span> — darba laika ierobežojumi neattiecas`;
-  }, 50);
 }
 
 function toggleOutsideHours(checked) {
@@ -4639,7 +4632,6 @@ function resetWiz() {
   // Notīra vērtības — NAV default datuma
   document.getElementById('w_date').value = '';
   document.getElementById('CAP_RES').innerHTML = '';
-  document.getElementById('HOURS_INFO').innerHTML = '';
   document.getElementById('btn_s2').disabled = true;
   document.getElementById('btn_s1').disabled = true;
   ['w_ppl','w_client','w_phone','w_email','w_cmt','w_food','w_admin','w_inv_email','w_rekviziti']
@@ -4687,12 +4679,6 @@ function resetWiz() {
   _outsideHours = false;
   const ow = document.getElementById('OUTSIDE_WARN');
   if (ow) ow.classList.remove('show');
-}
-
-function updateHoursInfo(dateStr) {
-  const wh = getWorkHoursClient(dateStr);
-  const el = document.getElementById('HOURS_INFO');
-  if (el) el.innerHTML = `⏰ Darba laiks šajā dienā: <b style="color:var(--text)">${wh.open} – ${wh.close}</b>`;
 }
 
 function toggleClosed() {
@@ -4748,7 +4734,6 @@ function onDateChange() {
   document.getElementById('tp_label').textContent = 'Izvēlies beigu laiku';
   document.getElementById('tp_btn').classList.add('empty-val');
   applyWorkHours(date, 'w_from', 'w_to', null, null);
-  updateHoursInfo(date);
   document.getElementById('CAP_RES').innerHTML = '';
   document.getElementById('btn_s2').disabled = true;
   _capOk = false;
