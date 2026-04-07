@@ -4595,6 +4595,9 @@ function selectDate(ds) {
   btn.classList.remove('open');
   // Atjauno darba laiku un laiku pickeru opcijas
   onDateChange();
+  // Bērnu ballīte — atjaunot hint pēc datuma maiņas
+  var kp = document.getElementById('w_kids_party');
+  if (kp && kp.checked) wKidsParty(true);
 }
 
 // ── Laika saraksts ──
@@ -4828,8 +4831,10 @@ function onDateChange() {
   _capOk = false;
   renderDLP(date);
   // Ja bērnu ballīte jau atzīmēta — atjaunot hint (svētdiena/ne-svētdiena)
-  var kp = document.getElementById('w_kids_party');
-  if (kp && kp.checked) wKidsParty(true);
+  setTimeout(function() {
+    var kp = document.getElementById('w_kids_party');
+    if (kp && kp.checked) wKidsParty(true);
+  }, 50);
 }
 
 // ── Dienas noslodzes tabula ──────────────────────────────────────
