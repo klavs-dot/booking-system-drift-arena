@@ -2064,9 +2064,25 @@ button{cursor:pointer}
 .fd-opt { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--text2); cursor:pointer; }
 
 
-.fd-mode-checks { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
-.fd-mode-check { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text2); cursor:pointer; user-select:none; }
-.fd-mode-check input[type=checkbox] { width:15px; height:15px; cursor:pointer; flex-shrink:0; accent-color:var(--accent); }
+.fd-mode-checks { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:8px; }
+.fd-mode-check { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--text2); cursor:pointer; user-select:none; position:relative; }
+.fd-mode-check input[type=checkbox] { position:absolute; opacity:0; width:0; height:0; }
+.fd-mode-check .chk {
+  width:18px; height:18px; flex-shrink:0; border-radius:3px;
+  border:2px solid var(--border2); background:var(--card2);
+  display:flex; align-items:center; justify-content:center;
+  transition: all .15s;
+}
+.fd-mode-check .chk::after {
+  content:''; display:none; width:5px; height:9px;
+  border:solid #fff; border-width:0 2.5px 2.5px 0;
+  transform:rotate(45deg); margin-top:-2px;
+}
+.fd-mode-check input[type=checkbox]:checked + .chk {
+  background:var(--accent); border-color:var(--accent);
+}
+.fd-mode-check input[type=checkbox]:checked + .chk::after { display:block; }
+.fd-mode-check:hover .chk { border-color:var(--accent); }
 
 /* Wizard formas ēdienu/dzērienu input row fix */
 .wiz-block .bextra-input-row { display:flex; gap:6px; align-items:center; margin:6px 0 4px; }
@@ -2370,14 +2386,17 @@ window.google={script:{run:window.__gsr__}};
             <div class="fd-mode-checks">
               <label class="fd-mode-check">
                 <input type="checkbox" id="w_food_later" checked onchange="wFoodModeCheck('food','later',this.checked)">
+                <span class="chk"></span>
                 <span>📞 Precizēs</span>
               </label>
               <label class="fd-mode-check">
                 <input type="checkbox" id="w_food_onsite" onchange="wFoodModeCheck('food','onsite',this.checked)">
+                <span class="chk"></span>
                 <span>🙋 Uz vietas</span>
               </label>
               <label class="fd-mode-check">
                 <input type="checkbox" id="w_food_now" onchange="wFoodModeCheck('food','now',this.checked)">
+                <span class="chk"></span>
                 <span>✏️ Tagad</span>
               </label>
             </div>
@@ -2401,14 +2420,17 @@ window.google={script:{run:window.__gsr__}};
             <div class="fd-mode-checks">
               <label class="fd-mode-check">
                 <input type="checkbox" id="w_drinks_later" checked onchange="wFoodModeCheck('drinks','later',this.checked)">
+                <span class="chk"></span>
                 <span>📞 Precizēs</span>
               </label>
               <label class="fd-mode-check">
                 <input type="checkbox" id="w_drinks_onsite" onchange="wFoodModeCheck('drinks','onsite',this.checked)">
+                <span class="chk"></span>
                 <span>🙋 Uz vietas</span>
               </label>
               <label class="fd-mode-check">
                 <input type="checkbox" id="w_drinks_now" onchange="wFoodModeCheck('drinks','now',this.checked)">
+                <span class="chk"></span>
                 <span>✏️ Tagad</span>
               </label>
             </div>
