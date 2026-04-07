@@ -1799,6 +1799,12 @@ button{cursor:pointer}
 /* Braucienu kopējais skaits zem laika */
 .bc-rides-total { margin-top:8px; font-size:18px; font-weight:800; color:var(--accent); font-family:var(--font-head); letter-spacing:0.5px; }
 
+/* Kartītes pilnā platumā M_DAY modālī */
+#M_DAY .bc-grid {
+  grid-template-columns: 70px 1fr 110px 1fr 1fr 160px 140px;
+}
+#M_DAY .bcard { margin-bottom:12px; }
+
 .bextra-title { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; }
 .bextra-item  { font-size:12px; color:var(--text2); padding:2px 0; border-bottom:1px solid var(--border); }
 .bextra-empty { font-size:12px; color:var(--text3); padding:2px 0; }
@@ -3078,7 +3084,7 @@ window.google={script:{run:window.__gsr__}};
         <button onclick="closeM('M_DAY')" style="background:none;border:1px solid var(--border2);color:var(--text2);width:36px;height:36px;border-radius:var(--r);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">✕</button>
       </div>
     </div>
-    <div class="blist" id="DAY_LIST" style="flex:1;overflow-y:auto;padding:20px 24px;"></div>
+    <div class="blist" id="DAY_LIST" style="flex:1;overflow-y:auto;overflow-x:auto;padding:20px 24px;"></div>
   </div>
 </div>
 
