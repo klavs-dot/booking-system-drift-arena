@@ -3634,13 +3634,41 @@ function wSidebarUpdate() {
   }
 
   // Noslodze izvēlētajā laikā
-  if (!date || !from || !to) {
+  if (!date) {
     var el = document.getElementById('wsb-cap-content');
-    if (el) el.innerHTML='<div class="wsb-hint">Izvēlies datumu un laiku</div>';
+    if (el) el.innerHTML='<div class="wsb-hint">Izvēlies datumu</div>';
     return;
   }
-  var fromMin = tmin(from), toMin = tmin(to);
+
   var dayBookings = (ALL||[]).filter(function(b){return b.date===date && b.status!=='Atcelta';});
+
+  if (!from || !to) {
+    // Nav laika — rādām dienas kopējo max noslodzi
+    var peakUsed = 0;
+    for (var h = 0; h < 24; h++) {
+      var midMin = h * 60 + 30;
+      var cnt = dayBookings.filter(function(b){return tmin(b.timeFrom)<=midMin && tmin(b.timeTo)>midMin;})
+        .reduce(function(s,b){return s+b.people;},0);
+      if (cnt > peakUsed) peakUsed = cnt;
+    }
+    var total = 90;
+    var newTotal = peakUsed + ppl;
+    var newPct = Math.round(newTotal/total*100);
+    var color = newTotal>90?'var(--red)':newTotal>60?'#f59e0b':'#22c55e';
+    var el = document.getElementById('wsb-cap-content');
+    if (el) el.innerHTML = '<div class="wsb-cap-row">'
+      + '<span class="wsb-cap-num" style="color:'+color+'">'+newTotal+'</span>'
+      + '<span class="wsb-cap-of"> / '+total+' cilv.</span>'
+      + '</div>'
+      + '<div class="wsb-bar-wrap"><div class="wsb-bar-fill" style="width:'+Math.min(100,newPct)+'%;background:'+color+'"></div></div>'
+      + '<div class="wsb-cap-sub">'+(peakUsed>0?'Pīķa noslodze šodien: '+peakUsed+' cilv.':'Diena brīva')+(ppl>0?' + '+ppl+' jauni':'')+'</div>'
+      + '<div style="font-size:11px;color:var(--text3);margin-top:4px;">Izvēlies laiku precīzākai noslodzei</div>'
+      + (newTotal>90?'<div class="wsb-warn">⚠️ Pārsniedz kapacitāti!</div>':'');
+    if (ppl > 0) wSidebarSlots(date, ppl);
+    return;
+  }
+
+  var fromMin = tmin(from), toMin = tmin(to);
   // Kapacitāte izvēlētajā laikā
   var overlap = dayBookings.filter(function(b){
     return tmin(b.timeFrom)<toMin && tmin(b.timeTo)>fromMin;
