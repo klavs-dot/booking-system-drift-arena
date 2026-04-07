@@ -2315,7 +2315,7 @@ window.google={script:{run:window.__gsr__}};
       <!-- BLOKS 2: Klienta info -->
       <div class="wiz-block">
         <div class="wiz-block-title">👤 Klienta informācija</div>
-        <div class="wform-row4">
+        <div class="wform-row3" style="margin-bottom:14px;">
           <div class="field">
             <label>Vārds / Uzņēmums <span class="req">*</span></label>
             <input type="text" id="w_client" placeholder="Jānis Bērziņš vai SIA XYZ" oninput="wValidate()">
@@ -2328,18 +2328,17 @@ window.google={script:{run:window.__gsr__}};
             <label>E-pasts</label>
             <input type="email" id="w_email" placeholder="nav obligāts">
           </div>
+        </div>
+        <div class="wform-row3">
           <div class="field">
-            <label>Cilvēku skaits <span class="req">*</span></label>
+            <label>👥 Cilvēku skaits <span class="req">*</span></label>
             <input type="number" id="w_ppl" min="1" max="90" placeholder="0"
               class="ppl-big-input" oninput="wValidate(); wUpdateRidesTotal();">
           </div>
-        </div>
-        <div class="wform-row2" style="margin-top:14px;">
           <div class="field">
-            <label>🏁 Plānotais braucienu skaits uz personu</label>
+            <label>🏁 Braucienu skaits uz personu</label>
             <input type="number" id="w_rides" min="0" placeholder="Nav obligāts"
-              style="font-size:22px;padding:10px;width:100%;box-sizing:border-box;text-align:center;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);"
-              oninput="wCheckRides(this.value); wUpdateRidesTotal();">
+              class="ppl-big-input" oninput="wCheckRides(this.value); wUpdateRidesTotal();">
             <div id="w_rides_hint" style="display:none;" class="rides-upsell-hint">
               💡 <b>Piedāvā klientam 2 braucienus uz personu — tad būs lētāk!</b>
               <div style="display:flex;gap:8px;margin-top:6px;">
