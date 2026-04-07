@@ -831,12 +831,7 @@ button{cursor:pointer}
 .wiz{max-width:720px}
 
 /* ── DIENAS NOSLODZES TABULA ── */
-.new-layout {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 20px;
-  align-items: start;
-}
+
 .new-layout .wiz { max-width: none; }
 .day-load-panel {
   position: sticky;
@@ -1893,43 +1888,28 @@ button{cursor:pointer}
 .tl-today .tl-cards .bcard { }
 
 
-.wform-row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:16px; }
-.wform-row4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:14px; margin-bottom:16px; }
-.wform-row2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
-.wform-checks { display:flex; gap:24px; margin-bottom:16px; flex-wrap:wrap; }
-.wcheck { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text2); cursor:pointer; }
+
+
+
+
+
 .wcheck input { width:16px; height:16px; cursor:pointer; }
 
 
-.outside-toggle-row { display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:14px; padding:10px 14px; background:var(--card2); border:1px solid var(--border); border-radius:var(--r); }
-.wcheck-outside { font-size:13px; color:var(--text2); flex-shrink:0; margin-top:2px; }
-.outside-times-hint { display:flex; flex-direction:column; gap:6px; flex:1; }
-.oht-label { font-size:11px; color:var(--text3); font-weight:600; text-transform:uppercase; letter-spacing:0.4px; }
-.oht-times { display:flex; flex-wrap:wrap; gap:4px; }
-.oht-slot { padding:3px 8px; background:var(--card); border:1px solid #3b82f6; border-radius:4px; color:#60a5fa; font-size:11px; font-weight:600; cursor:pointer; }
-.oht-slot:hover { background:#3b82f6; color:#fff; }
+
+
+
+
+
+
+
 
 
 /* Cilvēku skaits — liels pulsējošs kvadrāts */
-@keyframes ppl-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.15); }
+
   50%      { box-shadow: 0 0 0 8px rgba(255,255,255,0.0); }
 }
-.ppl-big-input {
-  width: 100%;
-  padding: 18px 12px;
-  font-size: 42px;
-  font-weight: 800;
-  text-align: center;
-  background: var(--card2);
-  border: 2px solid var(--border2);
-  border-radius: var(--r);
-  color: #fff;
-  box-sizing: border-box;
-  animation: ppl-pulse 1.5s ease-in-out infinite;
-  font-family: var(--font-head);
-  letter-spacing: 2px;
-}
+
 .ppl-big-input:focus {
   border-color: var(--accent);
   outline: none;
@@ -1938,8 +1918,8 @@ button{cursor:pointer}
 }
 
 /* Ēdieni/dzērieni opcijas formā */
-.fd-option-group { display:flex; flex-direction:column; gap:4px; margin-bottom:4px; }
-.fd-opt { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text2); cursor:pointer; padding:4px 0; }
+
+
 .fd-opt input { flex-shrink:0; }
 .fd-inline-list { margin-bottom:6px; }
 .fd-row { display:flex; align-items:center; gap:4px; padding:3px 0; border-bottom:1px solid var(--border); }
@@ -1949,55 +1929,135 @@ button{cursor:pointer}
 .fd-q:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
 .fd-del { background:none; border:none; color:var(--text3); cursor:pointer; font-size:12px; }
 .fd-del:hover { color:var(--red); }
-.fd-add-row { display:flex; gap:6px; align-items:center; margin-top:6px; }
-.fd-in-name { flex:1; padding:6px 8px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:12px; }
-.fd-in-qty  { width:48px; padding:6px 4px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:12px; text-align:center; }
-.fd-add-btn { padding:6px 12px; background:var(--accent); color:#fff; border:none; border-radius:var(--r); cursor:pointer; font-weight:700; font-size:14px; }
 
 
-.bfd-status  { font-size:11px; font-weight:600; padding:3px 8px; border-radius:4px; margin-bottom:4px; }
-.bfd-call    { background:#1a1400; color:#facc15; border:1px solid #854d0e; }
-.bfd-onsite  { background:#0d2e16; color:#22c55e; border:1px solid #166534; }
+
+
+
+
+
+
+
 
 
 /* Sidebar */
 .wiz { max-width:100%; }
-.new-layout { display:grid; grid-template-columns:1fr 300px; gap:20px; align-items:start; }
-.wiz-sidebar { display:flex; flex-direction:column; gap:12px; position:sticky; top:80px; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Darba laika badge */
+
+
+/* Obligāto lauku kļūda */
+
+
+
+/* Rides upsell */
+
+
+
+
+
+/* Kids Sunday */
+
+
+
+/* Jaunās formas stils */
+.wiz-block { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:18px 20px; margin-bottom:14px; }
+.wiz-block-title { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:14px; }
+.wform-row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.wform-row4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; }
+.wform-row2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.wform-checks { display:flex; gap:20px; flex-wrap:wrap; }
+.wcheck { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text2); cursor:pointer; }
+.wcheck input[type=checkbox] { width:16px; height:16px; cursor:pointer; flex-shrink:0; }
+.wcheck-outside { font-size:13px; color:var(--text2); }
+.new-layout { display:grid; grid-template-columns:1fr 280px; gap:20px; align-items:start; }
+.wiz { min-width:0; }
+
+/* Sidebar */
+.wiz-sidebar { display:flex; flex-direction:column; gap:12px; position:sticky; top:70px; }
 .wsb-card { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:14px 16px; }
-.wsb-title { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
+.wsb-title { font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
 .wsb-hint { font-size:12px; color:var(--text3); }
-.wsb-hours-val { font-size:18px; font-weight:700; color:var(--text); }
+.wsb-hours-val { font-size:22px; font-weight:700; color:#22c55e; }
 .wsb-cap-row { display:flex; align-items:baseline; gap:4px; margin-bottom:6px; }
-.wsb-cap-num { font-size:36px; font-weight:800; font-family:var(--font-head); }
+.wsb-cap-num { font-size:40px; font-weight:800; font-family:var(--font-head); line-height:1; }
 .wsb-cap-of  { font-size:14px; color:var(--text3); }
 .wsb-bar-wrap { height:6px; background:var(--border); border-radius:3px; margin-bottom:6px; overflow:hidden; }
-.wsb-bar-fill { height:100%; border-radius:3px; transition:width 0.3s; }
+.wsb-bar-fill { height:100%; border-radius:3px; transition:width 0.4s; }
 .wsb-cap-sub { font-size:11px; color:var(--text3); }
 .wsb-warn { font-size:12px; color:var(--red); font-weight:700; margin-top:6px; }
-.wsb-slot-row { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+.wsb-slot-row { display:flex; align-items:center; gap:6px; margin-bottom:3px; }
 .wsb-slot-lbl { font-size:10px; color:var(--text3); width:36px; flex-shrink:0; }
-.wsb-slot-bar { flex:1; height:10px; background:var(--border); border-radius:2px; overflow:hidden; }
+.wsb-slot-bar { flex:1; height:8px; background:var(--border); border-radius:2px; overflow:hidden; }
 .wsb-slot-num { font-size:10px; color:var(--text2); width:24px; text-align:right; }
 
 /* Darba laika badge */
-.work-hours-badge { margin-top:6px; font-size:12px; color:#22c55e; background:#0d2e16; border:1px solid #166534; border-radius:4px; padding:4px 8px; }
+.work-hours-badge { margin-top:6px; font-size:12px; color:#22c55e; background:#031a0a; border:1px solid #166534; border-radius:4px; padding:4px 8px; }
 
 /* Obligāto lauku kļūda */
-.field-error input, .field-error textarea, .field-error select {
-  border-color: var(--red) !important;
-  box-shadow: 0 0 0 2px rgba(239,68,68,0.25) !important;
+.field-error > input, .field-error > textarea, .field-error > select { border-color:var(--red) !important; box-shadow:0 0 0 2px rgba(239,68,68,0.2) !important; }
+.field-error > label { color:var(--red) !important; }
+.picker-err { border-color:var(--red) !important; }
+
+/* Cilvēku skaits */
+@keyframes ppl-pulse {
+  0%,100% { box-shadow:0 0 0 0 rgba(255,255,255,0.12); }
+  50%      { box-shadow:0 0 0 8px rgba(255,255,255,0); }
 }
-.field-error label { color: var(--red) !important; }
+.ppl-big-input { width:100%; padding:10px; font-size:36px; font-weight:800; text-align:center;
+  background:var(--card2); border:2px solid var(--border2); border-radius:var(--r); color:#fff;
+  box-sizing:border-box; font-family:var(--font-head); animation:ppl-pulse 2s ease-in-out infinite; }
+.ppl-big-input:focus { border-color:var(--accent); outline:none; animation:none; }
+
+/* Ēdieni/dzērieni */
+.outside-times-hint { display:flex; flex-direction:column; gap:6px; margin-top:8px; padding:10px; background:var(--card2); border-radius:var(--r); }
+.oht-label { font-size:11px; color:var(--text3); font-weight:600; }
+.oht-times { display:flex; flex-wrap:wrap; gap:4px; }
+.oht-slot { padding:3px 8px; background:var(--card); border:1px solid #3b82f6; border-radius:4px; color:#60a5fa; font-size:11px; font-weight:600; cursor:pointer; }
+.oht-slot:hover { background:#3b82f6; color:#fff; }
+.fd-option-group { display:flex; flex-direction:column; gap:3px; }
+.fd-opt { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--text2); cursor:pointer; padding:2px 0; }
+.fd-inline-list { margin-bottom:6px; }
+.fd-row { display:flex; align-items:center; gap:4px; padding:3px 0; border-bottom:1px solid var(--border); }
+.fd-nm { flex:1; font-size:12px; color:var(--text2); }
+.fd-qt { font-size:11px; color:var(--accent); font-weight:700; min-width:24px; }
+.fd-q  { padding:2px 5px; background:var(--card2); border:1px solid var(--border2); border-radius:4px; color:var(--text2); font-size:11px; cursor:pointer; }
+.fd-q:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+.fd-del { background:none; border:none; color:var(--text3); cursor:pointer; font-size:12px; }
+.fd-del:hover { color:var(--red); }
+.fd-add-row { display:flex; gap:6px; align-items:center; margin-top:4px; }
+.fd-in-name { flex:1; padding:5px 8px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:12px; }
+.fd-in-qty  { width:48px; padding:5px 4px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:12px; text-align:center; }
+.fd-add-btn { padding:5px 12px; background:var(--accent); color:#fff; border:none; border-radius:var(--r); cursor:pointer; font-weight:700; font-size:14px; }
 
 /* Rides upsell */
 .rides-upsell-hint { margin-top:8px; padding:10px 12px; background:#0a1628; border:1px solid #1d4ed8; border-radius:var(--r); font-size:12px; color:var(--text2); }
 .rides-upsell-btn { padding:5px 12px; border-radius:var(--r); cursor:pointer; font-size:12px; font-weight:700; border:1px solid; }
 .rides-upsell-btn.yes { background:#0d2e16; color:#22c55e; border-color:#22c55e; }
 .rides-upsell-btn.no  { background:var(--card2); color:var(--text3); border-color:var(--border); }
-
-/* Kids Sunday */
 .kids-sunday-hint { margin-top:8px; padding:10px 12px; background:#1a0f00; border:1px solid #92400e; border-radius:var(--r); font-size:12px; color:var(--text2); }
+
+/* Status badges kartītēs */
+.bfd-status  { font-size:11px; font-weight:600; padding:3px 8px; border-radius:4px; margin-bottom:4px; display:inline-block; }
+.bfd-call    { background:#1a1400; color:#facc15; border:1px solid #854d0e; }
+.bfd-onsite  { background:#0d2e16; color:#22c55e; border:1px solid #166534; }
 
 </style>
 
@@ -2139,67 +2199,55 @@ window.google={script:{run:window.__gsr__}};
 <div class="view" id="view-new">
   <div class="phdr">
     <div class="ptitle">JAUNA REZERVĀCIJA</div>
-    <div class="psub">Aizpildi visus laukus vienā solī</div>
-    <div class="outside-warn-banner" id="OUTSIDE_WARN">
-      <span class="outside-warn-dot"></span>
-      Ārpus darba laika rezervācija
-      <span class="outside-warn-dot"></span>
-    </div>
   </div>
-
   <div class="new-layout">
-  <div class="wiz">
 
-    <div class="spanel active card" id="sp1">
-      <!-- Rinda 1: Datums + Laiks -->
-      <div class="wform-row3">
-        <div class="field">
-          <label>📅 Datums <span class="req">*</span></label>
-          <input type="hidden" id="w_date">
-          <div class="picker-wrap" id="dp_wrap">
-            <button type="button" class="picker-btn empty-val" id="dp_btn" onclick="togglePicker('dp')">
-              <span id="dp_label">Izvēlies datumu</span>
-              <span class="pb-arrow">▼</span>
-            </button>
-            <div class="picker-drop" id="dp_drop">
-              <div class="pdcal" id="dp_cal"></div>
-            </div>
-          </div>
-          <div id="w_workhours_info" style="display:none;" class="work-hours-badge"></div>
-        </div>
-        <div class="field">
-          <label>🕐 Sākums <span class="req">*</span></label>
-          <select id="w_from" style="display:none"></select>
-          <div class="picker-wrap" id="fp_wrap">
-            <button type="button" class="picker-btn empty-val" id="fp_btn" onclick="togglePicker('fp')">
-              <span id="fp_label">Izvēlies sākuma laiku</span>
-              <span class="pb-arrow">▼</span>
-            </button>
-            <div class="picker-drop" id="fp_drop">
-              <div id="fp_list" class="ptime-list"></div>
-            </div>
-          </div>
-        </div>
-        <div class="field">
-          <label>🕑 Beigas <span class="req">*</span></label>
-          <select id="w_to" style="display:none"></select>
-          <div class="picker-wrap" id="tp_wrap">
-            <button type="button" class="picker-btn empty-val" id="tp_btn" onclick="togglePicker('tp')">
-              <span id="tp_label">Izvēlies beigu laiku</span>
-              <span class="pb-arrow">▼</span>
-            </button>
-            <div class="picker-drop" id="tp_drop">
-              <div id="tp_list" class="ptime-list"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- KREISĀ PUSE: Forma -->
+    <div class="wiz" id="sp1">
 
-      <!-- Ārpus darba laika checkbox + laiki -->
-      <div class="outside-toggle-row">
-        <label class="wcheck wcheck-outside">
+      <!-- BLOKS 1: Datums un laiks -->
+      <div class="wiz-block">
+        <div class="wiz-block-title">📅 Datums un laiks</div>
+        <div class="wform-row3">
+          <div class="field">
+            <label>Datums <span class="req">*</span></label>
+            <input type="hidden" id="w_date">
+            <div class="picker-wrap" id="dp_wrap">
+              <button type="button" class="picker-btn empty-val" id="dp_btn" onclick="togglePicker('dp')">
+                <span id="dp_label">Izvēlies datumu</span>
+                <span class="pb-arrow">▼</span>
+              </button>
+              <div class="picker-drop" id="dp_drop"><div class="pdcal" id="dp_cal"></div></div>
+            </div>
+            <div id="w_workhours_info" class="work-hours-badge" style="display:none;"></div>
+          </div>
+          <div class="field">
+            <label>Sākums <span class="req">*</span></label>
+            <select id="w_from" style="display:none;"></select>
+            <div class="picker-wrap" id="fp_wrap">
+              <button type="button" class="picker-btn empty-val" id="fp_btn" onclick="togglePicker('fp')">
+                <span id="fp_label">Izvēlies laiku</span>
+                <span class="pb-arrow">▼</span>
+              </button>
+              <div class="picker-drop" id="fp_drop"><div id="fp_list" class="ptime-list"></div></div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Beigas <span class="req">*</span></label>
+            <select id="w_to" style="display:none;"></select>
+            <div class="picker-wrap" id="tp_wrap">
+              <button type="button" class="picker-btn empty-val" id="tp_btn" onclick="togglePicker('tp')">
+                <span id="tp_label">Izvēlies laiku</span>
+                <span class="pb-arrow">▼</span>
+              </button>
+              <div class="picker-drop" id="tp_drop"><div id="tp_list" class="ptime-list"></div></div>
+            </div>
+          </div>
+        </div>
+        <div id="HOURS_INFO" class="hours-info"></div>
+        <label class="wcheck wcheck-outside" style="margin-top:6px;">
           <input type="checkbox" id="w_outside" onchange="toggleOutsideHours(this.checked)">
-          <span>⚠️ Pieņemt ārpus darba laika</span>
+          <span>⚠️ Ārpus darba laika</span>
         </label>
         <div id="outside-times-hint" style="display:none;" class="outside-times-hint">
           <span class="oht-label">Pieejamie laiki ārpus darba laika:</span>
@@ -2207,224 +2255,205 @@ window.google={script:{run:window.__gsr__}};
         </div>
       </div>
 
-      <!-- Kapacitātes indikators -->
-      <div id="HOURS_INFO" class="hours-info"></div>
-      <div class="cap-bar-wrap" id="CAP_BAR_WRAP" style="display:none">
-        <div class="cap-bar-label">
-          <span>Noslogojums izvēlētajā laikā</span>
-          <span id="CAP_BAR_PCT">0%</span>
-        </div>
-        <div class="cap-bar-track">
-          <div class="cap-bar-fill" id="CAP_BAR_FILL" style="width:0%"></div>
-        </div>
-        <div class="cap-bar-sub" id="CAP_BAR_SUB"></div>
-      </div>
-
-      <!-- Rinda 2: Klients + Telefons + E-pasts + Cilvēki -->
-      <div class="wform-row4">
-        <div class="field">
-          <label>👤 Vārds / Uzņēmums <span class="req">*</span></label>
-          <input type="text" id="w_client" placeholder="Jānis Bērziņš vai SIA XYZ" oninput="wValidate()">
-        </div>
-        <div class="field">
-          <label>📞 Telefons <span class="req">*</span></label>
-          <input type="tel" id="w_phone" placeholder="2XXXXXXX" oninput="wValidate()">
-        </div>
-        <div class="field">
-          <label>✉️ E-pasts</label>
-          <input type="email" id="w_email" placeholder="nav obligāts">
-        </div>
-        <div class="field">
-          <label>👥 Cilvēku skaits <span class="req">*</span></label>
-          <input type="number" id="w_ppl" min="1" max="90" placeholder="0"
-            class="ppl-big-input" oninput="wValidate()">
-          <div class="hint">Maks. 90 cilvēki</div>
-        </div>
-      </div>
-
-      <!-- Rinda 3: Maksājums + Komentārs -->
-      <div class="wform-row2">
-        <div class="field">
-          <label>💳 Maksāšanas veids</label>
-          <select id="w_inv" onchange="toggleInvFields('w'); wValidate()">
-            <option>Uz vietas</option>
-            <option>Ar rēķinu - pēcapmaksa</option>
-            <option>Ar rēķinu - priekšapmaksa</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>👩‍💼 Administrators <span class="req">*</span></label>
-          <input type="text" id="w_admin" placeholder="Vārds" oninput="wValidate()">
-        </div>
-      </div>
-
-      <!-- Rēķina lauki -->
-      <div class="inv-req-field" id="w_inv_email_wrap" style="display:none">
-        <div class="wform-row2" style="margin-bottom:10px;">
+      <!-- BLOKS 2: Klienta info -->
+      <div class="wiz-block">
+        <div class="wiz-block-title">👤 Klienta informācija</div>
+        <div class="wform-row4">
           <div class="field">
-            <label>📧 E-pasts rēķinam <span class="req">*</span></label>
-            <input type="email" id="w_inv_email" placeholder="invoice@company.lv">
+            <label>Vārds / Uzņēmums <span class="req">*</span></label>
+            <input type="text" id="w_client" placeholder="Jānis Bērziņš vai SIA XYZ" oninput="wValidate()">
           </div>
           <div class="field">
-            <label>🏢 Uzņēmuma nosaukums</label>
-            <div style="position:relative;">
-              <input type="text" id="w_rek_name" placeholder="SIA Uzņēmums..." autocomplete="off"
-                oninput="wUrSearch(this.value)">
-              <div id="w_rek_suggest" class="rek-suggest" style="display:none;"></div>
-            </div>
-          </div>
-        </div>
-        <div class="wform-row2" style="margin-bottom:10px;">
-          <div class="field">
-            <label>🔢 Reģistrācijas numurs</label>
-            <div style="display:flex;gap:8px;">
-              <input type="text" id="w_rek_reg" placeholder="40001234567" style="flex:1;">
-              <button type="button" class="rek-search-btn" onclick="wUrSearchByReg()">🔍 UR.gov</button>
-            </div>
+            <label>Telefons <span class="req">*</span></label>
+            <input type="tel" id="w_phone" placeholder="2XXXXXXX" oninput="wValidate()">
           </div>
           <div class="field">
-            <label>📍 Juridiskā adrese</label>
-            <input type="text" id="w_rek_addr" placeholder="Rīga, Brīvības iela 1">
+            <label>E-pasts</label>
+            <input type="email" id="w_email" placeholder="nav obligāts">
           </div>
-        </div>
-        <div class="wform-row2" style="margin-bottom:10px;">
           <div class="field">
-            <label>🧾 PVN numurs <span style="color:var(--text3);font-weight:400;">(neobligāts)</span></label>
-            <input type="text" id="w_rek_pvn" placeholder="LV40001234567">
-            <div class="hint">Pārbaudīt manuāli <a href="https://lursoft.lv" target="_blank" style="color:var(--accent)">Lursoft.lv</a></div>
+            <label>Cilvēku skaits <span class="req">*</span></label>
+            <input type="number" id="w_ppl" min="1" max="90" placeholder="0"
+              class="ppl-big-input" oninput="wValidate()">
           </div>
-          <div class="field" style="display:flex;align-items:flex-end;gap:12px;padding-bottom:4px;">
-            <label class="wcheck" style="margin:0;">
-              <input type="checkbox" id="w_rek_telpa">
-              <span style="font-size:12px;">Rēķins par telpu nomu prezentācijām</span>
-            </label>
-          </div>
-        </div>
-        <div id="w_ur_status" style="font-size:12px;color:#22c55e;min-height:16px;margin-bottom:8px;"></div>
-        <label class="wcheck" style="margin-bottom:10px;font-size:12px;color:var(--text3);">
-          <input type="checkbox" id="w_rek_later" onchange="wRekLater(this.checked)">
-          <span>⏰ Rekvizītus ievadīšu vēlāk</span>
-        </label>
-      </div>
-
-      <!-- Ēdieni un dzērieni -->
-      <div class="wform-row2" style="margin-bottom:14px;">
-        <div class="field">
-          <label>🍕 Ēdieni</label>
-          <div class="fd-option-group" id="w_food_opts">
-            <label class="fd-opt"><input type="radio" name="w_food_mode" value="later" checked onchange="wFoodMode('food',this.value)"> 📞 Precizēs/sazvanīt</label>
-            <label class="fd-opt"><input type="radio" name="w_food_mode" value="onsite" onchange="wFoodMode('food',this.value)"> 🙋 Izvēlēsies uz vietas</label>
-            <label class="fd-opt"><input type="radio" name="w_food_mode" value="now" onchange="wFoodMode('food',this.value)"> ✏️ Ievadīt tagad</label>
-          </div>
-          <div id="w_food_input" style="display:none;margin-top:8px;">
-            <div class="fd-inline-list" id="w_food_list"></div>
-            <div class="fd-add-row">
-              <input type="text" id="w_food_name" placeholder="Nosaukums..." class="fd-in-name">
-              <input type="number" id="w_food_qty" value="1" min="1" class="fd-in-qty">
-              <button type="button" class="fd-add-btn" onclick="wFdAdd('food')">+</button>
-            </div>
-          </div>
-          <input type="hidden" id="w_food" value="PRECIZES">
-        </div>
-        <div class="field">
-          <label>🍷 Dzērieni</label>
-          <div class="fd-option-group" id="w_drinks_opts">
-            <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="later" checked onchange="wFoodMode('drinks',this.value)"> 📞 Precizēs/sazvanīt</label>
-            <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="onsite" onchange="wFoodMode('drinks',this.value)"> 🙋 Izvēlēsies uz vietas</label>
-            <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="now" onchange="wFoodMode('drinks',this.value)"> ✏️ Ievadīt tagad</label>
-          </div>
-          <div id="w_drinks_input" style="display:none;margin-top:8px;">
-            <div class="fd-inline-list" id="w_drinks_list"></div>
-            <div class="fd-add-row">
-              <input type="text" id="w_drinks_name" placeholder="Nosaukums..." class="fd-in-name">
-              <input type="number" id="w_drinks_qty" value="1" min="1" class="fd-in-qty">
-              <button type="button" class="fd-add-btn" onclick="wFdAdd('drinks')">+</button>
-            </div>
-          </div>
-          <input type="hidden" id="w_drinks" value="PRECIZES">
         </div>
       </div>
 
-      <!-- Rinda 4: Komentārs -->
-      <div class="field">
-        <label>📝 Komentāri</label>
-        <textarea id="w_cmt" placeholder="Dzimšanas diena, braucieni, īpašas vēlmes..."></textarea>
-      </div>
-
-      <!-- Plānotie braucieni + Bērnu ballīte -->
-      <div class="wform-row2" style="margin-bottom:14px;">
-        <div class="field">
-          <label>🏁 Plānotais braucienu skaits</label>
-          <input type="number" id="w_rides" min="0" placeholder="Nav obligāts"
-            class="rides-input" style="font-size:20px;padding:8px;width:100%;box-sizing:border-box;"
-            oninput="wCheckRides(this.value)">
-          <div id="w_rides_hint" style="display:none;" class="rides-upsell-hint">
-            💡 <b>Vai piedāvāji ņemt vairāk braucienus, jo lētāk?</b>
-            <div style="display:flex;gap:8px;margin-top:6px;">
-              <button type="button" class="rides-upsell-btn yes" onclick="wRidesUpsell(true)">✓ Jā, piedāvāju</button>
-              <button type="button" class="rides-upsell-btn no" onclick="wRidesUpsell(false)">✗ Nē</button>
-            </div>
+      <!-- BLOKS 3: Maksājums un admin -->
+      <div class="wiz-block">
+        <div class="wiz-block-title">💳 Maksājums</div>
+        <div class="wform-row2">
+          <div class="field">
+            <label>Maksāšanas veids</label>
+            <select id="w_inv" onchange="toggleInvFields('w'); wValidate();">
+              <option>Uz vietas</option>
+              <option>Ar rēķinu - pēcapmaksa</option>
+              <option>Ar rēķinu - priekšapmaksa</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Administrators <span class="req">*</span></label>
+            <input type="text" id="w_admin" placeholder="Vārds" oninput="wValidate()">
           </div>
         </div>
-        <div class="field">
-          <label>🎈 Bērnu ballīte?</label>
-          <label class="wcheck" style="margin-top:8px;">
-            <input type="checkbox" id="w_kids_party" onchange="wKidsParty(this.checked)">
-            <span>Jā, bērnu ballīte</span>
+        <!-- Rēķina lauki - tikai ja rēķins -->
+        <div id="w_inv_email_wrap" style="display:none;">
+          <div class="wform-row2" style="margin-bottom:10px;">
+            <div class="field">
+              <label>E-pasts rēķinam <span class="req">*</span></label>
+              <input type="email" id="w_inv_email" placeholder="invoice@company.lv">
+            </div>
+            <div class="field">
+              <label>Uzņēmuma nosaukums (UR.gov)</label>
+              <div style="position:relative;">
+                <input type="text" id="w_rek_name" placeholder="SIA Uzņēmums..." autocomplete="off" oninput="wUrSearch(this.value)">
+                <div id="w_rek_suggest" class="rek-suggest" style="display:none;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="wform-row2" style="margin-bottom:10px;">
+            <div class="field">
+              <label>Reģistrācijas numurs</label>
+              <div style="display:flex;gap:8px;">
+                <input type="text" id="w_rek_reg" placeholder="40001234567" style="flex:1;">
+                <button type="button" class="rek-search-btn" onclick="wUrSearchByReg()">🔍 UR.gov</button>
+              </div>
+            </div>
+            <div class="field">
+              <label>Juridiskā adrese</label>
+              <input type="text" id="w_rek_addr" placeholder="Rīga, Brīvības iela 1">
+            </div>
+          </div>
+          <div class="wform-row2" style="margin-bottom:8px;">
+            <div class="field">
+              <label>PVN numurs <span style="color:var(--text3);font-weight:400;">(neobligāts — pārbaudīt <a href="https://lursoft.lv" target="_blank" style="color:var(--accent)">Lursoft.lv</a>)</span></label>
+              <input type="text" id="w_rek_pvn" placeholder="LV40001234567">
+            </div>
+            <div class="field" style="display:flex;align-items:flex-end;padding-bottom:8px;">
+              <label class="wcheck">
+                <input type="checkbox" id="w_rek_telpa">
+                <span>Rēķins par telpu nomu prezentācijām</span>
+              </label>
+            </div>
+          </div>
+          <div id="w_ur_status" style="font-size:12px;color:#22c55e;min-height:14px;margin-bottom:6px;"></div>
+          <label class="wcheck" style="font-size:12px;color:var(--text3);margin-bottom:8px;">
+            <input type="checkbox" id="w_rek_later" onchange="wRekLater(this.checked)">
+            <span>⏰ Rekvizītus ievadīšu vēlāk</span>
           </label>
-          <div id="w_kids_sunday_hint" style="display:none;" class="kids-sunday-hint">
-            🧃 Svētdienās bezmaksas PEPSI! Pārcelt uz svētdienu?
-            <div style="display:flex;gap:8px;margin-top:6px;">
-              <button type="button" class="rides-upsell-btn yes" onclick="wSuggestSunday()">📅 Pārcelt</button>
-              <button type="button" class="rides-upsell-btn no" onclick="document.getElementById('w_kids_sunday_hint').style.display='none'">Palikt šajā</button>
+        </div>
+      </div>
+
+      <!-- BLOKS 4: Ēdieni un dzērieni -->
+      <div class="wiz-block">
+        <div class="wiz-block-title">🍕 Ēdieni un dzērieni</div>
+        <div class="wform-row2">
+          <div class="field">
+            <label>🍕 Ēdieni</label>
+            <div class="fd-option-group">
+              <label class="fd-opt"><input type="radio" name="w_food_mode" value="later" checked onchange="wFoodMode('food',this.value)"> 📞 Precizēs/sazvanīt</label>
+              <label class="fd-opt"><input type="radio" name="w_food_mode" value="onsite" onchange="wFoodMode('food',this.value)"> 🙋 Izvēlēsies uz vietas</label>
+              <label class="fd-opt"><input type="radio" name="w_food_mode" value="now" onchange="wFoodMode('food',this.value)"> ✏️ Ievadīt tagad</label>
             </div>
+            <div id="w_food_input" style="display:none;margin-top:8px;">
+              <div class="fd-inline-list" id="w_food_list"></div>
+              <div class="fd-add-row">
+                <input type="text" id="w_food_name" placeholder="Nosaukums..." class="fd-in-name"
+                  onkeydown="if(event.key==='Enter'){wFdAdd('food');}">
+                <input type="number" id="w_food_qty" value="1" min="1" class="fd-in-qty">
+                <button type="button" class="fd-add-btn" onclick="wFdAdd('food')">+</button>
+              </div>
+            </div>
+            <input type="hidden" id="w_food" value="PRECIZES">
+          </div>
+          <div class="field">
+            <label>🍷 Dzērieni</label>
+            <div class="fd-option-group">
+              <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="later" checked onchange="wFoodMode('drinks',this.value)"> 📞 Precizēs/sazvanīt</label>
+              <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="onsite" onchange="wFoodMode('drinks',this.value)"> 🙋 Izvēlēsies uz vietas</label>
+              <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="now" onchange="wFoodMode('drinks',this.value)"> ✏️ Ievadīt tagad</label>
+            </div>
+            <div id="w_drinks_input" style="display:none;margin-top:8px;">
+              <div class="fd-inline-list" id="w_drinks_list"></div>
+              <div class="fd-add-row">
+                <input type="text" id="w_drinks_name" placeholder="Nosaukums..." class="fd-in-name"
+                  onkeydown="if(event.key==='Enter'){wFdAdd('drinks');}">
+                <input type="number" id="w_drinks_qty" value="1" min="1" class="fd-in-qty">
+                <button type="button" class="fd-add-btn" onclick="wFdAdd('drinks')">+</button>
+              </div>
+            </div>
+            <input type="hidden" id="w_drinks" value="PRECIZES">
           </div>
         </div>
       </div>
 
-      <!-- Checkboxes -->
-      <div class="wform-checks">
-        <label class="wcheck">
-          <input type="checkbox" id="w_closed"> 🔒 Slēgtais pasākums
-        </label>
-        <label class="wcheck">
-          <input type="checkbox" id="w_outside" onchange="toggleOutsideHours(this.checked)"> ⚠️ Ārpus darba laika
-        </label>
+      <!-- BLOKS 5: Papildus -->
+      <div class="wiz-block">
+        <div class="wiz-block-title">📝 Papildus informācija</div>
+        <div class="field" style="margin-bottom:14px;">
+          <label>Komentāri</label>
+          <textarea id="w_cmt" placeholder="Dzimšanas diena, īpašas vēlmes..."></textarea>
+        </div>
+        <div class="wform-row2" style="margin-bottom:14px;">
+          <div class="field">
+            <label>🏁 Plānotais braucienu skaits</label>
+            <input type="number" id="w_rides" min="0" placeholder="Nav obligāts"
+              style="font-size:22px;padding:10px;width:100%;box-sizing:border-box;text-align:center;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);"
+              oninput="wCheckRides(this.value)">
+            <div id="w_rides_hint" style="display:none;" class="rides-upsell-hint">
+              💡 <b>Vai piedāvāji ņemt vairāk braucienus, jo lētāk?</b>
+              <div style="display:flex;gap:8px;margin-top:6px;">
+                <button type="button" class="rides-upsell-btn yes" onclick="wRidesUpsell(true)">✓ Jā</button>
+                <button type="button" class="rides-upsell-btn no" onclick="wRidesUpsell(false)">✗ Nē</button>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label>🎈 Bērnu ballīte?</label>
+            <label class="wcheck" style="margin-top:8px;">
+              <input type="checkbox" id="w_kids_party" onchange="wKidsParty(this.checked)">
+              <span>Jā, bērnu ballīte</span>
+            </label>
+            <div id="w_kids_sunday_hint" style="display:none;" class="kids-sunday-hint">
+              🧃 Svētdienās bezmaksas PEPSI!
+              <div style="display:flex;gap:8px;margin-top:4px;">
+                <button type="button" class="rides-upsell-btn yes" onclick="wSuggestSunday()">📅 Pārcelt uz svētdienu</button>
+                <button type="button" class="rides-upsell-btn no" onclick="document.getElementById('w_kids_sunday_hint').style.display='none'">Palikt</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="wform-checks">
+          <label class="wcheck">
+            <input type="checkbox" id="w_closed"> 🔒 Slēgtais pasākums
+          </label>
+        </div>
       </div>
 
       <!-- Kļūda un poga -->
       <div class="err-msg" id="W_ERR"></div>
       <button class="btn btn-p" id="btn_s1" onclick="submitNew()" disabled>✓ Pieņemt rezervāciju</button>
-    </div>
 
-  </div>
-  <!-- ══ LABĀ PUSE: Noslodze + Info ══ -->
-  <div class="wiz-sidebar" id="wiz-sidebar">
+    </div><!-- /wiz -->
 
-    <!-- Darba laiks -->
-    <div class="wsb-card" id="wsb-hours" style="display:none;">
-      <div class="wsb-title">🕐 Darba laiks šajā dienā</div>
-      <div class="wsb-hours-val" id="wsb-hours-val">—</div>
-    </div>
-
-    <!-- Noslodze -->
-    <div class="wsb-card">
-      <div class="wsb-title">📊 Noslodze izvēlētajā laikā</div>
-      <div id="wsb-cap-content">
-        <div class="wsb-hint">Izvēlies datumu un laiku</div>
+    <!-- LABĀ PUSE: Sidebar -->
+    <div class="wiz-sidebar">
+      <div class="wsb-card" id="wsb-hours" style="display:none;">
+        <div class="wsb-title">🕐 Darba laiks šajā dienā</div>
+        <div class="wsb-hours-val" id="wsb-hours-val">—</div>
+      </div>
+      <div class="wsb-card">
+        <div class="wsb-title">📊 Noslodze izvēlētajā laikā</div>
+        <div id="wsb-cap-content"><div class="wsb-hint">Izvēlies datumu un laiku</div></div>
+      </div>
+      <div class="wsb-card" id="wsb-slots-card" style="display:none;">
+        <div class="wsb-title">👥 Dienas slodze pa stundām</div>
+        <div id="wsb-slots-content"></div>
       </div>
     </div>
 
-    <!-- Stundu slodze pēc cilvēku skaita -->
-    <div class="wsb-card" id="wsb-slots-card" style="display:none;">
-      <div class="wsb-title">👥 Slodze šajā dienā pa stundām</div>
-      <div id="wsb-slots-content"></div>
-    </div>
-
-  </div>
-
-  </div>
-</div>
+  </div><!-- /new-layout -->
+</div><!-- /view-new -->
 
 <!-- ══ RĒĶINI ══ -->
 <div class="view" id="view-invoices">

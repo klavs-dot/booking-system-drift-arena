@@ -829,12 +829,7 @@ button{cursor:pointer}
 .wiz{max-width:720px}
 
 /* ── DIENAS NOSLODZES TABULA ── */
-.new-layout {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 20px;
-  align-items: start;
-}
+
 .new-layout .wiz { max-width: none; }
 .day-load-panel {
   position: sticky;
@@ -1891,43 +1886,28 @@ button{cursor:pointer}
 .tl-today .tl-cards .bcard { }
 
 
-.wform-row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:16px; }
-.wform-row4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:14px; margin-bottom:16px; }
-.wform-row2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
-.wform-checks { display:flex; gap:24px; margin-bottom:16px; flex-wrap:wrap; }
-.wcheck { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text2); cursor:pointer; }
+
+
+
+
+
 .wcheck input { width:16px; height:16px; cursor:pointer; }
 
 
-.outside-toggle-row { display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:14px; padding:10px 14px; background:var(--card2); border:1px solid var(--border); border-radius:var(--r); }
-.wcheck-outside { font-size:13px; color:var(--text2); flex-shrink:0; margin-top:2px; }
-.outside-times-hint { display:flex; flex-direction:column; gap:6px; flex:1; }
-.oht-label { font-size:11px; color:var(--text3); font-weight:600; text-transform:uppercase; letter-spacing:0.4px; }
-.oht-times { display:flex; flex-wrap:wrap; gap:4px; }
-.oht-slot { padding:3px 8px; background:var(--card); border:1px solid #3b82f6; border-radius:4px; color:#60a5fa; font-size:11px; font-weight:600; cursor:pointer; }
-.oht-slot:hover { background:#3b82f6; color:#fff; }
+
+
+
+
+
+
+
 
 
 /* Cilvēku skaits — liels pulsējošs kvadrāts */
-@keyframes ppl-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.15); }
+
   50%      { box-shadow: 0 0 0 8px rgba(255,255,255,0.0); }
 }
-.ppl-big-input {
-  width: 100%;
-  padding: 18px 12px;
-  font-size: 42px;
-  font-weight: 800;
-  text-align: center;
-  background: var(--card2);
-  border: 2px solid var(--border2);
-  border-radius: var(--r);
-  color: #fff;
-  box-sizing: border-box;
-  animation: ppl-pulse 1.5s ease-in-out infinite;
-  font-family: var(--font-head);
-  letter-spacing: 2px;
-}
+
 .ppl-big-input:focus {
   border-color: var(--accent);
   outline: none;
@@ -1936,8 +1916,8 @@ button{cursor:pointer}
 }
 
 /* Ēdieni/dzērieni opcijas formā */
-.fd-option-group { display:flex; flex-direction:column; gap:4px; margin-bottom:4px; }
-.fd-opt { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text2); cursor:pointer; padding:4px 0; }
+
+
 .fd-opt input { flex-shrink:0; }
 .fd-inline-list { margin-bottom:6px; }
 .fd-row { display:flex; align-items:center; gap:4px; padding:3px 0; border-bottom:1px solid var(--border); }
@@ -1947,55 +1927,135 @@ button{cursor:pointer}
 .fd-q:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
 .fd-del { background:none; border:none; color:var(--text3); cursor:pointer; font-size:12px; }
 .fd-del:hover { color:var(--red); }
-.fd-add-row { display:flex; gap:6px; align-items:center; margin-top:6px; }
-.fd-in-name { flex:1; padding:6px 8px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:12px; }
-.fd-in-qty  { width:48px; padding:6px 4px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:12px; text-align:center; }
-.fd-add-btn { padding:6px 12px; background:var(--accent); color:#fff; border:none; border-radius:var(--r); cursor:pointer; font-weight:700; font-size:14px; }
 
 
-.bfd-status  { font-size:11px; font-weight:600; padding:3px 8px; border-radius:4px; margin-bottom:4px; }
-.bfd-call    { background:#1a1400; color:#facc15; border:1px solid #854d0e; }
-.bfd-onsite  { background:#0d2e16; color:#22c55e; border:1px solid #166534; }
+
+
+
+
+
+
+
 
 
 /* Sidebar */
 .wiz { max-width:100%; }
-.new-layout { display:grid; grid-template-columns:1fr 300px; gap:20px; align-items:start; }
-.wiz-sidebar { display:flex; flex-direction:column; gap:12px; position:sticky; top:80px; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Darba laika badge */
+
+
+/* Obligāto lauku kļūda */
+
+
+
+/* Rides upsell */
+
+
+
+
+
+/* Kids Sunday */
+
+
+
+/* Jaunās formas stils */
+.wiz-block { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:18px 20px; margin-bottom:14px; }
+.wiz-block-title { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:14px; }
+.wform-row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.wform-row4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; }
+.wform-row2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.wform-checks { display:flex; gap:20px; flex-wrap:wrap; }
+.wcheck { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text2); cursor:pointer; }
+.wcheck input[type=checkbox] { width:16px; height:16px; cursor:pointer; flex-shrink:0; }
+.wcheck-outside { font-size:13px; color:var(--text2); }
+.new-layout { display:grid; grid-template-columns:1fr 280px; gap:20px; align-items:start; }
+.wiz { min-width:0; }
+
+/* Sidebar */
+.wiz-sidebar { display:flex; flex-direction:column; gap:12px; position:sticky; top:70px; }
 .wsb-card { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:14px 16px; }
-.wsb-title { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
+.wsb-title { font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
 .wsb-hint { font-size:12px; color:var(--text3); }
-.wsb-hours-val { font-size:18px; font-weight:700; color:var(--text); }
+.wsb-hours-val { font-size:22px; font-weight:700; color:#22c55e; }
 .wsb-cap-row { display:flex; align-items:baseline; gap:4px; margin-bottom:6px; }
-.wsb-cap-num { font-size:36px; font-weight:800; font-family:var(--font-head); }
+.wsb-cap-num { font-size:40px; font-weight:800; font-family:var(--font-head); line-height:1; }
 .wsb-cap-of  { font-size:14px; color:var(--text3); }
 .wsb-bar-wrap { height:6px; background:var(--border); border-radius:3px; margin-bottom:6px; overflow:hidden; }
-.wsb-bar-fill { height:100%; border-radius:3px; transition:width 0.3s; }
+.wsb-bar-fill { height:100%; border-radius:3px; transition:width 0.4s; }
 .wsb-cap-sub { font-size:11px; color:var(--text3); }
 .wsb-warn { font-size:12px; color:var(--red); font-weight:700; margin-top:6px; }
-.wsb-slot-row { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+.wsb-slot-row { display:flex; align-items:center; gap:6px; margin-bottom:3px; }
 .wsb-slot-lbl { font-size:10px; color:var(--text3); width:36px; flex-shrink:0; }
-.wsb-slot-bar { flex:1; height:10px; background:var(--border); border-radius:2px; overflow:hidden; }
+.wsb-slot-bar { flex:1; height:8px; background:var(--border); border-radius:2px; overflow:hidden; }
 .wsb-slot-num { font-size:10px; color:var(--text2); width:24px; text-align:right; }
 
 /* Darba laika badge */
-.work-hours-badge { margin-top:6px; font-size:12px; color:#22c55e; background:#0d2e16; border:1px solid #166534; border-radius:4px; padding:4px 8px; }
+.work-hours-badge { margin-top:6px; font-size:12px; color:#22c55e; background:#031a0a; border:1px solid #166534; border-radius:4px; padding:4px 8px; }
 
 /* Obligāto lauku kļūda */
-.field-error input, .field-error textarea, .field-error select {
-  border-color: var(--red) !important;
-  box-shadow: 0 0 0 2px rgba(239,68,68,0.25) !important;
+.field-error > input, .field-error > textarea, .field-error > select { border-color:var(--red) !important; box-shadow:0 0 0 2px rgba(239,68,68,0.2) !important; }
+.field-error > label { color:var(--red) !important; }
+.picker-err { border-color:var(--red) !important; }
+
+/* Cilvēku skaits */
+@keyframes ppl-pulse {
+  0%,100% { box-shadow:0 0 0 0 rgba(255,255,255,0.12); }
+  50%      { box-shadow:0 0 0 8px rgba(255,255,255,0); }
 }
-.field-error label { color: var(--red) !important; }
+.ppl-big-input { width:100%; padding:10px; font-size:36px; font-weight:800; text-align:center;
+  background:var(--card2); border:2px solid var(--border2); border-radius:var(--r); color:#fff;
+  box-sizing:border-box; font-family:var(--font-head); animation:ppl-pulse 2s ease-in-out infinite; }
+.ppl-big-input:focus { border-color:var(--accent); outline:none; animation:none; }
+
+/* Ēdieni/dzērieni */
+.outside-times-hint { display:flex; flex-direction:column; gap:6px; margin-top:8px; padding:10px; background:var(--card2); border-radius:var(--r); }
+.oht-label { font-size:11px; color:var(--text3); font-weight:600; }
+.oht-times { display:flex; flex-wrap:wrap; gap:4px; }
+.oht-slot { padding:3px 8px; background:var(--card); border:1px solid #3b82f6; border-radius:4px; color:#60a5fa; font-size:11px; font-weight:600; cursor:pointer; }
+.oht-slot:hover { background:#3b82f6; color:#fff; }
+.fd-option-group { display:flex; flex-direction:column; gap:3px; }
+.fd-opt { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--text2); cursor:pointer; padding:2px 0; }
+.fd-inline-list { margin-bottom:6px; }
+.fd-row { display:flex; align-items:center; gap:4px; padding:3px 0; border-bottom:1px solid var(--border); }
+.fd-nm { flex:1; font-size:12px; color:var(--text2); }
+.fd-qt { font-size:11px; color:var(--accent); font-weight:700; min-width:24px; }
+.fd-q  { padding:2px 5px; background:var(--card2); border:1px solid var(--border2); border-radius:4px; color:var(--text2); font-size:11px; cursor:pointer; }
+.fd-q:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+.fd-del { background:none; border:none; color:var(--text3); cursor:pointer; font-size:12px; }
+.fd-del:hover { color:var(--red); }
+.fd-add-row { display:flex; gap:6px; align-items:center; margin-top:4px; }
+.fd-in-name { flex:1; padding:5px 8px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:12px; }
+.fd-in-qty  { width:48px; padding:5px 4px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:12px; text-align:center; }
+.fd-add-btn { padding:5px 12px; background:var(--accent); color:#fff; border:none; border-radius:var(--r); cursor:pointer; font-weight:700; font-size:14px; }
 
 /* Rides upsell */
 .rides-upsell-hint { margin-top:8px; padding:10px 12px; background:#0a1628; border:1px solid #1d4ed8; border-radius:var(--r); font-size:12px; color:var(--text2); }
 .rides-upsell-btn { padding:5px 12px; border-radius:var(--r); cursor:pointer; font-size:12px; font-weight:700; border:1px solid; }
 .rides-upsell-btn.yes { background:#0d2e16; color:#22c55e; border-color:#22c55e; }
 .rides-upsell-btn.no  { background:var(--card2); color:var(--text3); border-color:var(--border); }
-
-/* Kids Sunday */
 .kids-sunday-hint { margin-top:8px; padding:10px 12px; background:#1a0f00; border:1px solid #92400e; border-radius:var(--r); font-size:12px; color:var(--text2); }
+
+/* Status badges kartītēs */
+.bfd-status  { font-size:11px; font-weight:600; padding:3px 8px; border-radius:4px; margin-bottom:4px; display:inline-block; }
+.bfd-call    { background:#1a1400; color:#facc15; border:1px solid #854d0e; }
+.bfd-onsite  { background:#0d2e16; color:#22c55e; border:1px solid #166534; }
 
 </style>
 
