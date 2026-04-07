@@ -2068,6 +2068,12 @@ button{cursor:pointer}
 .fd-mode-check { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text2); cursor:pointer; user-select:none; }
 .fd-mode-check input[type=checkbox] { width:15px; height:15px; cursor:pointer; flex-shrink:0; accent-color:var(--accent); }
 
+/* Wizard formas ēdienu/dzērienu input row fix */
+.wiz-block .bextra-input-row { display:flex; gap:6px; align-items:center; margin:6px 0 4px; }
+.wiz-block .bextra-in-name { flex:1; min-width:0; }
+.wiz-block .bextra-in-qty { width:48px; flex-shrink:0; }
+.wiz-block .bextra-add { margin-top:8px; }
+
 </style>
 
 </head>
@@ -2377,7 +2383,7 @@ window.google={script:{run:window.__gsr__}};
             </div>
             <div id="w_food_input" style="display:none;margin-top:6px;">
               <div class="bextra-list" id="w_food_list"></div>
-              <div class="bextra-input-row" id="wfi-food" style="display:flex;margin-top:4px;">
+              <div class="bextra-input-row" id="wfi-food" style="display:none;margin-top:4px;">
                 <input class="bextra-in-name" type="text" id="w_food_name" placeholder="Nosaukums..."
                   onkeydown="if(event.key==='Enter'){wFdConfirm('food');}">
                 <input class="bextra-in-qty" type="number" id="w_food_qty" value="1" min="1">
@@ -2408,7 +2414,7 @@ window.google={script:{run:window.__gsr__}};
             </div>
             <div id="w_drinks_input" style="display:none;margin-top:6px;">
               <div class="bextra-list" id="w_drinks_list"></div>
-              <div class="bextra-input-row" id="wfi-drinks" style="display:flex;margin-top:4px;">
+              <div class="bextra-input-row" id="wfi-drinks" style="display:none;margin-top:4px;">
                 <input class="bextra-in-name" type="text" id="w_drinks_name" placeholder="Nosaukums..."
                   onkeydown="if(event.key==='Enter'){wFdConfirm('drinks');}">
                 <input class="bextra-in-qty" type="number" id="w_drinks_qty" value="1" min="1">
@@ -3393,6 +3399,11 @@ function wFoodMode(field, mode) {
   if (!inputDiv || !hidden) return;
   if (mode === 'now') {
     inputDiv.style.display = 'block';
+    // Reset input row stāvokli — paslēpt ievadi, rādīt + Pievienot
+    var inputRow = document.getElementById('wfi-'+field);
+    var addBtn   = document.getElementById('wfa-'+field);
+    if (inputRow) { inputRow.style.display = 'none'; inputRow.removeAttribute('data-edit-idx'); }
+    if (addBtn) addBtn.style.display = '';
     hidden.value = wFdBuild(field);
   } else if (mode === 'onsite') {
     inputDiv.style.display = 'none';
@@ -4549,6 +4560,32 @@ function resetWiz() {
   ['w_ppl','w_client','w_phone','w_email','w_cmt','w_food','w_admin','w_inv_email','w_rekviziti']
     .forEach(id => document.getElementById(id).value = '');
   toggleInvFields('w');
+
+  // ── Pilnīgi notīrīt ēdienu/dzērienu stāvokli ──
+  wFdItems = {food:[], drinks:[]};
+  // Reset checkboxus
+  ['food','drinks'].forEach(function(field) {
+    var laterEl = document.getElementById('w_'+field+'_later');
+    var onsiteEl = document.getElementById('w_'+field+'_onsite');
+    var nowEl = document.getElementById('w_'+field+'_now');
+    if (laterEl) laterEl.checked = true;
+    if (onsiteEl) onsiteEl.checked = false;
+    if (nowEl) nowEl.checked = false;
+    // Paslēpt input bloku
+    var inputDiv = document.getElementById('w_'+field+'_input');
+    if (inputDiv) inputDiv.style.display = 'none';
+    // Paslēpt input row, rādīt + Pievienot
+    var inputRow = document.getElementById('wfi-'+field);
+    if (inputRow) { inputRow.style.display = 'none'; inputRow.removeAttribute('data-edit-idx'); }
+    var addBtn = document.getElementById('wfa-'+field);
+    if (addBtn) addBtn.style.display = '';
+    // Notīrīt sarakstu
+    var list = document.getElementById('w_'+field+'_list');
+    if (list) list.innerHTML = '';
+    // Reset hidden value
+    var hidden = document.getElementById('w_'+field);
+    if (hidden) hidden.value = 'PRECIZES';
+  });
   // Notīra picker pogas
   document.getElementById('dp_label').textContent = 'Izvēlies datumu';
   document.getElementById('dp_btn').classList.add('empty-val');
@@ -4841,10 +4878,9 @@ function submitNew() {
     invoice:  document.getElementById('w_inv').value,
     comment:  document.getElementById('w_cmt').value,
     food:     document.getElementById('w_food').value,
-    drinks:   document.getElementById('w_drinks')?.value||'',
+    drinks:   document.getElementById('w_drinks').value,
     rides:    parseInt(document.getElementById('w_rides')?.value||0)||0,
     kids_party: document.getElementById('w_kids_party')?.checked||false,
-    drinks:   document.getElementById('w_drinks').value,
     admin,
     closed:    document.getElementById('w_closed').checked,
     outside:   document.getElementById('w_outside')?.checked || _outsideHours,
