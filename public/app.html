@@ -1785,7 +1785,7 @@ button{cursor:pointer}
 
 .bc-grid {
   display: grid;
-  grid-template-columns: 70px 240px 120px 210px 210px 180px 155px;
+  grid-template-columns: 70px 240px 210px 210px 180px 155px;
   gap: 16px;
   align-items: start;
   grid-auto-rows: auto;
@@ -1795,6 +1795,9 @@ button{cursor:pointer}
 .bc-rides { min-width:0; }
 .bc-info  { min-width:0; }
 .bc-btns  { display:flex; flex-direction:column; gap:5px; width:155px; flex-shrink:0; }
+
+/* Braucienu kopējais skaits zem laika */
+.bc-rides-total { margin-top:8px; font-size:18px; font-weight:800; color:var(--accent); font-family:var(--font-head); letter-spacing:0.5px; }
 
 .bextra-title { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; }
 .bextra-item  { font-size:12px; color:var(--text2); padding:2px 0; border-bottom:1px solid var(--border); }
@@ -2305,7 +2308,39 @@ window.google={script:{run:window.__gsr__}};
           <div class="field">
             <label>Cilvēku skaits <span class="req">*</span></label>
             <input type="number" id="w_ppl" min="1" max="90" placeholder="0"
-              class="ppl-big-input" oninput="wValidate()">
+              class="ppl-big-input" oninput="wValidate(); wUpdateRidesTotal();">
+          </div>
+        </div>
+        <div class="wform-row2" style="margin-top:14px;">
+          <div class="field">
+            <label>🏁 Plānotais braucienu skaits uz personu</label>
+            <input type="number" id="w_rides" min="0" placeholder="Nav obligāts"
+              style="font-size:22px;padding:10px;width:100%;box-sizing:border-box;text-align:center;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);"
+              oninput="wCheckRides(this.value); wUpdateRidesTotal();">
+            <div id="w_rides_hint" style="display:none;" class="rides-upsell-hint">
+              💡 <b>Piedāvā klientam 2 braucienus uz personu — tad būs lētāk!</b>
+              <div style="display:flex;gap:8px;margin-top:6px;">
+                <button type="button" class="rides-upsell-btn yes" onclick="wRidesUpsell(true)">✓ Labi, 2</button>
+                <button type="button" class="rides-upsell-btn no" onclick="wRidesUpsell(false)">✗ Atstāt 1</button>
+              </div>
+            </div>
+            <div id="w_rides_total" style="margin-top:6px;font-size:12px;color:var(--text3);display:none;">
+              Kopā braucieni: <span id="w_rides_total_num" style="color:var(--accent);font-weight:700;">0</span>
+            </div>
+          </div>
+          <div class="field" id="w_kids_party_wrap">
+            <label>🎈 Bērnu ballīte?</label>
+            <label class="wcheck" style="margin-top:8px;">
+              <input type="checkbox" id="w_kids_party" onchange="wKidsParty(this.checked)">
+              <span>Jā, bērnu ballīte</span>
+            </label>
+            <div id="w_kids_sunday_hint" style="display:none;" class="kids-sunday-hint">
+              🧃 Svētdienās bezmaksas PEPSI!
+              <div style="display:flex;gap:8px;margin-top:4px;">
+                <button type="button" class="rides-upsell-btn yes" onclick="wSuggestSunday()">📅 Pārcelt uz svētdienu</button>
+                <button type="button" class="rides-upsell-btn no" onclick="document.getElementById('w_kids_sunday_hint').style.display='none'">Palikt</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2457,35 +2492,6 @@ window.google={script:{run:window.__gsr__}};
         <div class="field" style="margin-bottom:14px;">
           <label>Komentāri</label>
           <textarea id="w_cmt" placeholder="Dzimšanas diena, īpašas vēlmes..."></textarea>
-        </div>
-        <div class="wform-row2" style="margin-bottom:14px;">
-          <div class="field">
-            <label>🏁 Plānotais braucienu skaits</label>
-            <input type="number" id="w_rides" min="0" placeholder="Nav obligāts"
-              style="font-size:22px;padding:10px;width:100%;box-sizing:border-box;text-align:center;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);"
-              oninput="wCheckRides(this.value)">
-            <div id="w_rides_hint" style="display:none;" class="rides-upsell-hint">
-              💡 <b>Vai piedāvāji ņemt vairāk braucienus, jo lētāk?</b>
-              <div style="display:flex;gap:8px;margin-top:6px;">
-                <button type="button" class="rides-upsell-btn yes" onclick="wRidesUpsell(true)">✓ Jā</button>
-                <button type="button" class="rides-upsell-btn no" onclick="wRidesUpsell(false)">✗ Nē</button>
-              </div>
-            </div>
-          </div>
-          <div class="field">
-            <label>🎈 Bērnu ballīte?</label>
-            <label class="wcheck" style="margin-top:8px;">
-              <input type="checkbox" id="w_kids_party" onchange="wKidsParty(this.checked)">
-              <span>Jā, bērnu ballīte</span>
-            </label>
-            <div id="w_kids_sunday_hint" style="display:none;" class="kids-sunday-hint">
-              🧃 Svētdienās bezmaksas PEPSI!
-              <div style="display:flex;gap:8px;margin-top:4px;">
-                <button type="button" class="rides-upsell-btn yes" onclick="wSuggestSunday()">📅 Pārcelt uz svētdienu</button>
-                <button type="button" class="rides-upsell-btn no" onclick="document.getElementById('w_kids_sunday_hint').style.display='none'">Palikt</button>
-              </div>
-            </div>
-          </div>
         </div>
         <div class="wform-checks">
           <label class="wcheck">
@@ -3615,12 +3621,30 @@ function wCheckRides(val) {
   var n = parseInt(val||0);
   var hint = document.getElementById('w_rides_hint');
   if (!hint) return;
-  if (n > 0 && !_ridesUpsellAnswered) hint.style.display='block';
+  // Ja ievada 1 un vēl nav atbildēts — piedāvā 2
+  if (n === 1 && !_ridesUpsellAnswered) hint.style.display='block';
   else hint.style.display='none';
 }
 function wRidesUpsell(yes) {
   _ridesUpsellAnswered = true;
   document.getElementById('w_rides_hint').style.display='none';
+  if (yes) {
+    document.getElementById('w_rides').value = 2;
+    wUpdateRidesTotal();
+  }
+}
+function wUpdateRidesTotal() {
+  var ppl   = parseInt(document.getElementById('w_ppl')?.value || 0) || 0;
+  var rides = parseInt(document.getElementById('w_rides')?.value || 0) || 0;
+  var totalEl = document.getElementById('w_rides_total');
+  var numEl   = document.getElementById('w_rides_total_num');
+  if (!totalEl || !numEl) return;
+  if (rides > 0 && ppl > 0) {
+    numEl.textContent = ppl * rides;
+    totalEl.style.display = 'block';
+  } else {
+    totalEl.style.display = 'none';
+  }
 }
 
 // ── Bērnu ballīte ──
@@ -4089,22 +4113,13 @@ function renderCard(b, nowMin) {
   var closedBanner  = b.closed ? '<div class="bclosed"><span class="bnow-dot" style="background:var(--red)"></span>Slēgtais pasākums<span class="bnow-dot" style="background:var(--red)"></span></div>' : '';
   var outsideBanner = (b.outside===true||b.outside==='true'||b.outside==='TRUE') ? '<div class="boutside"><span class="bnow-dot" style="background:#3b82f6"></span>Ārpus darba laika<span class="bnow-dot" style="background:#3b82f6"></span></div>' : '';
 
-  // Braucieni
-  var ridesHtml = '<div class="bextra-title">&#127937; Braucieni</div>'
-    + '<input class="rides-input" id="ri-'+id+'" type="number" min="0" value="'+(b.rides||0)+'" oninput="bRidesChange(this,\''+id+'\')">'
-    + '<div class="rides-btns">'
-    + '<button class="rides-quick" onclick="bRidesAdd(this,1)" data-bid="'+id+'">+1</button>'
-    + '<button class="rides-quick" onclick="bRidesAdd(this,2)" data-bid="'+id+'">+2</button>'
-    + '<button class="rides-quick" onclick="bRidesAdd(this,5)" data-bid="'+id+'">+5</button>'
-    + '<button class="rides-quick" onclick="bRidesAdd(this,10)" data-bid="'+id+'">+10</button>'
-    + '</div>'
-    + '<button class="rides-save" id="rs-'+id+'" onclick="bRidesSave(this)" data-bid="'+id+'" style="display:none;">&#10003; Saglabāt</button>';
-
-  // HTML secība: laiks | info | braucieni | ēdieni | dzērieni | pogas
+  // HTML secība: laiks | info | ēdieni | dzērieni | pogas
   // SVARĪGI: bc-btns BEZ grid-column — lai iet secīgi
+  var ridesDisplay = (b.rides && b.rides > 0)
+    ? '<div class="bc-rides-total">&#127937; '+b.rides+'</div>' : '';
   return '<div class="bcard '+sc+' '+timeClass+'">'
     + '<div class="bc-grid">'
-    + '<div class="bc-time"><div class="btime">'+tf+'</div><div class="bsep">|</div><div class="btime2">'+tt+'</div><div style="margin-top:8px;">'+bdg+'</div></div>'
+    + '<div class="bc-time"><div class="btime">'+tf+'</div><div class="bsep">|</div><div class="btime2">'+tt+'</div><div style="margin-top:8px;">'+bdg+'</div>'+ridesDisplay+'</div>'
     + '<div class="bc-info">'
     +   '<div class="bc-info-actions">'
     +     '<button class="bact-btn btn-g" data-fn="openEdit" data-id="'+id+'" onclick="cfmAct(this)">&#9998; Labot rezervāciju</button>'
@@ -4118,7 +4133,6 @@ function renderCard(b, nowMin) {
     +   (b.comment ? '<div class="bcmt-s">&#128172; '+esc(b.comment)+'</div>' : '')
     +   (b.admin ? '<div class="badm">&#128105;&#8205;&#128188; '+esc(b.admin)+' &middot; '+esc(b.accepted)+'</div>' : '')
     + '</div>'
-    + '<div class="bc-rides">'+ridesHtml+'</div>'
     + '<div class="bc-food">'+foodHtml+'</div>'
     + '<div class="bc-food">'+drinksHtml+'</div>'
     + '<div class="bc-rek" id="rek-col-'+id+'">'
@@ -4690,6 +4704,18 @@ function onDateChange() {
   document.getElementById('btn_s2').disabled = true;
   _capOk = false;
   renderDLP(date);
+  // Paslēpt bērnu ballītes opciju ja svētdiena (nav jāpiedāvā pārcelt)
+  var parts = date.split('-').map(Number);
+  var dow = new Date(parts[0],parts[1]-1,parts[2]).getDay();
+  var kidsWrap = document.getElementById('w_kids_party_wrap');
+  if (kidsWrap) kidsWrap.style.display = (dow === 0) ? 'none' : '';
+  // Reset kids party checkbox ja paslēpj
+  if (dow === 0) {
+    var kp = document.getElementById('w_kids_party');
+    if (kp) kp.checked = false;
+    var kh = document.getElementById('w_kids_sunday_hint');
+    if (kh) kh.style.display = 'none';
+  }
 }
 
 // ── Dienas noslodzes tabula ──────────────────────────────────────
@@ -4901,7 +4927,7 @@ function submitNew() {
     comment:  document.getElementById('w_cmt').value,
     food:     document.getElementById('w_food').value,
     drinks:   document.getElementById('w_drinks').value,
-    rides:    parseInt(document.getElementById('w_rides')?.value||0)||0,
+    rides:    (parseInt(document.getElementById('w_rides')?.value||0)||0) * (parseInt(document.getElementById('w_ppl')?.value||0)||0),
     kids_party: document.getElementById('w_kids_party')?.checked||false,
     admin,
     closed:    document.getElementById('w_closed').checked,
