@@ -3782,7 +3782,23 @@ function wKidsParty(checked) {
 }
 function wSuggestSunday() {
   var date = (document.getElementById('w_date')||{}).value||'';
-  if (!date) return;
+  if (!date) {
+    // Nav datuma — liekam nākamo svētdienu
+    var d = new Date();
+    var daysToSunday = (7 - d.getDay()) % 7 || 7;
+    d.setDate(d.getDate() + daysToSunday);
+    var newDate = d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+    document.getElementById('w_date').value = newDate;
+    var parts = newDate.split('-');
+    var label = parseInt(parts[2])+'. '+MLV[parseInt(parts[1])-1]+' '+parts[0];
+    var btn = document.getElementById('dp_btn');
+    var lbl = document.getElementById('dp_label');
+    if (btn) btn.classList.remove('empty-val');
+    if (lbl) lbl.textContent = label;
+    onDateChange();
+    toast('Izvēlēta svētdiena '+label, 'ok');
+    return;
+  }
   var d = new Date(date.split('-')[0], date.split('-')[1]-1, date.split('-')[2]);
   var daysToSunday = (7 - d.getDay()) % 7 || 7;
   d.setDate(d.getDate() + daysToSunday);
@@ -3794,8 +3810,8 @@ function wSuggestSunday() {
   var lbl = document.getElementById('dp_label');
   if (btn) btn.classList.remove('empty-val');
   if (lbl) lbl.textContent = label;
-  document.getElementById('w_kids_sunday_hint').style.display='none';
-  wValidate();
+  // Izsaukt onDateChange lai atjaunotu darba laiku, noslodzi un bērnu ballītes hint
+  onDateChange();
   toast('Pārcelt uz svētdienu '+label, 'ok');
 }
 
