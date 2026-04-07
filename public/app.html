@@ -4774,11 +4774,14 @@ function resetWiz() {
 
 function showStep(n) {
   for (let i = 1; i <= 3; i++) {
-    document.getElementById(`sp${i}`).classList.toggle('active', i===n);
+    const sp = document.getElementById(`sp${i}`);
+    if (sp) sp.classList.toggle('active', i===n);
     const si = document.getElementById(`si${i}`);
-    si.classList.remove('active','done');
-    if (i < n) si.classList.add('done');
-    if (i === n) si.classList.add('active');
+    if (si) {
+      si.classList.remove('active','done');
+      if (i < n) si.classList.add('done');
+      if (i === n) si.classList.add('active');
+    }
   }
   if (n===3) buildS3();
 }
