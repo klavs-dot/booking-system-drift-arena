@@ -4733,7 +4733,8 @@ function selectTime(pickerId, selId, val) {
   // Aizver
   document.getElementById(pickerId + '_drop').classList.remove('open');
   btn.classList.remove('open');
-  // Triggerē kapacitātes pārbaudi
+  // Triggerē validāciju un kapacitātes pārbaudi
+  wValidate();
   checkCap();
 }
 
@@ -4925,6 +4926,7 @@ function onDateChange() {
   document.getElementById('btn_s2').disabled = true;
   _capOk = false;
   renderDLP(date);
+  wValidate();
   // Ja bērnu ballīte jau atzīmēta — atjaunot hint (svētdiena/ne-svētdiena)
   setTimeout(function() {
     var kp = document.getElementById('w_kids_party');
@@ -5112,7 +5114,26 @@ function buildS3() {
 }
 
 function submitNew() {
-  if (!wHighlightRequired()) { toast('Lūdzu aizpildi visus obligātos laukus!', 'warn'); return; }
+  if (!wHighlightRequired()) {
+    // Parādīt kurš lauks trūkst
+    var missing = [];
+    var checks = [
+      {id:'w_client', name:'Vārds'},
+      {id:'w_phone', name:'Telefons'},
+      {id:'w_admin', name:'Administrators'},
+      {id:'w_ppl', name:'Cilvēku skaits', check: function(el){return parseInt(el.value)>0;}},
+      {id:'w_date', name:'Datums'},
+      {id:'w_from', name:'Sākuma laiks'},
+      {id:'w_to', name:'Beigu laiks'},
+    ];
+    checks.forEach(function(c) {
+      var el = document.getElementById(c.id);
+      var ok = c.check ? c.check(el) : (el && el.value && el.value.trim());
+      if (!ok) missing.push(c.name);
+    });
+    toast('Trūkst: ' + missing.join(', '), 'warn');
+    return;
+  }
   const client = document.getElementById('w_client').value.trim();
   const phone  = document.getElementById('w_phone').value.trim();
   const admin  = document.getElementById('w_admin').value.trim();
