@@ -1799,11 +1799,8 @@ button{cursor:pointer}
 /* Braucienu kopējais skaits zem laika */
 .bc-rides-total { margin-top:8px; font-size:18px; font-weight:800; color:var(--accent); font-family:var(--font-head); letter-spacing:0.5px; }
 
-/* Kartītes pilnā platumā M_DAY modālī */
-#M_DAY .bc-grid {
-  grid-template-columns: 70px 1fr 110px 1fr 1fr 160px 140px;
-}
-#M_DAY .bcard { margin-bottom:12px; }
+/* Kartītes pilnā platumā dienas skatā */
+#view-day .bcard { margin-bottom:12px; }
 
 .bextra-title { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; }
 .bextra-item  { font-size:12px; color:var(--text2); padding:2px 0; border-bottom:1px solid var(--border); }
@@ -2209,6 +2206,7 @@ window.google={script:{run:window.__gsr__}};
     <button class="nb" id="nb-texts" onclick="goNav('texts',this)">💬 Teksti</button>
     <button class="nb" id="nb-todo" onclick="goNav('todo',this)">📋 To-Do</button>
     <button class="nb" id="nb-schedule" onclick="goNav('schedule',this)">🗓️ Grafiks</button>
+    <button class="nb" id="nb-day" style="display:none;"></button>
     <button class="nb" id="nb-invoices" onclick="goNav('invoices',this)">🧾 Rēķini</button>
     <div class="nb-new-wrap">
       <button class="nb nb-new" id="nb-new" onclick="goNav('new',this)">＋ Jauna rezervācija</button>
@@ -2296,6 +2294,18 @@ window.google={script:{run:window.__gsr__}};
 <!-- ══ TIMELINE ══ -->
 <div class="view active" id="view-today">
   <div id="TIMELINE_CONTENT"></div>
+</div>
+
+<!-- ══ DIENAS SKATS ══ -->
+<div class="view" id="view-day">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <div class="ptitle" id="DAY_VIEW_TITLE"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-p" onclick="newForDate()" style="padding:8px 16px;">＋ Pievienot šai dienai</button>
+      <button class="btn btn-s" onclick="goNav('calendar',document.getElementById('nb-calendar'))" style="padding:8px 16px;">← Atpakaļ uz pārskatu</button>
+    </div>
+  </div>
+  <div id="DAY_VIEW_LIST"></div>
 </div>
 
 <!-- ══ JAUNA REZERVĀCIJA ══ -->
@@ -3075,18 +3085,8 @@ window.google={script:{run:window.__gsr__}};
 </div>
 
 <!-- ══ DAY DETAIL MODAL ══ -->
-<div class="mbg" id="M_DAY">
-  <div class="mbox" style="max-width:100%;width:100%;height:100%;margin:0;border-radius:0;display:flex;flex-direction:column;position:relative;">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:2px solid var(--accent);flex-shrink:0;">
-      <div class="mtitle" id="DAY_TITLE" style="margin:0;padding:0;"></div>
-      <div style="display:flex;gap:10px;align-items:center;">
-        <button class="btn btn-p" onclick="newForDate()" style="padding:8px 16px;">＋ Pievienot šai dienai</button>
-        <button onclick="closeM('M_DAY')" style="background:none;border:1px solid var(--border2);color:var(--text2);width:36px;height:36px;border-radius:var(--r);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">✕</button>
-      </div>
-    </div>
-    <div class="blist" id="DAY_LIST" style="flex:1;overflow-y:auto;overflow-x:auto;padding:20px 24px;"></div>
-  </div>
-</div>
+<div id="DAY_TITLE" style="display:none;"></div>
+<div id="DAY_LIST" style="display:none;"></div>
 
 <script>
 // ================================================================
@@ -4431,16 +4431,15 @@ function slotBar(lbl, cnt) {
 function openDay(ds) {
   _dayDate = ds;
   const [y,m,d] = ds.split('-');
-  document.getElementById('DAY_TITLE').textContent =
+  document.getElementById('DAY_VIEW_TITLE').textContent =
     `📅 ${parseInt(d)}. ${MLV[parseInt(m)-1]} ${y}`;
   const list = ALL.filter(b => b.date===ds)
     .sort((a,b) => tmin(a.timeFrom)-tmin(b.timeFrom));
-  document.getElementById('DAY_LIST').innerHTML =
+  document.getElementById('DAY_VIEW_LIST').innerHTML =
     list.length ? list.map(renderCard).join('') : emptyEl('Nav rezervāciju šajā dienā');
-  openM('M_DAY');
+  goNav('day', document.getElementById('nb-day'));
 }
 function newForDate() {
-  closeM('M_DAY');
   goNav('new', document.getElementById('nb-new'));
   // Iestāda datumu un picker pogu
   document.getElementById('w_date').value = _dayDate;
