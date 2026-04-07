@@ -2566,28 +2566,18 @@ window.google={script:{run:window.__gsr__}};
         </div>
       </div>
 
-      <!-- Kapacitātes pārbaude -->
-      <div class="wiz-block">
-        <div class="wiz-block-title">📊 Kapacitātes pārbaude</div>
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
-          <button type="button" class="btn btn-s" id="btn_s2" onclick="checkCap()" disabled style="padding:8px 16px;">🔍 Pārbaudīt kapacitāti</button>
-          <span style="font-size:11px;color:var(--text3);">Obligāti pirms saglabāšanas</span>
-        </div>
-        <div id="CAP_RES"></div>
-        <!-- Dienas noslodzes tabula -->
-        <div style="margin-top:12px;">
-          <div id="DLP_DATE" style="font-size:12px;color:var(--text3);margin-bottom:6px;"></div>
-          <div id="DLP_LEG" style="font-size:10px;color:var(--text3);margin-bottom:4px;"></div>
-          <div id="DLP_BODY"></div>
-        </div>
-        <!-- Kopsavilkums -->
-        <div id="S3SUM" style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:13px;color:var(--text2);"></div>
-      </div>
-
       <!-- Ārpus darba laika brīdinājums -->
       <div id="OUTSIDE_WARN" class="outside-warn-banner">
         ⚠️ Rezervācija ir ārpus darba laika
       </div>
+
+      <!-- Hidden elements priekš JS saderības -->
+      <div id="CAP_RES" style="display:none;"></div>
+      <div id="DLP_DATE" style="display:none;"></div>
+      <div id="DLP_LEG" style="display:none;"></div>
+      <div id="DLP_BODY" style="display:none;"></div>
+      <div id="S3SUM" style="display:none;"></div>
+      <button id="btn_s2" style="display:none;"></button>
 
       <!-- Kļūda un poga -->
       <div class="err-msg" id="W_ERR"></div>
@@ -3744,7 +3734,7 @@ function wSidebarUpdate() {
       + '<div class="wsb-cap-sub">'+(peakUsed>0?'Pīķa noslodze šodien: '+peakUsed+' cilv.':'Diena brīva')+(ppl>0?' + '+ppl+' jauni':'')+'</div>'
       + '<div style="font-size:11px;color:var(--text3);margin-top:4px;">Izvēlies laiku precīzākai noslodzei</div>'
       + (newTotal>90?'<div class="wsb-warn">⚠️ Pārsniedz kapacitāti!</div>':'');
-    if (ppl > 0) wSidebarSlots(date, ppl);
+    wSidebarSlots(date, ppl);
     return;
   }
 
@@ -3770,7 +3760,7 @@ function wSidebarUpdate() {
     + (newTotal>90?'<div class="wsb-warn">⚠️ Pārsniedz kapacitāti!</div>':'');
 
   // Stundu slodze visa diena
-  if (ppl > 0) wSidebarSlots(date, ppl);
+  wSidebarSlots(date, ppl);
 }
 
 function wSidebarSlots(date, newPpl) {
@@ -3779,19 +3769,26 @@ function wSidebarSlots(date, newPpl) {
   if (!card || !content) return;
   card.style.display = 'block';
   var dayBookings = (ALL||[]).filter(function(b){return b.date===date && b.status!=='Atcelta';});
+  // Darba laika stundas
+  var WORK_HOURS = {1:{o:'11:00',c:'22:00'},2:{o:'11:00',c:'22:00'},3:{o:'11:00',c:'22:00'},
+    4:{o:'11:00',c:'22:00'},5:{o:'11:00',c:'23:00'},6:{o:'10:00',c:'23:00'},0:{o:'10:00',c:'22:00'}};
+  var parts = date.split('-').map(Number);
+  var dow = new Date(parts[0],parts[1]-1,parts[2]).getDay();
+  var wh = WORK_HOURS[dow]||{o:'11:00',c:'22:00'};
+  var startH = parseInt(wh.o);
+  var endH = parseInt(wh.c);
   var html = '';
-  for (var h = 8; h < 24; h++) {
+  for (var h = startH; h < endH; h++) {
     var slotFrom = h*60, slotTo = (h+1)*60;
     var overlap = dayBookings.filter(function(b){return tmin(b.timeFrom)<slotTo && tmin(b.timeTo)>slotFrom;});
     var used = overlap.reduce(function(s,b){return s+b.people;},0);
-    if (used === 0 && newPpl === 0) continue;
     var total = 90;
     var pct = Math.min(100, Math.round(used/total*100));
     var color = used>60?'var(--red)':used>40?'#f59e0b':used>0?'#22c55e':'var(--border)';
     html += '<div class="wsb-slot-row">'
       + '<span class="wsb-slot-lbl">'+p2(h)+':00</span>'
       + '<div class="wsb-slot-bar"><div style="width:'+pct+'%;background:'+color+';height:100%;border-radius:2px;"></div></div>'
-      + '<span class="wsb-slot-num" style="color:'+color+'">'+(used||'')+'</span>'
+      + '<span class="wsb-slot-num" style="color:'+(used>0?color:'var(--text3)')+'">'+(used||'·')+'</span>'
       + '</div>';
   }
   content.innerHTML = html || '<div class="wsb-hint">Nav rezervāciju šajā dienā</div>';
