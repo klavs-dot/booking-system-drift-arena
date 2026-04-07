@@ -2697,49 +2697,106 @@ window.google={script:{run:window.__gsr__}};
 
 <!-- ══ EDIT MODAL ══ -->
 <div class="mbg" id="M_EDIT">
-  <div class="mbox" style="max-width:640px">
-    <div class="mtitle">✏️ Rediģēt rezervāciju</div>
+  <div class="mbox" style="max-width:900px;background:#1a1a1a;padding:0;">
     <input type="hidden" id="e_id">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="field"><label>📅 Datums</label><input type="date" id="e_date"></div>
-      <div class="field"><label>👥 Cilvēku skaits</label><input type="number" id="e_ppl" min="1" max="90"></div>
-      <div class="field"><label>🕐 Sākums</label><select id="e_from"></select></div>
-      <div class="field"><label>🕐 Beigas</label><select id="e_to"></select></div>
-      <div class="field"><label>👤 Vārds / Uzņēmums</label><input type="text" id="e_client"></div>
-      <div class="field"><label>📞 Telefons</label><input type="tel" id="e_phone"></div>
-      <div class="field"><label>✉️ E-pasts</label><input type="email" id="e_email"></div>
-      <div class="field"><label>💳 Maksāšanas veids</label>
-        <select id="e_inv" onchange="toggleInvFields('e')">
-          <option>Uz vietas</option>
-          <option>Ar rēķinu - pēcapmaksa</option>
-          <option>Ar rēķinu - priekšapmaksa</option>
-        </select>
-      </div>
-      <div class="field inv-req-field" id="e_inv_email_wrap">
-        <label>📧 E-pasts rēķinam <span class="req">*</span></label>
-        <input type="email" id="e_inv_email" placeholder="invoice@company.lv">
-      </div>
-      <div class="field inv-req-field" id="e_rekviziti_wrap" style="grid-column:1/-1">
-        <label>🏢 Rekvizīti <span class="req">*</span></label>
-        <textarea id="e_rekviziti" placeholder="Uzņēmuma nosaukums, reģ. nr., PVN nr., juridiskā adrese..." style="min-height:72px"></textarea>
-      </div>
-      <div class="field" style="grid-column:1/-1"><label>📝 Komentāri</label><textarea id="e_cmt"></textarea></div>
-      <div class="field" style="grid-column:1/-1"><label>🍕 Ēdieni</label><textarea id="e_food" style="min-height:56px"></textarea></div>
-      <div class="field">
-        <label>👩‍💼 Administrators</label>
-        <input type="text" id="e_admin" placeholder="Tavs vārds">
-        <div class="hint">📌 Labošanas laiks tiks atjaunināts automātiski</div>
-      </div>
-      <div class="field"><label>📌 Statuss</label>
-        <select id="e_status">
-          <option>Aktīva</option><option>Ieradušies</option><option>Notikusi</option><option>Atcelta</option>
-        </select>
-      </div>
+    <div style="padding:20px 24px;border-bottom:2px solid var(--accent);">
+      <div style="font-family:var(--font-head);font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent);">✏️ Labot rezervāciju</div>
     </div>
-    <div id="E_CAP_ERR"></div>
-    <div class="mfoot">
-      <button class="btn btn-s" onclick="closeM('M_EDIT')">Atcelt</button>
-      <button class="btn btn-p" onclick="saveEdit()">💾 Saglabāt</button>
+    <div style="padding:20px 24px;max-height:75vh;overflow-y:auto;">
+
+      <!-- Datums un laiks -->
+      <div class="wiz-block" style="background:#222;">
+        <div class="wiz-block-title">📅 Datums un laiks</div>
+        <div class="wform-row3">
+          <div class="field"><label>Datums <span class="req">*</span></label><input type="date" id="e_date"></div>
+          <div class="field"><label>Sākums <span class="req">*</span></label><select id="e_from"></select></div>
+          <div class="field"><label>Beigas <span class="req">*</span></label><select id="e_to"></select></div>
+        </div>
+      </div>
+
+      <!-- Klienta info -->
+      <div class="wiz-block" style="background:#222;">
+        <div class="wiz-block-title">👤 Klienta informācija</div>
+        <div class="wform-row3" style="margin-bottom:14px;">
+          <div class="field"><label>Vārds / Uzņēmums <span class="req">*</span></label><input type="text" id="e_client"></div>
+          <div class="field"><label>Telefons <span class="req">*</span></label><input type="tel" id="e_phone"></div>
+          <div class="field"><label>E-pasts</label><input type="email" id="e_email"></div>
+        </div>
+        <div class="wform-row3">
+          <div class="field">
+            <label>👥 Cilvēku skaits <span class="req">*</span></label>
+            <input type="number" id="e_ppl" min="1" max="90" class="ppl-big-input">
+          </div>
+          <div class="field">
+            <label>🏁 Braucienu skaits (kopā)</label>
+            <input type="number" id="e_rides" min="0" class="ppl-big-input" placeholder="0">
+          </div>
+          <div class="field">
+            <label>📌 Statuss</label>
+            <select id="e_status" style="font-size:16px;padding:10px;">
+              <option>Aktīva</option><option>Ieradušies</option><option>Notikusi</option><option>Atcelta</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Maksājums -->
+      <div class="wiz-block" style="background:#222;">
+        <div class="wiz-block-title">💳 Maksājums</div>
+        <div class="field">
+          <label>Maksāšanas veids</label>
+          <select id="e_inv" onchange="toggleInvFields('e')">
+            <option>Uz vietas</option>
+            <option>Ar rēķinu - pēcapmaksa</option>
+            <option>Ar rēķinu - priekšapmaksa</option>
+          </select>
+        </div>
+        <div id="e_inv_email_wrap" style="display:none;margin-top:14px;">
+          <div class="wform-row2" style="margin-bottom:10px;">
+            <div class="field"><label>E-pasts rēķinam</label><input type="email" id="e_inv_email" placeholder="invoice@company.lv"></div>
+            <div class="field">
+              <label>Rekvizīti (JSON)</label>
+              <textarea id="e_rekviziti" placeholder='{"name":"SIA...","reg":"4000...","addr":"..."}' style="min-height:72px;font-size:12px;"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ēdieni un dzērieni -->
+      <div class="wiz-block" style="background:#222;">
+        <div class="wiz-block-title">🍕 Ēdieni un dzērieni</div>
+        <div class="wform-row2">
+          <div class="field"><label>🍕 Ēdieni</label><textarea id="e_food" style="min-height:56px" placeholder="PRECIZES / UZ_VIETAS / vai saraksts..."></textarea></div>
+          <div class="field"><label>🍸 Dzērieni</label><textarea id="e_drinks" style="min-height:56px" placeholder="PRECIZES / UZ_VIETAS / vai saraksts..."></textarea></div>
+        </div>
+      </div>
+
+      <!-- Papildus -->
+      <div class="wiz-block" style="background:#222;">
+        <div class="wiz-block-title">📝 Papildus informācija</div>
+        <div class="field" style="margin-bottom:14px;"><label>Komentāri</label><textarea id="e_cmt" placeholder="Dzimšanas diena, īpašas vēlmes..."></textarea></div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;">
+          <label class="wcheck"><input type="checkbox" id="e_closed"><span class="chk"></span><span>🔒 Slēgtais pasākums</span></label>
+          <label class="wcheck"><input type="checkbox" id="e_outside"><span class="chk"></span><span>⚠️ Ārpus darba laika</span></label>
+        </div>
+      </div>
+
+      <!-- Administrators -->
+      <div class="wiz-block" style="background:#222;">
+        <div class="wiz-block-title">👩‍💼 Administrators</div>
+        <div class="field">
+          <label>Kurš laboja? <span class="req">*</span></label>
+          <input type="text" id="e_admin" placeholder="Tavs vārds" style="font-size:16px;padding:12px;">
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">📌 Labošanas laiks tiks atjaunināts automātiski</div>
+        </div>
+      </div>
+
+      <div id="E_CAP_ERR"></div>
+
+    </div>
+    <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:12px;justify-content:flex-end;">
+      <button class="btn btn-s" onclick="closeM('M_EDIT')" style="padding:12px 24px;">Atcelt labošanu</button>
+      <button class="btn btn-p" onclick="saveEdit()" style="padding:12px 32px;">💾 Saglabāt izmaiņas</button>
     </div>
   </div>
 </div>
@@ -4368,6 +4425,7 @@ function openEdit(id) {
   document.getElementById('e_id').value     = b.id;
   document.getElementById('e_date').value   = b.date;
   document.getElementById('e_ppl').value    = b.people;
+  document.getElementById('e_rides').value  = b.rides || 0;
   document.getElementById('e_client').value = b.client;
   document.getElementById('e_phone').value  = b.phone;
   document.getElementById('e_email').value  = b.email;
@@ -4375,10 +4433,13 @@ function openEdit(id) {
   document.getElementById('e_inv_email').value = b.invEmail || '';
   document.getElementById('e_rekviziti').value = b.rekviziti || '';
   document.getElementById('e_cmt').value    = b.comment;
-  toggleInvFields('e');
-  document.getElementById('e_food').value   = b.food;
+  document.getElementById('e_food').value   = b.food || '';
+  document.getElementById('e_drinks').value = b.drinks || '';
   document.getElementById('e_admin').value  = b.admin;
   document.getElementById('e_status').value = b.status;
+  document.getElementById('e_closed').checked = b.closed || false;
+  document.getElementById('e_outside').checked = b.outside || false;
+  toggleInvFields('e');
   // Dropdown laiki ar tīrām HH:MM vērtībām
   buildTimeSel('e_from', cleanT(b.timeFrom));
   buildTimeSel('e_to',   cleanT(b.timeTo));
@@ -4401,8 +4462,12 @@ function saveEdit() {
     rekviziti: document.getElementById('e_rekviziti').value,
     comment:   document.getElementById('e_cmt').value,
     food:     document.getElementById('e_food').value,
+    drinks:   document.getElementById('e_drinks').value,
+    rides:    parseInt(document.getElementById('e_rides').value) || 0,
     admin:    document.getElementById('e_admin').value,
     status:   document.getElementById('e_status').value,
+    closed:   document.getElementById('e_closed').checked,
+    outside:  document.getElementById('e_outside').checked,
   };
   closeM('M_EDIT');
   ovl('Saglabā...');
