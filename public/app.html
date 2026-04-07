@@ -2195,7 +2195,21 @@ window.google={script:{run:window.__gsr__}};
     </div>
   </nav>
   <!-- STATISTIKAS PANELIS -->
-  <div class="topstats">
+  <div class="cap-pill" style="display:flex;align-items:center;gap:8px;">
+    Kapacitāte: <b id="cap-pill-val">90</b>
+    <button onclick="editCapacity()" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:3px;padding:2px 6px;cursor:pointer;font-size:10px;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">✎ Labot</button>
+  </div>
+</header>
+
+<main class="main">
+
+<!-- ══ PĀRSKATS ══ -->
+<div class="view" id="view-calendar">
+  <div class="phdr">
+    <div class="ptitle">PĀRSKATS</div>
+    <div class="psub">Klikšķini uz dienas, lai redzētu rezervācijas</div>
+  </div>
+  <div class="topstats" style="justify-content:flex-start;padding:0 0 16px 0;">
     <div class="tstat">
       <div class="tstat-lbl">Šodien</div>
       <div class="tstat-row">
@@ -2236,20 +2250,6 @@ window.google={script:{run:window.__gsr__}};
         <span class="tstat-sub">cilv.</span>
       </div>
     </div>
-  </div>
-  <div class="cap-pill" style="display:flex;align-items:center;gap:8px;">
-    Kapacitāte: <b id="cap-pill-val">90</b>
-    <button onclick="editCapacity()" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:3px;padding:2px 6px;cursor:pointer;font-size:10px;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">✎ Labot</button>
-  </div>
-</header>
-
-<main class="main">
-
-<!-- ══ PĀRSKATS ══ -->
-<div class="view" id="view-calendar">
-  <div class="phdr">
-    <div class="ptitle">PĀRSKATS</div>
-    <div class="psub">Klikšķini uz dienas, lai redzētu rezervācijas</div>
   </div>
   <div class="cctrls">
     <div style="display:flex;gap:6px">
