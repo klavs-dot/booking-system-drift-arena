@@ -2769,7 +2769,121 @@ window.google={script:{run:window.__gsr__}};
   </div>
 </div>
 
+<!-- ══ FOOTER ══ -->
+<footer style="margin-top:40px;padding:20px;text-align:center;border-top:1px solid var(--border);background:var(--surface);">
+  <div style="font-size:11px;color:var(--text3);font-family:var(--font-head);letter-spacing:1px;margin-bottom:8px;">SIA CALEIDUS</div>
+  <button onclick="openPinPad()" style="background:none;border:1px solid var(--border2);color:var(--text3);padding:4px 12px;border-radius:var(--r);cursor:pointer;font-size:9px;font-family:var(--font-head);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">🔒 MASTER ADMIN</button>
+</footer>
+
+<!-- ══ PIN PAD MODAL ══ -->
+<div class="mbg" id="M_PIN">
+  <div class="mbox" style="max-width:320px;text-align:center;background:#111;">
+    <div style="font-family:var(--font-head);font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:16px;">🔒 MASTER ADMIN</div>
+    <div id="pin-dots" style="display:flex;justify-content:center;gap:10px;margin-bottom:20px;height:20px;"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;max-width:220px;margin:0 auto;">
+      <button class="pin-btn" onclick="pinPress(1)">1</button>
+      <button class="pin-btn" onclick="pinPress(2)">2</button>
+      <button class="pin-btn" onclick="pinPress(3)">3</button>
+      <button class="pin-btn" onclick="pinPress(4)">4</button>
+      <button class="pin-btn" onclick="pinPress(5)">5</button>
+      <button class="pin-btn" onclick="pinPress(6)">6</button>
+      <button class="pin-btn" onclick="pinPress(7)">7</button>
+      <button class="pin-btn" onclick="pinPress(8)">8</button>
+      <button class="pin-btn" onclick="pinPress(9)">9</button>
+      <button class="pin-btn" onclick="pinClear()" style="font-size:11px;">✕</button>
+      <button class="pin-btn" onclick="pinPress(0)">0</button>
+      <button class="pin-btn" onclick="pinBackspace()" style="font-size:14px;">⌫</button>
+    </div>
+    <div id="pin-error" style="margin-top:12px;font-size:11px;color:var(--red);min-height:16px;"></div>
+    <button class="btn btn-s" onclick="closeM('M_PIN');pinClear();" style="margin-top:12px;padding:6px 20px;">Atcelt</button>
+  </div>
+</div>
+
+<!-- ══ MASTER ADMIN PANEL ══ -->
+<div class="mbg" id="M_ADMIN">
+  <div class="mbox" style="max-width:700px;background:#111;position:relative;">
+    <button onclick="closeM('M_ADMIN')" style="position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border2);color:var(--text2);width:32px;height:32px;border-radius:var(--r);cursor:pointer;font-size:16px;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">✕</button>
+    <div style="font-family:var(--font-head);font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:20px;">🔧 MASTER ADMIN PANELIS</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:20px;">Šie iestatījumi kontrolē sistēmas savienojumus. Mainot vērtības, sistēma pārslēgsies uz citu franšīzes datubāzi.</div>
+
+    <div class="wiz-block" style="background:#1a1a1a;">
+      <div class="wiz-block-title">📊 Google Sheets</div>
+      <div class="field" style="margin-bottom:12px;">
+        <label>Sheet ID</label>
+        <input type="text" id="adm_sheet_id" placeholder="1AbC...xyz" style="font-family:monospace;font-size:12px;">
+        <div style="font-size:10px;color:var(--text3);margin-top:4px;">Google Sheets dokumenta ID no URL: docs.google.com/spreadsheets/d/<b>ŠIS_ID</b>/edit</div>
+      </div>
+      <div class="field">
+        <label>Sheet nosaukums (lapa)</label>
+        <input type="text" id="adm_sheet_name" value="Rezervacijas" style="font-size:12px;">
+      </div>
+    </div>
+
+    <div class="wiz-block" style="background:#1a1a1a;">
+      <div class="wiz-block-title">🗓️ Google Calendar</div>
+      <div class="field" style="margin-bottom:12px;">
+        <label>Calendar ID (maiņu kalendārs)</label>
+        <input type="text" id="adm_cal_id" placeholder="abc123@group.calendar.google.com" style="font-family:monospace;font-size:12px;">
+        <div style="font-size:10px;color:var(--text3);margin-top:4px;">No kalendāra iestatījumiem → Integrēt kalendāru → Calendar ID</div>
+      </div>
+      <div class="field">
+        <label>Calendar Embed URL (iframe priekš Grafiks sadaļas)</label>
+        <input type="text" id="adm_cal_embed" placeholder="https://calendar.google.com/calendar/embed?src=..." style="font-family:monospace;font-size:12px;">
+      </div>
+    </div>
+
+    <div class="wiz-block" style="background:#1a1a1a;">
+      <div class="wiz-block-title">🔑 Google Service Account</div>
+      <div class="field">
+        <label>Service Account JSON</label>
+        <textarea id="adm_sa_json" placeholder='{"type":"service_account","project_id":"...","private_key":"..."}' style="font-family:monospace;font-size:11px;min-height:120px;"></textarea>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px;">Pilns JSON no Google Cloud Console → Service Accounts → Keys</div>
+      </div>
+    </div>
+
+    <div class="wiz-block" style="background:#1a1a1a;">
+      <div class="wiz-block-title">⚙️ Sistēmas iestatījumi</div>
+      <div class="wform-row2">
+        <div class="field">
+          <label>Kapacitāte (cilvēki)</label>
+          <input type="number" id="adm_capacity" min="1" max="999" style="font-size:16px;text-align:center;">
+        </div>
+        <div class="field">
+          <label>PIN kods (5 cipari)</label>
+          <input type="password" id="adm_pin" maxlength="5" style="font-size:16px;text-align:center;letter-spacing:8px;">
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px;">
+      <button class="btn btn-s" onclick="closeM('M_ADMIN')" style="padding:10px 20px;">Aizvērt</button>
+      <button class="btn btn-p" onclick="saveAdminSettings()" style="padding:10px 24px;">💾 Saglabāt iestatījumus</button>
+    </div>
+  </div>
+</div>
+
 </main>
+
+<style>
+.pin-btn {
+  width:60px; height:60px; border-radius:50%; border:2px solid var(--border2);
+  background:var(--card2); color:var(--text); font-size:22px; font-weight:700;
+  font-family:var(--font-head); cursor:pointer; transition:all .15s;
+}
+.pin-btn:hover { border-color:var(--accent); color:var(--accent); }
+.pin-btn:active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.pin-dot {
+  width:14px; height:14px; border-radius:50%; border:2px solid var(--border2);
+  background:transparent; transition:all .15s;
+}
+.pin-dot.filled { background:var(--accent); border-color:var(--accent); }
+.pin-dot.wrong { background:var(--red); border-color:var(--red); animation:pinShake .4s; }
+@keyframes pinShake {
+  0%,100% { transform:translateX(0); }
+  25% { transform:translateX(-8px); }
+  75% { transform:translateX(8px); }
+}
+</style>
 </div>
 
 <!-- ══ REKVIZĪTU MODAL ══ -->
@@ -5720,6 +5834,84 @@ function toast(msg, type) {
   t.className = 'toast on ' + (type||'');
   clearTimeout(t._t);
   t._t = setTimeout(() => t.classList.remove('on'), 4500);
+}
+
+// ══ MASTER ADMIN ══
+var _pinCode = '';
+var _masterPin = localStorage.getItem('da_master_pin') || '31593';
+
+function openPinPad() {
+  _pinCode = '';
+  renderPinDots();
+  document.getElementById('pin-error').textContent = '';
+  openM('M_PIN');
+}
+
+function renderPinDots() {
+  var html = '';
+  for (var i = 0; i < 5; i++) {
+    html += '<div class="pin-dot'+(i < _pinCode.length ? ' filled' : '')+'"></div>';
+  }
+  document.getElementById('pin-dots').innerHTML = html;
+}
+
+function pinPress(n) {
+  if (_pinCode.length >= 5) return;
+  _pinCode += String(n);
+  renderPinDots();
+  if (_pinCode.length === 5) {
+    setTimeout(function() {
+      if (_pinCode === _masterPin) {
+        closeM('M_PIN');
+        _pinCode = '';
+        openAdminPanel();
+      } else {
+        document.querySelectorAll('.pin-dot').forEach(function(d){ d.classList.add('wrong'); });
+        document.getElementById('pin-error').textContent = 'Nepareizs PIN kods';
+        setTimeout(function(){ _pinCode = ''; renderPinDots(); }, 600);
+      }
+    }, 200);
+  }
+}
+
+function pinClear() { _pinCode = ''; renderPinDots(); document.getElementById('pin-error').textContent = ''; }
+function pinBackspace() { _pinCode = _pinCode.slice(0,-1); renderPinDots(); }
+
+function openAdminPanel() {
+  document.getElementById('adm_sheet_id').value = localStorage.getItem('da_sheet_id') || '';
+  document.getElementById('adm_sheet_name').value = localStorage.getItem('da_sheet_name') || 'Rezervacijas';
+  document.getElementById('adm_cal_id').value = localStorage.getItem('da_cal_id') || '';
+  document.getElementById('adm_cal_embed').value = localStorage.getItem('da_cal_embed') || '';
+  document.getElementById('adm_sa_json').value = localStorage.getItem('da_sa_json') || '';
+  document.getElementById('adm_capacity').value = CAP;
+  document.getElementById('adm_pin').value = _masterPin;
+  openM('M_ADMIN');
+}
+
+function saveAdminSettings() {
+  var sheetId = document.getElementById('adm_sheet_id').value.trim();
+  var sheetName = document.getElementById('adm_sheet_name').value.trim();
+  var calId = document.getElementById('adm_cal_id').value.trim();
+  var calEmbed = document.getElementById('adm_cal_embed').value.trim();
+  var saJson = document.getElementById('adm_sa_json').value.trim();
+  var cap = parseInt(document.getElementById('adm_capacity').value) || CAP;
+  var pin = document.getElementById('adm_pin').value.trim();
+
+  if (sheetId) localStorage.setItem('da_sheet_id', sheetId);
+  if (sheetName) localStorage.setItem('da_sheet_name', sheetName);
+  if (calId) localStorage.setItem('da_cal_id', calId);
+  if (calEmbed) localStorage.setItem('da_cal_embed', calEmbed);
+  if (saJson) localStorage.setItem('da_sa_json', saJson);
+  if (pin && pin.length === 5) { localStorage.setItem('da_master_pin', pin); _masterPin = pin; }
+  setCapacity(cap);
+
+  if (calEmbed) {
+    var iframe = document.querySelector('#view-schedule iframe');
+    if (iframe) iframe.src = calEmbed;
+  }
+
+  closeM('M_ADMIN');
+  toast('✓ Iestatījumi saglabāti', 'ok');
 }
 </script>
 </body>
