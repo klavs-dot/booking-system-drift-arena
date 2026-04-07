@@ -1785,7 +1785,7 @@ button{cursor:pointer}
 
 .bc-grid {
   display: grid;
-  grid-template-columns: 70px 240px 210px 210px 180px 155px;
+  grid-template-columns: 70px 240px 120px 210px 210px 180px 155px;
   gap: 16px;
   align-items: start;
   grid-auto-rows: auto;
@@ -4250,8 +4250,18 @@ function renderCard(b, nowMin) {
   var closedBanner  = b.closed ? '<div class="bclosed"><span class="bnow-dot" style="background:var(--red)"></span>Slēgtais pasākums<span class="bnow-dot" style="background:var(--red)"></span></div>' : '';
   var outsideBanner = (b.outside===true||b.outside==='true'||b.outside==='TRUE') ? '<div class="boutside"><span class="bnow-dot" style="background:#3b82f6"></span>Ārpus darba laika<span class="bnow-dot" style="background:#3b82f6"></span></div>' : '';
 
-  // HTML secība: laiks | info | ēdieni | dzērieni | pogas
-  // SVARĪGI: bc-btns BEZ grid-column — lai iet secīgi
+  // Braucieni — editējama kolonna
+  var ridesHtml = '<div class="bextra-title">&#127937; Braucieni</div>'
+    + '<input class="rides-input" id="ri-'+id+'" type="number" min="0" value="'+(b.rides||0)+'" oninput="bRidesChange(this,\''+id+'\')">'
+    + '<div class="rides-btns">'
+    + '<button class="rides-quick" onclick="bRidesAdd(this,1)" data-bid="'+id+'">+1</button>'
+    + '<button class="rides-quick" onclick="bRidesAdd(this,2)" data-bid="'+id+'">+2</button>'
+    + '<button class="rides-quick" onclick="bRidesAdd(this,5)" data-bid="'+id+'">+5</button>'
+    + '<button class="rides-quick" onclick="bRidesAdd(this,10)" data-bid="'+id+'">+10</button>'
+    + '</div>'
+    + '<button class="rides-save" id="rs-'+id+'" onclick="bRidesSave(this)" data-bid="'+id+'" style="display:none;">&#10003; Saglabāt</button>';
+
+  // HTML secība: laiks | info | braucieni | ēdieni | dzērieni | rek | pogas
   var ridesDisplay = (b.rides && b.rides > 0)
     ? '<div class="bc-rides-total">&#127937; '+b.rides+'</div>' : '';
   return '<div class="bcard '+sc+' '+timeClass+'">'
@@ -4270,6 +4280,7 @@ function renderCard(b, nowMin) {
     +   (b.comment ? '<div class="bcmt-s">&#128172; '+esc(b.comment)+'</div>' : '')
     +   (b.admin ? '<div class="badm">&#128105;&#8205;&#128188; '+esc(b.admin)+' &middot; '+esc(b.accepted)+'</div>' : '')
     + '</div>'
+    + '<div class="bc-rides">'+ridesHtml+'</div>'
     + '<div class="bc-food">'+foodHtml+'</div>'
     + '<div class="bc-food">'+drinksHtml+'</div>'
     + '<div class="bc-rek" id="rek-col-'+id+'">'
