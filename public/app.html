@@ -2191,6 +2191,9 @@ window.google={script:{run:window.__gsr__}};
       Kapacitāte: <b id="cap-pill-val">90</b>
       <button onclick="editCapacity()" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:3px;padding:1px 5px;cursor:pointer;font-size:9px;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">✎</button>
     </div>
+    <div style="font-size:10px;color:var(--text3);font-family:var(--font-head);font-weight:600;letter-spacing:0.5px;">
+      Šodien maiņā: <span id="today-shift-names" style="color:var(--green);font-weight:700;">...</span>
+    </div>
   </div>
   <nav class="nav">
     <button class="nb" id="nb-calendar" onclick="goNav('calendar',this)">📅 Pārskats</button>
@@ -2967,6 +2970,26 @@ window.google={script:{run:window.__gsr__}};
 // ================================================================
 // KONSTANTES UN STATE
 // ================================================================
+function loadTodayShifts() {
+  fetch('/api/shifts')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var el = document.getElementById('today-shift-names');
+      if (!el) return;
+      if (data.ok && data.events && data.events.length > 0) {
+        var names = data.events.map(function(e){return e.title;}).filter(Boolean);
+        el.textContent = names.length ? names.join(', ') : 'Nav maiņu';
+      } else {
+        el.textContent = 'Nav maiņu';
+        el.style.color = 'var(--text3)';
+      }
+    })
+    .catch(function(){
+      var el = document.getElementById('today-shift-names');
+      if (el) { el.textContent = '—'; el.style.color = 'var(--text3)'; }
+    });
+}
+
 function editCapacity() {
   var current = CAP;
   var ov = document.createElement('div');
@@ -4134,6 +4157,8 @@ window.onload = function() {
   buildTimeSel('w_to',   '20:00');
 
   loadAll();
+  // Ielādē šodienas maiņas no kalendāra
+  loadTodayShifts();
   // Pēc ielādes aktivizēt šodienas skatu
   goNav('today', document.getElementById('nb-today'));
 };
