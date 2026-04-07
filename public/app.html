@@ -4263,7 +4263,7 @@ function renderCard(b, nowMin) {
 
   // HTML secība: laiks | info | braucieni | ēdieni | dzērieni | rek | pogas
   var ridesDisplay = (b.rides && b.rides > 0)
-    ? '<div class="bc-rides-total">&#127937; '+b.rides+'</div>' : '';
+    ? '<div class="bc-rides-total">&#127937; '+b.rides+'<div style="font-size:10px;color:var(--text3);font-weight:600;letter-spacing:0.5px;margin-top:2px;">~braucieni</div></div>' : '';
   return '<div class="bcard '+sc+' '+timeClass+'">'
     + '<div class="bc-grid">'
     + '<div class="bc-time"><div class="btime">'+tf+'</div><div class="bsep">|</div><div class="btime2">'+tt+'</div><div style="margin-top:8px;">'+bdg+'</div>'+ridesDisplay+'</div>'
@@ -4275,7 +4275,7 @@ function renderCard(b, nowMin) {
     +   '<div class="bcc">'+esc(b.client||'—')+'</div>'
     +   '<div class="bmeta-r">&#128222; '+esc(b.phone||'—')+'</div>'
     +   (b.email ? '<div class="bmeta-r">&#128231; '+esc(b.email)+'</div>' : '')
-    +   '<div class="bmeta-r">&#128101; '+b.people+' cilv.</div>'
+    +   '<div class="bmeta-r" style="font-size:17px;font-weight:700;color:#fff;">&#128101; '+b.people+' cilv.</div>'
     +   (b.invoice ? '<div class="bmeta-r">&#128179; '+esc(b.invoice)+'</div>' : '')
     +   (b.comment ? '<div class="bcmt-s">&#128172; '+esc(b.comment)+'</div>' : '')
     +   (b.admin ? '<div class="badm">&#128105;&#8205;&#128188; '+esc(b.admin)+' &middot; '+esc(b.accepted)+'</div>' : '')
