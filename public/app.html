@@ -2059,6 +2059,10 @@ button{cursor:pointer}
 .bfd-call    { background:#1a1400; color:#facc15; border:1px solid #854d0e; }
 .bfd-onsite  { background:#0d2e16; color:#22c55e; border:1px solid #166534; }
 
+
+.fd-mode-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
+.fd-opt { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--text2); cursor:pointer; }
+
 </style>
 
 </head>
@@ -2348,42 +2352,51 @@ window.google={script:{run:window.__gsr__}};
       <div class="wiz-block">
         <div class="wiz-block-title">🍕 Ēdieni un dzērieni</div>
         <div class="wform-row2">
+
+          <!-- ĒDIENI — tāds pats kā kartītē -->
           <div class="field">
-            <label>🍕 Ēdieni</label>
-            <div class="fd-option-group">
-              <label class="fd-opt"><input type="radio" name="w_food_mode" value="later" checked onchange="wFoodMode('food',this.value)"> 📞 Precizēs/sazvanīt</label>
-              <label class="fd-opt"><input type="radio" name="w_food_mode" value="onsite" onchange="wFoodMode('food',this.value)"> 🙋 Izvēlēsies uz vietas</label>
-              <label class="fd-opt"><input type="radio" name="w_food_mode" value="now" onchange="wFoodMode('food',this.value)"> ✏️ Ievadīt tagad</label>
+            <div class="bextra-title">🍕 Ēdieni</div>
+            <div class="fd-mode-row">
+              <label class="fd-opt"><input type="radio" name="w_food_mode" value="later" checked onchange="wFoodMode('food',this.value)"> 📞 Precizēs</label>
+              <label class="fd-opt"><input type="radio" name="w_food_mode" value="onsite" onchange="wFoodMode('food',this.value)"> 🙋 Uz vietas</label>
+              <label class="fd-opt"><input type="radio" name="w_food_mode" value="now" onchange="wFoodMode('food',this.value)"> ✏️ Tagad</label>
             </div>
-            <div id="w_food_input" style="display:none;margin-top:8px;">
-              <div class="fd-inline-list" id="w_food_list"></div>
-              <div class="fd-add-row">
-                <input type="text" id="w_food_name" placeholder="Nosaukums..." class="fd-in-name"
-                  onkeydown="if(event.key==='Enter'){wFdAdd('food');}">
-                <input type="number" id="w_food_qty" value="1" min="1" class="fd-in-qty">
-                <button type="button" class="fd-add-btn" onclick="wFdAdd('food')">+</button>
+            <div id="w_food_input" style="display:none;margin-top:6px;">
+              <div class="bextra-list" id="w_food_list"></div>
+              <div class="bextra-input-row" id="wfi-food" style="display:flex;margin-top:4px;">
+                <input class="bextra-in-name" type="text" id="w_food_name" placeholder="Nosaukums..."
+                  onkeydown="if(event.key==='Enter'){wFdConfirm('food');}">
+                <input class="bextra-in-qty" type="number" id="w_food_qty" value="1" min="1">
+                <button class="bextra-ok" type="button" onclick="wFdConfirm('food')">&#10003;</button>
+                <button class="bextra-cancel" type="button" onclick="wFdCancelInput('food')">&#10005;</button>
               </div>
+              <button class="bextra-add" type="button" id="wfa-food" onclick="wFdShowInput('food')">+ Pievienot</button>
             </div>
             <input type="hidden" id="w_food" value="PRECIZES">
           </div>
+
+          <!-- DZĒRIENI — tāds pats kā kartītē -->
           <div class="field">
-            <label>🍷 Dzērieni</label>
-            <div class="fd-option-group">
-              <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="later" checked onchange="wFoodMode('drinks',this.value)"> 📞 Precizēs/sazvanīt</label>
-              <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="onsite" onchange="wFoodMode('drinks',this.value)"> 🙋 Izvēlēsies uz vietas</label>
-              <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="now" onchange="wFoodMode('drinks',this.value)"> ✏️ Ievadīt tagad</label>
+            <div class="bextra-title">🍸 Dzērieni</div>
+            <div class="fd-mode-row">
+              <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="later" checked onchange="wFoodMode('drinks',this.value)"> 📞 Precizēs</label>
+              <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="onsite" onchange="wFoodMode('drinks',this.value)"> 🙋 Uz vietas</label>
+              <label class="fd-opt"><input type="radio" name="w_drinks_mode" value="now" onchange="wFoodMode('drinks',this.value)"> ✏️ Tagad</label>
             </div>
-            <div id="w_drinks_input" style="display:none;margin-top:8px;">
-              <div class="fd-inline-list" id="w_drinks_list"></div>
-              <div class="fd-add-row">
-                <input type="text" id="w_drinks_name" placeholder="Nosaukums..." class="fd-in-name"
-                  onkeydown="if(event.key==='Enter'){wFdAdd('drinks');}">
-                <input type="number" id="w_drinks_qty" value="1" min="1" class="fd-in-qty">
-                <button type="button" class="fd-add-btn" onclick="wFdAdd('drinks')">+</button>
+            <div id="w_drinks_input" style="display:none;margin-top:6px;">
+              <div class="bextra-list" id="w_drinks_list"></div>
+              <div class="bextra-input-row" id="wfi-drinks" style="display:flex;margin-top:4px;">
+                <input class="bextra-in-name" type="text" id="w_drinks_name" placeholder="Nosaukums..."
+                  onkeydown="if(event.key==='Enter'){wFdConfirm('drinks');}">
+                <input class="bextra-in-qty" type="number" id="w_drinks_qty" value="1" min="1">
+                <button class="bextra-ok" type="button" onclick="wFdConfirm('drinks')">&#10003;</button>
+                <button class="bextra-cancel" type="button" onclick="wFdCancelInput('drinks')">&#10005;</button>
               </div>
+              <button class="bextra-add" type="button" id="wfa-drinks" onclick="wFdShowInput('drinks')">+ Pievienot</button>
             </div>
             <input type="hidden" id="w_drinks" value="PRECIZES">
           </div>
+
         </div>
       </div>
 
@@ -3369,6 +3382,24 @@ function wFdRemove(field, idx) {
   wFdRender(field);
   document.getElementById('w_'+field).value = wFdBuild(field);
 }
+function wFdEdit(field, idx) {
+  var item = wFdItems[field][idx] || '';
+  var qm = item.match(/^(.+?) x(\d+)$/);
+  var nm = qm ? qm[1] : item;
+  var qt = qm ? qm[2] : '1';
+  var nameEl = document.getElementById('w_'+field+'_name');
+  var qtyEl  = document.getElementById('w_'+field+'_qty');
+  var inputRow = document.getElementById('wfi-'+field);
+  var addBtn   = document.getElementById('wfa-'+field);
+  if (!nameEl || !inputRow) return;
+  nameEl.value = nm;
+  if (qtyEl) qtyEl.value = qt;
+  inputRow.style.display = 'flex';
+  if (addBtn) addBtn.style.display = 'none';
+  inputRow.setAttribute('data-edit-idx', idx);
+  nameEl.focus();
+}
+
 function wFdQty(field, idx, delta) {
   var item = wFdItems[field][idx] || '';
   var qm = item.match(/^(.+?) x(\d+)$/);
@@ -3383,22 +3414,42 @@ function wFdRender(field) {
   var list = document.getElementById('w_'+field+'_list');
   if (!list) return;
   list.innerHTML = '';
-  wFdItems[field].forEach(function(item,i) {
+  wFdItems[field].forEach(function(item, i) {
     var qm = item.match(/^(.+?) x(\d+)$/);
     var nm = qm ? qm[1] : item;
     var qt = qm ? parseInt(qm[2]) : 1;
+
     var row = document.createElement('div');
-    row.className = 'fd-row';
-    row.innerHTML = '<span class="fd-nm">'+esc(nm)+'</span><span class="fd-qt">x'+qt+'</span>';
-    var bm = document.createElement('button'); bm.type='button'; bm.className='fd-q'; bm.textContent='-';
-    bm.onclick = (function(f,idx){return function(){wFdQty(f,idx,-1);};})(field,i);
-    var bp1 = document.createElement('button'); bp1.type='button'; bp1.className='fd-q'; bp1.textContent='+1';
-    bp1.onclick = (function(f,idx){return function(){wFdQty(f,idx,1);};})(field,i);
-    var bp2 = document.createElement('button'); bp2.type='button'; bp2.className='fd-q'; bp2.textContent='+2';
-    bp2.onclick = (function(f,idx){return function(){wFdQty(f,idx,2);};})(field,i);
-    var bd = document.createElement('button'); bd.type='button'; bd.className='fd-del'; bd.textContent='✕';
-    bd.onclick = (function(f,idx){return function(){wFdRemove(f,idx);};})(field,i);
-    row.appendChild(bm); row.appendChild(bp1); row.appendChild(bp2); row.appendChild(bd);
+    row.className = 'bextra-row';
+    row.setAttribute('data-idx', i);
+
+    var nameSpan = document.createElement('span');
+    nameSpan.className = 'bextra-name';
+    nameSpan.textContent = nm;
+
+    var qtySpan = document.createElement('span');
+    qtySpan.className = 'bextra-qty';
+    qtySpan.textContent = 'x' + qt;
+
+    var b1 = document.createElement('button'); b1.type='button'; b1.className='bextra-q'; b1.textContent='+1';
+    b1.onclick = (function(f,idx){return function(){wFdQty(f,idx,1);};})(field,i);
+
+    var b2 = document.createElement('button'); b2.type='button'; b2.className='bextra-q'; b2.textContent='+2';
+    b2.onclick = (function(f,idx){return function(){wFdQty(f,idx,2);};})(field,i);
+
+    var bedit = document.createElement('button'); bedit.type='button'; bedit.className='bextra-edit'; bedit.textContent='✎';
+    bedit.title = 'Labot';
+    bedit.onclick = (function(f,idx){return function(){wFdEdit(f,idx);};})(field,i);
+
+    var bdel = document.createElement('button'); bdel.type='button'; bdel.className='bextra-del'; bdel.textContent='✕';
+    bdel.onclick = (function(f,idx){return function(){wFdRemove(f,idx);};})(field,i);
+
+    row.appendChild(nameSpan);
+    row.appendChild(qtySpan);
+    row.appendChild(b1);
+    row.appendChild(b2);
+    row.appendChild(bedit);
+    row.appendChild(bdel);
     list.appendChild(row);
   });
 }
@@ -3561,6 +3612,46 @@ function wHighlightRequired() {
   return allOk;
 }
 
+
+
+// ── Formas ēdieni/dzērieni — tādi paši kā kartītē ──
+function wFdShowInput(field) {
+  var inputRow = document.getElementById('wfi-'+field);
+  var addBtn   = document.getElementById('wfa-'+field);
+  if (inputRow) inputRow.style.display = 'flex';
+  if (addBtn)   addBtn.style.display   = 'none';
+  var nameEl = document.getElementById('w_'+field+'_name');
+  if (nameEl) { nameEl.value = ''; nameEl.focus(); }
+  var qtyEl = document.getElementById('w_'+field+'_qty');
+  if (qtyEl) qtyEl.value = '1';
+}
+function wFdCancelInput(field) {
+  var inputRow = document.getElementById('wfi-'+field);
+  var addBtn   = document.getElementById('wfa-'+field);
+  if (inputRow) inputRow.style.display = 'none';
+  if (addBtn)   addBtn.style.display   = '';
+}
+function wFdConfirm(field) {
+  var nameEl   = document.getElementById('w_'+field+'_name');
+  var qtyEl    = document.getElementById('w_'+field+'_qty');
+  var inputRow = document.getElementById('wfi-'+field);
+  if (!nameEl) return;
+  var name = nameEl.value.trim();
+  var qty  = parseInt(qtyEl ? qtyEl.value : 1) || 1;
+  if (!name) { nameEl.focus(); return; }
+  var label    = name + (qty > 1 ? ' x'+qty : '');
+  var editIdx  = inputRow ? parseInt(inputRow.getAttribute('data-edit-idx')) : NaN;
+  if (!isNaN(editIdx) && editIdx >= 0) {
+    wFdItems[field][editIdx] = label;
+    inputRow.removeAttribute('data-edit-idx');
+  } else {
+    wFdItems[field].push(label);
+  }
+  wFdRender(field);
+  document.getElementById('w_'+field).value = wFdBuild(field);
+  wFdCancelInput(field);
+  if (document.getElementById('wfa-'+field)) document.getElementById('wfa-'+field).style.display = '';
+}
 
 window.onload = function() {
   document.addEventListener('click', function(e) {
