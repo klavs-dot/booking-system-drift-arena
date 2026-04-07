@@ -1907,5 +1907,55 @@ button{cursor:pointer}
 .oht-slot { padding:3px 8px; background:var(--card); border:1px solid #3b82f6; border-radius:4px; color:#60a5fa; font-size:11px; font-weight:600; cursor:pointer; }
 .oht-slot:hover { background:#3b82f6; color:#fff; }
 
+
+/* Cilvēku skaits — liels pulsējošs kvadrāts */
+@keyframes ppl-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.15); }
+  50%      { box-shadow: 0 0 0 8px rgba(255,255,255,0.0); }
+}
+.ppl-big-input {
+  width: 100%;
+  padding: 18px 12px;
+  font-size: 42px;
+  font-weight: 800;
+  text-align: center;
+  background: var(--card2);
+  border: 2px solid var(--border2);
+  border-radius: var(--r);
+  color: #fff;
+  box-sizing: border-box;
+  animation: ppl-pulse 1.5s ease-in-out infinite;
+  font-family: var(--font-head);
+  letter-spacing: 2px;
+}
+.ppl-big-input:focus {
+  border-color: var(--accent);
+  outline: none;
+  animation: none;
+  box-shadow: 0 0 0 3px rgba(251,96,27,0.25);
+}
+
+/* Ēdieni/dzērieni opcijas formā */
+.fd-option-group { display:flex; flex-direction:column; gap:4px; margin-bottom:4px; }
+.fd-opt { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text2); cursor:pointer; padding:4px 0; }
+.fd-opt input { flex-shrink:0; }
+.fd-inline-list { margin-bottom:6px; }
+.fd-row { display:flex; align-items:center; gap:4px; padding:3px 0; border-bottom:1px solid var(--border); }
+.fd-nm  { flex:1; font-size:12px; color:var(--text2); }
+.fd-qt  { font-size:11px; color:var(--accent); font-weight:700; min-width:24px; }
+.fd-q   { padding:2px 5px; background:var(--card2); border:1px solid var(--border2); border-radius:4px; color:var(--text2); font-size:11px; cursor:pointer; }
+.fd-q:hover { background:var(--accent); color:#fff; border-color:var(--accent); }
+.fd-del { background:none; border:none; color:var(--text3); cursor:pointer; font-size:12px; }
+.fd-del:hover { color:var(--red); }
+.fd-add-row { display:flex; gap:6px; align-items:center; margin-top:6px; }
+.fd-in-name { flex:1; padding:6px 8px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:12px; }
+.fd-in-qty  { width:48px; padding:6px 4px; background:var(--card2); border:1px solid var(--border2); border-radius:var(--r); color:var(--text); font-size:12px; text-align:center; }
+.fd-add-btn { padding:6px 12px; background:var(--accent); color:#fff; border:none; border-radius:var(--r); cursor:pointer; font-weight:700; font-size:14px; }
+
+
+.bfd-status  { font-size:11px; font-weight:600; padding:3px 8px; border-radius:4px; margin-bottom:4px; }
+.bfd-call    { background:#1a1400; color:#facc15; border:1px solid #854d0e; }
+.bfd-onsite  { background:#0d2e16; color:#22c55e; border:1px solid #166534; }
+
 </style>
 
