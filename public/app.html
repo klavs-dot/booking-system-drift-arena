@@ -2732,19 +2732,90 @@ window.google={script:{run:window.__gsr__}};
 <div class="view" id="view-invoices">
   <div class="phdr">
     <div class="ptitle">RĒĶINI</div>
-    <div class="psub">Rēķinu pārvaldības sistēma</div>
+    <div class="psub">Rēķinu ģenerēšana un pārvaldība</div>
   </div>
-  <div style="padding:40px 20px;text-align:center;color:var(--text3);font-family:var(--font-head);font-size:12px;letter-spacing:2px;text-transform:uppercase;">
-    🧾 Šī sadaļa tiek pārprogrammēta
-  </div>
-  <!-- Placeholder elementi priekš JS saderības -->
+
+  <!-- Rēķinu saraksts -->
+  <div id="INV_LIST" style="margin-top:16px;"></div>
+
+  <!-- Hidden saderības elementi -->
   <div style="display:none;">
-    <div id="INV_UNSENT_CNT"></div>
-    <div id="INV_UNSENT_LIST"></div>
-    <div id="INV_UNPAID_CNT"></div>
-    <div id="INV_UNPAID_LIST"></div>
+    <div id="INV_UNSENT_CNT"></div><div id="INV_UNSENT_LIST"></div>
+    <div id="INV_UNPAID_CNT"></div><div id="INV_UNPAID_LIST"></div>
     <div id="INV_SEARCH"></div>
     <table id="INV_TABLE"><tbody id="INV_TBODY"></tbody></table>
+  </div>
+</div>
+
+<!-- ══ RĒĶINA MODĀLIS ══ -->
+<div class="mbg" id="M_INV">
+  <div class="mbox" style="max-width:800px;background:#111;position:relative;max-height:90vh;overflow-y:auto;">
+    <button onclick="closeM('M_INV')" style="position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border2);color:var(--text2);width:32px;height:32px;border-radius:var(--r);cursor:pointer;font-size:16px;z-index:10;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">✕</button>
+
+    <div style="font-family:var(--font-head);font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;">🧾 RĒĶINA SAGATAVOŠANA</div>
+    <div id="inv-booking-info" style="margin-bottom:16px;"></div>
+
+    <!-- Braucienu pozīcija -->
+    <div class="wiz-block" style="background:#1a1a1a;">
+      <div class="wiz-block-title">🏁 Braucieni</div>
+      <div class="wform-row3">
+        <div class="field"><label>Braucienu skaits</label><input type="number" id="inv_rides_qty" min="0" value="0"></div>
+        <div class="field"><label>Cena par braucienu (ar PVN, EUR)</label><input type="number" id="inv_rides_price" min="0" step="0.01" value="0" placeholder="piem. 5.00"></div>
+        <div class="field"><label>Summa ar PVN</label><div id="inv_rides_total" style="font-size:22px;font-weight:700;color:var(--accent);padding-top:8px;">0.00 €</div></div>
+      </div>
+    </div>
+
+    <!-- Dzērienu pozīcijas -->
+    <div class="wiz-block" style="background:#1a1a1a;">
+      <div class="wiz-block-title">🍸 Dzērieni</div>
+      <div id="inv_drinks_list"></div>
+      <div class="wform-row3" style="margin-top:8px;">
+        <div class="field"><label>Nosaukums</label><input type="text" id="inv_drink_name" placeholder="Cola, Pepsi..."></div>
+        <div class="field"><label>Daudzums</label><input type="number" id="inv_drink_qty" min="1" value="1"></div>
+        <div class="field"><label>Cena ar PVN (EUR)</label>
+          <div style="display:flex;gap:6px;">
+            <input type="number" id="inv_drink_price" min="0" step="0.01" value="0" placeholder="2.50" style="flex:1;">
+            <button class="btn btn-p" onclick="invAddDrink()" style="padding:6px 14px;">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kopsavilkums -->
+    <div class="wiz-block" style="background:#1a1a1a;">
+      <div class="wiz-block-title">📊 Kopsavilkums</div>
+      <div id="inv_summary" style="font-size:13px;color:var(--text2);"></div>
+      <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:11px;color:var(--text3);">KOPĀ AR PVN</div>
+          <div id="inv_grand_total" style="font-size:32px;font-weight:800;color:var(--accent);font-family:var(--font-head);">0.00 €</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--text3);">Bez PVN (21%)</div>
+          <div id="inv_net_total" style="font-size:18px;font-weight:700;color:var(--text2);">0.00 €</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">PVN summa</div>
+          <div id="inv_vat_total" style="font-size:14px;color:var(--text3);">0.00 €</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telpu noma -->
+    <div style="margin-bottom:16px;">
+      <label class="wcheck">
+        <input type="checkbox" id="inv_telpa" onchange="invRecalc()">
+        <span class="chk"></span>
+        <span>🏢 Visu summu kā vienu pozīciju "Telpu noma"</span>
+      </label>
+    </div>
+
+    <!-- Pogas -->
+    <div style="display:flex;gap:12px;justify-content:flex-end;">
+      <button class="btn btn-s" onclick="closeM('M_INV')" style="padding:10px 20px;">Atcelt</button>
+      <button class="btn" onclick="invGeneratePDF()" style="padding:10px 20px;background:#0d2e16;color:#22c55e;border:1px solid #22c55e;font-weight:700;">📄 Lejupielādēt PDF</button>
+      <button class="btn btn-p" onclick="invSendEmail()" style="padding:10px 20px;">📧 Nosūtīt uz e-pastu</button>
+    </div>
+
+    <input type="hidden" id="inv_booking_id">
   </div>
 </div>
 
@@ -5856,6 +5927,355 @@ function toast(msg, type) {
   t.className = 'toast on ' + (type||'');
   clearTimeout(t._t);
   t._t = setTimeout(() => t.classList.remove('on'), 4500);
+}
+
+// ══ RĒĶINU SISTĒMA ══
+var _invDrinks = [];
+var _invBooking = null;
+
+function renderInvoices() {
+  var el = document.getElementById('INV_LIST');
+  if (!el) return;
+  // Filtrē rezervācijas ar rēķinu
+  var inv = ALL.filter(function(b) {
+    return b.status !== 'Atcelta' && b.invoice && (b.invoice.includes('rēķin') || b.invoice.includes('rēķīn'));
+  }).sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+
+  if (!inv.length) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3);font-family:var(--font-head);font-size:12px;letter-spacing:2px;text-transform:uppercase;">Nav rezervāciju ar rēķinu</div>';
+    return;
+  }
+
+  var html = '<div style="display:flex;flex-direction:column;gap:8px;">';
+  inv.forEach(function(b) {
+    var rek = null;
+    try { rek = b.rekviziti ? JSON.parse(b.rekviziti) : null; } catch(e){}
+    var rekName = rek ? (rek.name || '—') : '—';
+    var isTelpa = rek && rek.telpa;
+    var invSent = localStorage.getItem('inv_sent_'+b.id);
+    var statusBadge = invSent
+      ? '<span style="background:#0d2e16;color:#22c55e;border:1px solid #22c55e;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;">✓ NOSŪTĪTS</span>'
+      : '<span style="background:#2d1e03;color:#facc15;border:1px solid #854d0e;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;">⏳ GAIDA</span>';
+
+    html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">'
+      + '<div style="min-width:90px;"><div style="font-size:13px;font-weight:700;color:var(--text);">'+esc(b.date)+'</div><div style="font-size:11px;color:var(--text3);">'+cleanT(b.timeFrom)+' – '+cleanT(b.timeTo)+'</div></div>'
+      + '<div style="flex:1;min-width:150px;"><div style="font-size:14px;font-weight:700;">'+esc(b.client)+'</div><div style="font-size:11px;color:var(--text3);">'+esc(rekName)+'</div></div>'
+      + '<div style="min-width:80px;text-align:center;"><div style="font-size:11px;color:var(--text3);">Cilv.</div><div style="font-size:18px;font-weight:700;">'+b.people+'</div></div>'
+      + '<div style="min-width:80px;text-align:center;"><div style="font-size:11px;color:var(--text3);">Braucieni</div><div style="font-size:18px;font-weight:700;color:var(--accent);">'+(b.rides||0)+'</div></div>'
+      + '<div style="min-width:100px;text-align:center;">'+statusBadge+'</div>'
+      + '<div style="min-width:60px;"><div style="font-size:10px;color:var(--text3);">'+esc(b.invoice)+'</div></div>'
+      + (isTelpa ? '<div style="font-size:10px;color:#22c55e;">🏢 Telpu noma</div>' : '')
+      + '<button class="btn btn-p" onclick="openInvoice(\''+b.id+'\')" style="padding:6px 14px;font-size:12px;">🧾 Rēķins</button>'
+      + '</div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function openInvoice(id) {
+  var b = ALL.find(function(x){return x.id===id;});
+  if (!b) return;
+  _invBooking = b;
+  _invDrinks = [];
+  document.getElementById('inv_booking_id').value = id;
+
+  // Aizpildīt info
+  var rek = null;
+  try { rek = b.rekviziti ? JSON.parse(b.rekviziti) : null; } catch(e){}
+  document.getElementById('inv-booking-info').innerHTML =
+    '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;">'
+    + '<div style="font-size:15px;font-weight:700;">'+esc(b.client)+'</div>'
+    + '<div style="font-size:12px;color:var(--text2);margin-top:4px;">'+esc(b.date)+' · '+cleanT(b.timeFrom)+'–'+cleanT(b.timeTo)+' · '+b.people+' cilv.</div>'
+    + (rek && rek.name ? '<div style="font-size:12px;color:var(--text3);margin-top:4px;">'+esc(rek.name)+(rek.reg?' · '+esc(rek.reg):'')+'</div>' : '')
+    + (b.email ? '<div style="font-size:12px;color:var(--accent);margin-top:4px;">📧 '+esc(b.email)+'</div>' : '')
+    + '</div>';
+
+  // Braucieni
+  document.getElementById('inv_rides_qty').value = b.rides || 0;
+  document.getElementById('inv_rides_price').value = '';
+
+  // Telpu noma
+  var telpaCb = document.getElementById('inv_telpa');
+  if (telpaCb) telpaCb.checked = !!(rek && rek.telpa);
+
+  // Dzērieni no rezervācijas
+  _invDrinks = [];
+  if (b.drinks && b.drinks !== 'PRECIZES' && b.drinks !== 'UZ_VIETAS') {
+    b.drinks.split(',').map(function(s){return s.trim();}).filter(Boolean).forEach(function(item) {
+      var qm = item.match(/^(.+?)\s+x(\d+)$/);
+      var nm = qm ? qm[1] : item;
+      var qt = qm ? parseInt(qm[2]) : 1;
+      _invDrinks.push({name:nm, qty:qt, price:0});
+    });
+  }
+
+  invRenderDrinks();
+  invRecalc();
+  openM('M_INV');
+
+  // Pievienot input listeners
+  document.getElementById('inv_rides_qty').oninput = invRecalc;
+  document.getElementById('inv_rides_price').oninput = invRecalc;
+}
+
+function invAddDrink() {
+  var name = document.getElementById('inv_drink_name').value.trim();
+  var qty = parseInt(document.getElementById('inv_drink_qty').value) || 1;
+  var price = parseFloat(document.getElementById('inv_drink_price').value) || 0;
+  if (!name) return;
+  _invDrinks.push({name:name, qty:qty, price:price});
+  document.getElementById('inv_drink_name').value = '';
+  document.getElementById('inv_drink_qty').value = '1';
+  document.getElementById('inv_drink_price').value = '';
+  invRenderDrinks();
+  invRecalc();
+}
+
+function invRemoveDrink(idx) {
+  _invDrinks.splice(idx, 1);
+  invRenderDrinks();
+  invRecalc();
+}
+
+function invDrinkPriceChange(idx, val) {
+  _invDrinks[idx].price = parseFloat(val) || 0;
+  invRecalc();
+}
+
+function invRenderDrinks() {
+  var el = document.getElementById('inv_drinks_list');
+  if (!_invDrinks.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;">Nav dzērienu</div>'; return; }
+  var html = '';
+  _invDrinks.forEach(function(d, i) {
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">'
+      + '<span style="flex:1;font-size:13px;color:var(--text);">'+esc(d.name)+' x'+d.qty+'</span>'
+      + '<input type="number" min="0" step="0.01" value="'+(d.price||'')+'" placeholder="Cena ar PVN" style="width:100px;padding:5px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:12px;text-align:center;" oninput="invDrinkPriceChange('+i+',this.value)">'
+      + '<span style="min-width:60px;text-align:right;font-size:12px;color:var(--text2);">'+(d.qty * d.price).toFixed(2)+' €</span>'
+      + '<button onclick="invRemoveDrink('+i+')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;">✕</button>'
+      + '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function invRecalc() {
+  var ridesQty = parseInt(document.getElementById('inv_rides_qty').value) || 0;
+  var ridesPrice = parseFloat(document.getElementById('inv_rides_price').value) || 0;
+  var ridesTotal = ridesQty * ridesPrice;
+
+  document.getElementById('inv_rides_total').textContent = ridesTotal.toFixed(2) + ' €';
+
+  var drinksTotal = _invDrinks.reduce(function(s,d){return s + d.qty * d.price;}, 0);
+  var grandTotal = ridesTotal + drinksTotal;
+  var netTotal = grandTotal / 1.21;
+  var vatTotal = grandTotal - netTotal;
+
+  document.getElementById('inv_grand_total').textContent = grandTotal.toFixed(2) + ' €';
+  document.getElementById('inv_net_total').textContent = netTotal.toFixed(2) + ' €';
+  document.getElementById('inv_vat_total').textContent = vatTotal.toFixed(2) + ' €';
+
+  // Kopsavilkums
+  var isTelpa = document.getElementById('inv_telpa').checked;
+  var lines = [];
+  if (isTelpa) {
+    lines.push('<div>🏢 Telpu noma — <b>'+grandTotal.toFixed(2)+' €</b> (ar PVN)</div>');
+  } else {
+    if (ridesTotal > 0) lines.push('<div>🏁 Braucieni: '+ridesQty+' x '+ridesPrice.toFixed(2)+' = <b>'+ridesTotal.toFixed(2)+' €</b></div>');
+    _invDrinks.forEach(function(d) {
+      if (d.price > 0) lines.push('<div>🍸 '+esc(d.name)+': '+d.qty+' x '+d.price.toFixed(2)+' = <b>'+(d.qty*d.price).toFixed(2)+' €</b></div>');
+    });
+  }
+  document.getElementById('inv_summary').innerHTML = lines.join('') || '<div style="color:var(--text3);">Ievadi cenas lai redzētu kopsavilkumu</div>';
+}
+
+function invGetData() {
+  var b = _invBooking;
+  if (!b) return null;
+  var rek = null;
+  try { rek = b.rekviziti ? JSON.parse(b.rekviziti) : null; } catch(e){}
+
+  var ridesQty = parseInt(document.getElementById('inv_rides_qty').value) || 0;
+  var ridesPrice = parseFloat(document.getElementById('inv_rides_price').value) || 0;
+  var isTelpa = document.getElementById('inv_telpa').checked;
+
+  // Rēķina numurs: dd/mm/gg-N
+  var today = new Date();
+  var dd = p2(today.getDate()), mm = p2(today.getMonth()+1), yy = String(today.getFullYear()).slice(2);
+  var dateKey = dd+'/'+mm+'/'+yy;
+  var dayCount = parseInt(localStorage.getItem('inv_count_'+dateKey) || '0') + 1;
+
+  return {
+    invNumber: 'Rēķins#'+dateKey+'-'+dayCount,
+    dateKey: dateKey,
+    dayCount: dayCount,
+    date: today.toLocaleDateString('lv-LV'),
+    dueDate: new Date(today.getTime() + 5*24*60*60*1000).toLocaleDateString('lv-LV'),
+    client: b.client,
+    email: b.email || '',
+    bookingDate: b.date,
+    bookingTime: cleanT(b.timeFrom)+' – '+cleanT(b.timeTo),
+    people: b.people,
+    rek: rek,
+    isTelpa: isTelpa,
+    rides: {qty: ridesQty, price: ridesPrice, total: ridesQty * ridesPrice},
+    drinks: _invDrinks.filter(function(d){return d.price > 0;}),
+    sender: {
+      name: 'SIA "DA LIEPĀJA"',
+      pvn: 'LV40203522098',
+      reg: '40203522098',
+      addr: 'Liepāja, Ganību 197/205, LV-3407',
+      bank: 'Luminor Bank AS Latvijas filiāle',
+      swift: 'RIKOLV2X',
+      account: 'LV81RIKO0001080210823'
+    }
+  };
+}
+
+function invGeneratePDF() {
+  var data = invGetData();
+  if (!data) return;
+  var grandTotal = data.rides.total + data.drinks.reduce(function(s,d){return s+d.qty*d.price;},0);
+  if (grandTotal <= 0) { toast('Ievadi vismaz vienu pozīciju ar cenu!', 'warn'); return; }
+
+  // Saglabāt rēķina numuru
+  localStorage.setItem('inv_count_'+data.dateKey, data.dayCount);
+
+  // Ģenerēt PDF klienta pusē ar jsPDF
+  ovl('Ģenerē rēķinu...');
+  loadJsPDF(function() {
+    var doc = generateInvoicePDF(data);
+    doc.save(data.invNumber.replace(/[#\/]/g,'_')+'.pdf');
+    hovl();
+    localStorage.setItem('inv_sent_'+_invBooking.id, '1');
+    toast('✓ Rēķins lejupielādēts: '+data.invNumber, 'ok');
+    renderInvoices();
+  });
+}
+
+function invSendEmail() {
+  var data = invGetData();
+  if (!data) return;
+  var email = data.email || (data.rek ? '' : '');
+  if (!email) { toast('Nav e-pasta adreses!', 'warn'); return; }
+  // Ģenerē PDF un atver mailto ar pielikumu (vai tikai atver mailto)
+  invGeneratePDF();
+  setTimeout(function() {
+    window.open('mailto:'+email+'?subject='+encodeURIComponent(data.invNumber+' — '+data.sender.name)+'&body='+encodeURIComponent('Labdien!\n\nPielikumā rēķins '+data.invNumber+'.\n\nApmaksas termiņš: '+data.dueDate+'.\n\nAr cieņu,\n'+data.sender.name), '_blank');
+  }, 1000);
+}
+
+function loadJsPDF(cb) {
+  if (window.jspdf) { cb(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js';
+  s.onload = cb;
+  document.head.appendChild(s);
+}
+
+function generateInvoicePDF(data) {
+  var jsPDF = window.jspdf.jsPDF;
+  var doc = new jsPDF('p', 'mm', 'a4');
+  var W = 210, M = 15;
+  var y = 15;
+
+  // Logo (text-based since we can't easily embed image)
+  doc.setFontSize(24); doc.setFont('helvetica','bold');
+  doc.setTextColor(232,77,14); doc.text('DRIFT ARENA', M, y+8);
+  doc.setFontSize(8); doc.setTextColor(100);
+  doc.text('WOLFTRIKE', M, y+14);
+
+  // Rēķina numurs
+  doc.setFontSize(18); doc.setFont('helvetica','bold');
+  doc.setTextColor(40); doc.text(data.invNumber, W-M, y+8, {align:'right'});
+  y += 22;
+
+  // Datumi
+  doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(80);
+  doc.text('Izrakstīts: '+data.date, W-M, y, {align:'right'}); y+=5;
+  doc.text('Apmaksas termiņš: '+data.dueDate, W-M, y, {align:'right'}); y+=10;
+
+  // Nosūtītājs / Saņēmējs
+  doc.setDrawColor(232,77,14); doc.setLineWidth(0.5);
+  doc.line(M, y, W-M, y); y+=6;
+
+  doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(40);
+  doc.text('NOSŪTĪTĀJS', M, y);
+  doc.text('SAŅĒMĒJS', W/2+5, y); y+=5;
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60);
+  var sLines = [data.sender.name, 'PVN Nr: '+data.sender.pvn, 'Reģ. Nr: '+data.sender.reg, data.sender.addr, data.sender.bank+'; '+data.sender.swift, 'Konts: '+data.sender.account];
+  sLines.forEach(function(l){doc.text(l, M, y); y+=4;});
+
+  // Saņēmējs
+  y -= sLines.length * 4;
+  var rLines = [];
+  if (data.rek) {
+    if (data.rek.name) rLines.push(data.rek.name);
+    if (data.rek.reg) rLines.push('Reģ. Nr: '+data.rek.reg);
+    if (data.rek.pvn) rLines.push('PVN Nr: '+data.rek.pvn);
+    if (data.rek.addr) rLines.push(data.rek.addr);
+  }
+  if (!rLines.length) rLines.push(data.client);
+  rLines.forEach(function(l){doc.text(l, W/2+5, y); y+=4;});
+  y = Math.max(y, y) + 8;
+
+  // Tabula
+  doc.setDrawColor(232,77,14); doc.setLineWidth(0.3);
+  // Header
+  doc.setFillColor(232,77,14); doc.rect(M, y, W-2*M, 8, 'F');
+  doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(255);
+  doc.text('NOSAUKUMS', M+3, y+5.5);
+  doc.text('DAUDZ.', 115, y+5.5);
+  doc.text('CENA BEZ PVN', 135, y+5.5);
+  doc.text('SUMMA', W-M-3, y+5.5, {align:'right'});
+  y += 10;
+
+  var grandTotal = 0;
+  doc.setFont('helvetica','normal'); doc.setTextColor(40); doc.setFontSize(9);
+
+  if (data.isTelpa) {
+    var total = data.rides.total + data.drinks.reduce(function(s,d){return s+d.qty*d.price;},0);
+    var net = total / 1.21;
+    doc.setDrawColor(200); doc.rect(M, y-1, W-2*M, 7, 'S');
+    doc.text('Telpu noma', M+3, y+4);
+    doc.text('1', 120, y+4);
+    doc.text(net.toFixed(2), 155, y+4, {align:'right'});
+    doc.text(net.toFixed(2), W-M-3, y+4, {align:'right'});
+    y += 8; grandTotal = total;
+  } else {
+    if (data.rides.total > 0) {
+      var rNet = data.rides.total / 1.21;
+      doc.setDrawColor(200); doc.rect(M, y-1, W-2*M, 7, 'S');
+      doc.text('Braucieni', M+3, y+4);
+      doc.text(String(data.rides.qty), 120, y+4);
+      doc.text((data.rides.price/1.21).toFixed(2), 155, y+4, {align:'right'});
+      doc.text(rNet.toFixed(2), W-M-3, y+4, {align:'right'});
+      y += 8; grandTotal += data.rides.total;
+    }
+    data.drinks.forEach(function(d) {
+      var lineTotal = d.qty * d.price;
+      var lineNet = lineTotal / 1.21;
+      doc.setDrawColor(200); doc.rect(M, y-1, W-2*M, 7, 'S');
+      doc.text(d.name, M+3, y+4);
+      doc.text(String(d.qty), 120, y+4);
+      doc.text((d.price/1.21).toFixed(2), 155, y+4, {align:'right'});
+      doc.text(lineNet.toFixed(2), W-M-3, y+4, {align:'right'});
+      y += 8; grandTotal += lineTotal;
+    });
+  }
+
+  y += 4;
+  var netGrand = grandTotal / 1.21;
+  var vatGrand = grandTotal - netGrand;
+
+  // Kopsummas
+  doc.setDrawColor(232,77,14); doc.line(120, y, W-M, y); y+=6;
+  doc.setFontSize(9); doc.setFont('helvetica','normal');
+  doc.text('Summa bez PVN:', 120, y); doc.text(netGrand.toFixed(2)+' EUR', W-M-3, y, {align:'right'}); y+=5;
+  doc.text('PVN 21%:', 120, y); doc.text(vatGrand.toFixed(2)+' EUR', W-M-3, y, {align:'right'}); y+=5;
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(232,77,14);
+  doc.text('KOPĀ APMAKSAI:', 120, y+1); doc.text(grandTotal.toFixed(2)+' EUR', W-M-3, y+1, {align:'right'});
+
+  return doc;
 }
 
 // ══ MASTER ADMIN ══
