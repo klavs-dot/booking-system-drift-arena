@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Drift Arena — Rezervācijas</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js" defer></script>
 <style>
 /* ================================================================
    DRIFT ARENA — Brand Design System
@@ -5960,7 +5959,7 @@ function renderInvoices() {
 
     html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">'
       + '<div style="min-width:90px;"><div style="font-size:13px;font-weight:700;color:var(--text);">'+esc(b.date)+'</div><div style="font-size:11px;color:var(--text3);">'+cleanT(b.timeFrom)+' – '+cleanT(b.timeTo)+'</div></div>'
-      + '<div style="flex:1;min-width:150px;"><div style="font-size:14px;font-weight:700;">'+esc(b.client)+'</div><div style="font-size:11px;color:var(--text3);">'+esc(rekName)+'</div></div>'
+      + '<div style="flex:1;min-width:150px;"><div style="font-size:14px;font-weight:700;">'+esc(rekName)+'</div><div style="font-size:11px;color:var(--text3);">'+esc(b.client)+'</div></div>'
       + '<div style="min-width:80px;text-align:center;"><div style="font-size:11px;color:var(--text3);">Cilv.</div><div style="font-size:18px;font-weight:700;">'+b.people+'</div></div>'
       + '<div style="min-width:80px;text-align:center;"><div style="font-size:11px;color:var(--text3);">Braucieni</div><div style="font-size:18px;font-weight:700;color:var(--accent);">'+(b.rides||0)+'</div></div>'
       + '<div style="min-width:100px;text-align:center;">'+statusBadge+'</div>'
@@ -6140,16 +6139,29 @@ function invGeneratePDF() {
   // Saglabāt rēķina numuru
   localStorage.setItem('inv_count_'+data.dateKey, data.dayCount);
 
-  // Ģenerēt PDF klienta pusē ar jsPDF
   ovl('Ģenerē rēķinu...');
-  loadJsPDF(function() {
-    var doc = generateInvoicePDF(data);
-    doc.save(data.invNumber.replace(/[#\/]/g,'_')+'.pdf');
+  fetch('/api/invoice', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  })
+  .then(function(r){return r.json();})
+  .then(function(res){
     hovl();
-    localStorage.setItem('inv_sent_'+_invBooking.id, '1');
-    toast('✓ Rēķins lejupielādēts: '+data.invNumber, 'ok');
-    renderInvoices();
-  });
+    if (res.ok && res.pdf) {
+      // Lejupielādēt PDF
+      var link = document.createElement('a');
+      link.href = res.pdf;
+      link.download = data.invNumber.replace(/[#\/]/g,'_')+'.pdf';
+      link.click();
+      localStorage.setItem('inv_sent_'+_invBooking.id, '1');
+      toast('✓ Rēķins lejupielādēts: '+data.invNumber, 'ok');
+      renderInvoices();
+    } else {
+      toast('Kļūda ģenerējot PDF: '+(res.error||''), 'err');
+    }
+  })
+  .catch(function(e){ hovl(); toast('Kļūda: '+e.message, 'err'); });
 }
 
 function invSendEmail() {
@@ -6162,124 +6174,6 @@ function invSendEmail() {
   setTimeout(function() {
     window.open('mailto:'+email+'?subject='+encodeURIComponent(data.invNumber+' — '+data.sender.name)+'&body='+encodeURIComponent('Labdien!\n\nPielikumā rēķins '+data.invNumber+'.\n\nApmaksas termiņš: '+data.dueDate+'.\n\nAr cieņu,\n'+data.sender.name), '_blank');
   }, 1000);
-}
-
-function loadJsPDF(cb) {
-  if (window.jspdf) { cb(); return; }
-  // Ja vēl nav ielādēts — pagaida
-  var attempts = 0;
-  var check = setInterval(function() {
-    attempts++;
-    if (window.jspdf) { clearInterval(check); cb(); }
-    else if (attempts > 50) { clearInterval(check); hovl(); toast('PDF bibliotēka nav ielādēta. Pārlādē lapu.', 'err'); }
-  }, 200);
-}
-
-function generateInvoicePDF(data) {
-  var jsPDF = window.jspdf.jsPDF;
-  var doc = new jsPDF('p', 'mm', 'a4');
-  var W = 210, M = 15;
-  var y = 15;
-
-  // Logo (text-based since we can't easily embed image)
-  doc.setFontSize(24); doc.setFont('helvetica','bold');
-  doc.setTextColor(232,77,14); doc.text('DRIFT ARENA', M, y+8);
-  doc.setFontSize(8); doc.setTextColor(100);
-  doc.text('WOLFTRIKE', M, y+14);
-
-  // Rēķina numurs
-  doc.setFontSize(18); doc.setFont('helvetica','bold');
-  doc.setTextColor(40); doc.text(data.invNumber, W-M, y+8, {align:'right'});
-  y += 22;
-
-  // Datumi
-  doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(80);
-  doc.text('Izrakstīts: '+data.date, W-M, y, {align:'right'}); y+=5;
-  doc.text('Apmaksas termiņš: '+data.dueDate, W-M, y, {align:'right'}); y+=10;
-
-  // Nosūtītājs / Saņēmējs
-  doc.setDrawColor(232,77,14); doc.setLineWidth(0.5);
-  doc.line(M, y, W-M, y); y+=6;
-
-  doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(40);
-  doc.text('NOSŪTĪTĀJS', M, y);
-  doc.text('SAŅĒMĒJS', W/2+5, y); y+=5;
-
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60);
-  var sLines = [data.sender.name, 'PVN Nr: '+data.sender.pvn, 'Reģ. Nr: '+data.sender.reg, data.sender.addr, data.sender.bank+'; '+data.sender.swift, 'Konts: '+data.sender.account];
-  sLines.forEach(function(l){doc.text(l, M, y); y+=4;});
-
-  // Saņēmējs
-  y -= sLines.length * 4;
-  var rLines = [];
-  if (data.rek) {
-    if (data.rek.name) rLines.push(data.rek.name);
-    if (data.rek.reg) rLines.push('Reģ. Nr: '+data.rek.reg);
-    if (data.rek.pvn) rLines.push('PVN Nr: '+data.rek.pvn);
-    if (data.rek.addr) rLines.push(data.rek.addr);
-  }
-  if (!rLines.length) rLines.push(data.client);
-  rLines.forEach(function(l){doc.text(l, W/2+5, y); y+=4;});
-  y = Math.max(y, y) + 8;
-
-  // Tabula
-  doc.setDrawColor(232,77,14); doc.setLineWidth(0.3);
-  // Header
-  doc.setFillColor(232,77,14); doc.rect(M, y, W-2*M, 8, 'F');
-  doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(255);
-  doc.text('NOSAUKUMS', M+3, y+5.5);
-  doc.text('DAUDZ.', 115, y+5.5);
-  doc.text('CENA BEZ PVN', 135, y+5.5);
-  doc.text('SUMMA', W-M-3, y+5.5, {align:'right'});
-  y += 10;
-
-  var grandTotal = 0;
-  doc.setFont('helvetica','normal'); doc.setTextColor(40); doc.setFontSize(9);
-
-  if (data.isTelpa) {
-    var total = data.rides.total + data.drinks.reduce(function(s,d){return s+d.qty*d.price;},0);
-    var net = total / 1.21;
-    doc.setDrawColor(200); doc.rect(M, y-1, W-2*M, 7, 'S');
-    doc.text('Telpu noma', M+3, y+4);
-    doc.text('1', 120, y+4);
-    doc.text(net.toFixed(2), 155, y+4, {align:'right'});
-    doc.text(net.toFixed(2), W-M-3, y+4, {align:'right'});
-    y += 8; grandTotal = total;
-  } else {
-    if (data.rides.total > 0) {
-      var rNet = data.rides.total / 1.21;
-      doc.setDrawColor(200); doc.rect(M, y-1, W-2*M, 7, 'S');
-      doc.text('Braucieni', M+3, y+4);
-      doc.text(String(data.rides.qty), 120, y+4);
-      doc.text((data.rides.price/1.21).toFixed(2), 155, y+4, {align:'right'});
-      doc.text(rNet.toFixed(2), W-M-3, y+4, {align:'right'});
-      y += 8; grandTotal += data.rides.total;
-    }
-    data.drinks.forEach(function(d) {
-      var lineTotal = d.qty * d.price;
-      var lineNet = lineTotal / 1.21;
-      doc.setDrawColor(200); doc.rect(M, y-1, W-2*M, 7, 'S');
-      doc.text(d.name, M+3, y+4);
-      doc.text(String(d.qty), 120, y+4);
-      doc.text((d.price/1.21).toFixed(2), 155, y+4, {align:'right'});
-      doc.text(lineNet.toFixed(2), W-M-3, y+4, {align:'right'});
-      y += 8; grandTotal += lineTotal;
-    });
-  }
-
-  y += 4;
-  var netGrand = grandTotal / 1.21;
-  var vatGrand = grandTotal - netGrand;
-
-  // Kopsummas
-  doc.setDrawColor(232,77,14); doc.line(120, y, W-M, y); y+=6;
-  doc.setFontSize(9); doc.setFont('helvetica','normal');
-  doc.text('Summa bez PVN:', 120, y); doc.text(netGrand.toFixed(2)+' EUR', W-M-3, y, {align:'right'}); y+=5;
-  doc.text('PVN 21%:', 120, y); doc.text(vatGrand.toFixed(2)+' EUR', W-M-3, y, {align:'right'}); y+=5;
-  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(232,77,14);
-  doc.text('KOPĀ APMAKSAI:', 120, y+1); doc.text(grandTotal.toFixed(2)+' EUR', W-M-3, y+1, {align:'right'});
-
-  return doc;
 }
 
 // ══ MASTER ADMIN ══
