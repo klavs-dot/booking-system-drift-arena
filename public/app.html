@@ -2732,60 +2732,19 @@ window.google={script:{run:window.__gsr__}};
 <div class="view" id="view-invoices">
   <div class="phdr">
     <div class="ptitle">RĒĶINI</div>
-    <div class="psub">Pārskats par rēķiniem un apmaksām</div>
+    <div class="psub">Rēķinu pārvaldības sistēma</div>
   </div>
-
-  <!-- Brīdinājuma bloki -->
-  <div class="inv-alerts">
-    <div class="inv-alert-box unsent">
-      <div class="inv-alert-hdr">
-        🔴 Jānosūta rēķins
-        <span class="inv-alert-cnt" id="INV_UNSENT_CNT">0</span>
-      </div>
-      <div class="inv-alert-list" id="INV_UNSENT_LIST">
-        <div class="inv-ar-empty">Nav nenosūtītu rēķinu</div>
-      </div>
-    </div>
-    <div class="inv-alert-box unpaid">
-      <div class="inv-alert-hdr">
-        🟡 Nosūtīts, bet nav apmaksāts
-        <span class="inv-alert-cnt" id="INV_UNPAID_CNT">0</span>
-      </div>
-      <div class="inv-alert-list" id="INV_UNPAID_LIST">
-        <div class="inv-ar-empty">Visi nosūtītie rēķini ir apmaksāti</div>
-      </div>
-    </div>
+  <div style="padding:40px 20px;text-align:center;color:var(--text3);font-family:var(--font-head);font-size:12px;letter-spacing:2px;text-transform:uppercase;">
+    🧾 Šī sadaļa tiek pārprogrammēta
   </div>
-
-  <!-- Filtri + meklēšana -->
-  <div class="inv-filters">
-    <button class="inv-filter-btn active" onclick="setInvFilter('all',this)">Visi</button>
-    <button class="inv-filter-btn" onclick="setInvFilter('invoice',this)">Ar rēķinu</button>
-    <button class="inv-filter-btn" onclick="setInvFilter('unsent',this)">Nenosūtīti</button>
-    <button class="inv-filter-btn" onclick="setInvFilter('unpaid',this)">Neapmaksāti</button>
-    <button class="inv-filter-btn" onclick="setInvFilter('paid',this)">Apmaksāti</button>
-    <input class="inv-search" id="INV_SEARCH" type="text" placeholder="🔍 Meklēt..." oninput="renderInvoiceTable()">
-  </div>
-
-  <!-- Tabula -->
-  <div style="overflow-x:auto">
-    <table class="inv-table" id="INV_TABLE">
-      <thead>
-        <tr>
-          <th>Datums / Laiks</th>
-          <th>Uzņēmums / Klients</th>
-          <th>Rekvizīti</th>
-          <th>Kontakti</th>
-          <th>E-pasts rēķinam</th>
-          <th>Cilv.</th>
-          <th>Ēdieni</th>
-          <th>Komentāri</th>
-          <th>Rēķins nosūtīts</th>
-          <th>Rēķins apmaksāts</th>
-        </tr>
-      </thead>
-      <tbody id="INV_TBODY"></tbody>
-    </table>
+  <!-- Placeholder elementi priekš JS saderības -->
+  <div style="display:none;">
+    <div id="INV_UNSENT_CNT"></div>
+    <div id="INV_UNSENT_LIST"></div>
+    <div id="INV_UNPAID_CNT"></div>
+    <div id="INV_UNPAID_LIST"></div>
+    <div id="INV_SEARCH"></div>
+    <table id="INV_TABLE"><tbody id="INV_TBODY"></tbody></table>
   </div>
 </div>
 
