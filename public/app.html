@@ -4434,13 +4434,68 @@ function slotBar(lbl, cnt) {
 function openDay(ds) {
   _dayDate = ds;
   const [y,m,d] = ds.split('-');
+  const DAY_NAMES_LV = ['Svētdiena','Pirmdiena','Otrdiena','Trešdiena','Ceturtdiena','Piektdiena','Sestdiena'];
+  const dow = new Date(parseInt(y), parseInt(m)-1, parseInt(d)).getDay();
   document.getElementById('DAY_VIEW_TITLE').textContent =
-    `📅 ${parseInt(d)}. ${MLV[parseInt(m)-1]} ${y}`;
+    `📅 ${DAY_NAMES_LV[dow]}, ${parseInt(d)}. ${MLV[parseInt(m)-1]} ${y}`;
   const list = ALL.filter(b => b.date===ds)
     .sort((a,b) => tmin(a.timeFrom)-tmin(b.timeFrom));
   document.getElementById('DAY_VIEW_LIST').innerHTML =
-    list.length ? list.map(renderCard).join('') : emptyEl('Nav rezervāciju šajā dienā');
+    list.length ? list.map(renderCardReadonly).join('') : emptyEl('Nav rezervāciju šajā dienā');
   goNav('day', document.getElementById('nb-day'));
+}
+
+function renderCardReadonly(b) {
+  var tf = cleanT(b.timeFrom), tt = cleanT(b.timeTo);
+  var sc = b.status==='Notikusi' ? 'sdone' : b.status==='Atcelta' ? 'scanc' : b.status==='Ieradušies' ? 'sarrived' : '';
+  var bdg = b.status==='Notikusi' ? '<span class="badge bd">&#10003; Notikusi</span>'
+    : b.status==='Atcelta' ? '<span class="badge bc">Atcelta</span>'
+    : b.status==='Ieradušies' ? '<span class="badge bd">Ieradušies</span>'
+    : '<span class="badge ba">Aktīva</span>';
+
+  var ridesDisplay = (b.rides && b.rides > 0)
+    ? '<div class="bc-rides-total">&#127937; '+b.rides+'<div style="font-size:10px;color:var(--text3);font-weight:600;margin-top:2px;">~braucieni</div></div>' : '';
+
+  // Ēdienu statuss
+  var foodTxt = '';
+  if (b.food === 'PRECIZES') foodTxt = '<div class="bfd-status bfd-call">📞 Precizēs</div>';
+  else if (b.food === 'UZ_VIETAS') foodTxt = '<div class="bfd-status bfd-onsite">🙋 Uz vietas</div>';
+  else if (b.food) foodTxt = '<div style="font-size:12px;color:var(--text2);">'+esc(b.food)+'</div>';
+
+  var drinksTxt = '';
+  if (b.drinks === 'PRECIZES') drinksTxt = '<div class="bfd-status bfd-call">📞 Precizēs</div>';
+  else if (b.drinks === 'UZ_VIETAS') drinksTxt = '<div class="bfd-status bfd-onsite">🙋 Uz vietas</div>';
+  else if (b.drinks) drinksTxt = '<div style="font-size:12px;color:var(--text2);">'+esc(b.drinks)+'</div>';
+
+  // Rekvizīti
+  var rek = null;
+  try { rek = b.rekviziti ? JSON.parse(b.rekviziti) : null; } catch(e){}
+  var rekTxt = '';
+  if (rek && rek.later) rekTxt = '<div style="color:#facc15;font-size:11px;font-weight:700;">⚠️ NOSKAIDROT</div>';
+  else if (rek && (rek.name||rek.reg)) rekTxt = '<div style="font-size:11px;color:var(--text2);">'+(rek.name?esc(rek.name):'')+(rek.reg?' · '+esc(rek.reg):'')+'</div>';
+
+  var closedBanner = b.closed ? '<div class="bclosed"><span class="bnow-dot" style="background:var(--red)"></span>Slēgtais pasākums</div>' : '';
+
+  return '<div class="bcard '+sc+'" style="margin-bottom:12px;">'
+    + '<div class="bc-grid">'
+    + '<div class="bc-time"><div class="btime">'+tf+'</div><div class="bsep">|</div><div class="btime2">'+tt+'</div><div style="margin-top:8px;">'+bdg+'</div>'+ridesDisplay+'</div>'
+    + '<div class="bc-info">'
+    +   '<div class="bcc">'+esc(b.client||'—')+'</div>'
+    +   '<div class="bmeta-r">&#128222; '+esc(b.phone||'—')+'</div>'
+    +   (b.email ? '<div class="bmeta-r">&#128231; '+esc(b.email)+'</div>' : '')
+    +   '<div class="bmeta-r" style="font-size:17px;font-weight:700;color:#fff;">&#128101; '+b.people+' cilv.</div>'
+    +   (b.invoice ? '<div class="bmeta-r">&#128179; '+esc(b.invoice)+'</div>' : '')
+    +   (b.comment ? '<div class="bcmt-s">&#128172; '+esc(b.comment)+'</div>' : '')
+    +   (b.admin ? '<div class="badm">&#128105;&#8205;&#128188; '+esc(b.admin)+' &middot; '+esc(b.accepted)+'</div>' : '')
+    + '</div>'
+    + '<div class="bc-rides"><div class="bextra-title">&#127937; Braucieni</div><div style="font-size:28px;font-weight:700;text-align:center;">'+(b.rides||0)+'</div></div>'
+    + '<div class="bc-food"><div class="bextra-title">&#127829; Ēdieni</div>'+foodTxt+'</div>'
+    + '<div class="bc-food"><div class="bextra-title">&#127864; Dzērieni</div>'+drinksTxt+'</div>'
+    + '<div class="bc-rek"><div class="bextra-title">&#128196; Rekvizīti</div>'+rekTxt+'</div>'
+    + '<div class="bc-btns"></div>'
+    + '</div>'
+    + closedBanner
+    + '</div>';
 }
 function newForDate() {
   goNav('new', document.getElementById('nb-new'));
