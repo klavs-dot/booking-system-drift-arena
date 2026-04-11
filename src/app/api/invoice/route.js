@@ -39,7 +39,18 @@ export async function POST(req) {
       return NextResponse.json({ ok: false, error: 'Šablons nav atrasts!' }, { status: 400 });
     }
 
-    // 2. Kopēt šablonu
+    // 2. Ja lapa ar šo nosaukumu jau eksistē — dzēst to (labošana)
+    const existingSheet = meta.data.sheets.find(s => s.properties.title === invNumber);
+    if (existingSheet) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: INVOICE_SHEET_ID,
+        resource: {
+          requests: [{ deleteSheet: { sheetId: existingSheet.properties.sheetId } }]
+        }
+      });
+    }
+
+    // 3. Kopēt šablonu
     const copyRes = await sheets.spreadsheets.sheets.copyTo({
       spreadsheetId: INVOICE_SHEET_ID,
       sheetId: templateSheet.properties.sheetId,
@@ -47,7 +58,7 @@ export async function POST(req) {
     });
     const newSheetId = copyRes.data.sheetId;
 
-    // 3. Pārsaukt un pārvietot
+    // 4. Pārsaukt un pārvietot
     await sheets.spreadsheets.batchUpdate({
       spreadsheetId: INVOICE_SHEET_ID,
       resource: {
