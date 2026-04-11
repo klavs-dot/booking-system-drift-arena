@@ -2735,7 +2735,24 @@ window.google={script:{run:window.__gsr__}};
       <div class="ptitle">RĒĶINI</div>
       <div class="psub">Rēķinu ģenerēšana un pārvaldība</div>
     </div>
-    <button class="btn btn-p" onclick="openStandaloneInvoice()" style="padding:10px 20px;font-size:13px;">＋ Jauns rēķins</button>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <button class="btn btn-s" onclick="document.getElementById('inv_export_panel').style.display=document.getElementById('inv_export_panel').style.display==='none'?'block':'none'" style="padding:8px 14px;font-size:11px;">📁 Eksportēt ZIP</button>
+      <button class="btn btn-p" onclick="openStandaloneInvoice()" style="padding:10px 20px;font-size:13px;">＋ Jauns rēķins</button>
+    </div>
+  </div>
+
+  <!-- Eksporta panelis -->
+  <div id="inv_export_panel" style="display:none;margin-top:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;">
+    <div style="font-family:var(--font-head);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;">📁 Rēķinu eksports grāmatvedībai</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+      <button class="btn" onclick="invExportZip('lastmonth')" style="padding:8px 16px;background:#0c1e3d;color:#60a5fa;border:1px solid #1d4ed8;font-weight:700;">📅 Pagājušā mēneša apmaksātie</button>
+      <div style="display:flex;gap:8px;align-items:flex-end;">
+        <div class="field" style="margin:0;"><label style="font-size:9px;">No</label><input type="date" id="inv_exp_from" style="padding:6px;font-size:12px;width:140px;"></div>
+        <div class="field" style="margin:0;"><label style="font-size:9px;">Līdz</label><input type="date" id="inv_exp_to" style="padding:6px;font-size:12px;width:140px;"></div>
+        <button class="btn btn-p" onclick="invExportZip('custom')" style="padding:8px 16px;font-size:12px;">📁 Lejupielādēt</button>
+      </div>
+    </div>
+    <div id="inv_export_status" style="margin-top:8px;font-size:11px;color:var(--text3);"></div>
   </div>
 
   <!-- Statistika -->
@@ -6702,6 +6719,91 @@ function invSendEmail() {
     var body = 'Sveiki,\n\nPielikumā nosūtam rēķinu.\n\nPriecāsimies par savlaicīgu apmaksu un gaidīsim Jūs ciemos atkal.\n\nAr cieņu,\nDrift Arena komanda';
     window.open('mailto:'+email+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body), '_blank');
   }, 500);
+}
+
+// ══ RĒĶINU ZIP EKSPORTS ══
+function invExportZip(mode) {
+  var inv = ALL.filter(function(b) {
+    return b.status !== 'Atcelta' && b.invoice && (b.invoice.includes('rēķin') || b.invoice.includes('rēķīn'));
+  });
+  // Pievienot standalone
+  var sList = []; try{sList=JSON.parse(localStorage.getItem('inv_standalone_list')||'[]');}catch(e){}
+  sList.forEach(function(si){ inv.push(si); });
+
+  var fromDate, toDate, label;
+  if (mode === 'lastmonth') {
+    var now = new Date();
+    fromDate = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().slice(0,10);
+    toDate = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().slice(0,10);
+    label = 'Rekini_' + MLV[now.getMonth()-1<0?11:now.getMonth()-1] + '_' + (now.getMonth()===0?now.getFullYear()-1:now.getFullYear());
+  } else {
+    fromDate = document.getElementById('inv_exp_from').value;
+    toDate = document.getElementById('inv_exp_to').value;
+    if (!fromDate || !toDate) { toast('Ievadi abus datumus!', 'warn'); return; }
+    label = 'Rekini_' + fromDate + '_lidz_' + toDate;
+  }
+
+  // Filtrēt — tikai apmaksātie norādītajā periodā
+  var filtered = inv.filter(function(b) {
+    var st = getInvStatus(b);
+    if (st !== 'paid') return false;
+    var paidDate = localStorage.getItem('inv_paid_date_'+b.id) || b.date || '';
+    return paidDate >= fromDate && paidDate <= toDate;
+  });
+
+  if (!filtered.length) {
+    document.getElementById('inv_export_status').innerHTML = '<span style="color:#facc15;">⚠️ Nav apmaksātu rēķinu šajā periodā ('+fromDate+' – '+toDate+')</span>';
+    return;
+  }
+
+  // Savākt PDF no localStorage
+  var files = [];
+  var missing = [];
+  filtered.forEach(function(b) {
+    var pdf = localStorage.getItem('inv_pdf_'+b.id);
+    var rek2 = null; try{rek2=b.rekviziti?JSON.parse(b.rekviziti):null;}catch(e){}
+    var nm = (rek2&&rek2.name?rek2.name:b.client||'rekins').replace(/[^a-zA-ZāčēģīķļņšūžĀČĒĢĪĶĻŅŠŪŽ0-9 ]/g,'').replace(/\s+/g,'_');
+    var fname = nm + '_' + (b.date||'') + '.pdf';
+    if (pdf) {
+      files.push({name: fname, data: pdf});
+    } else {
+      missing.push(nm);
+    }
+  });
+
+  if (!files.length) {
+    document.getElementById('inv_export_status').innerHTML = '<span style="color:var(--red);">❌ Nav saglabātu PDF failu. Lejupielādē katru rēķinu atsevišķi vispirms.</span>';
+    return;
+  }
+
+  document.getElementById('inv_export_status').innerHTML = '⏳ Gatavo ZIP ('+files.length+' rēķini)...' + (missing.length ? '<br><span style="color:#facc15;">⚠️ Trūkst PDF: '+missing.join(', ')+'</span>' : '');
+
+  // Ielādēt JSZip
+  if (!window.JSZip) {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload = function(){ buildZip(files, label); };
+    s.onerror = function(){ toast('Nevar ielādēt ZIP bibliotēku', 'err'); };
+    document.head.appendChild(s);
+  } else {
+    buildZip(files, label);
+  }
+}
+
+function buildZip(files, label) {
+  var zip = new JSZip();
+  files.forEach(function(f) {
+    // Konvertēt data URI uz binary
+    var b64 = f.data.split(',')[1];
+    zip.file(f.name, b64, {base64: true});
+  });
+  zip.generateAsync({type:'blob'}).then(function(blob) {
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = label + '.zip';
+    link.click();
+    document.getElementById('inv_export_status').innerHTML = '<span style="color:#22c55e;">✅ ZIP lejupielādēts: '+files.length+' rēķini</span>';
+  });
 }
 
 // ══ MASTER ADMIN ══
