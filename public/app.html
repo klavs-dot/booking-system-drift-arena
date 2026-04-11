@@ -5978,17 +5978,17 @@ function renderInvoices() {
 
     html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">'
       + '<div style="min-width:130px;"><div style="font-size:13px;font-weight:700;color:var(--text);">'+dateFmt+'</div><div style="font-size:11px;color:var(--text3);">'+cleanT(b.timeFrom)+' – '+cleanT(b.timeTo)+'</div></div>'
-      + '<div style="flex:1;min-width:150px;"><div style="font-size:14px;font-weight:700;">'+esc(rekName)+'</div><div style="font-size:11px;color:var(--text3);">'+esc(b.client)+'</div></div>'
-      + '<div style="min-width:80px;text-align:center;"><div style="font-size:11px;color:var(--text3);">Cilv.</div><div style="font-size:18px;font-weight:700;">'+b.people+'</div></div>'
-      + '<div style="min-width:80px;text-align:center;"><div style="font-size:11px;color:var(--text3);">Braucieni</div><div style="font-size:18px;font-weight:700;color:var(--accent);">'+(b.rides||0)+'</div></div>'
-      + '<div style="min-width:160px;text-align:center;">'+stBadge+'</div>'
-      + '<div style="min-width:80px;"><div style="font-size:10px;color:var(--text3);">'+esc(b.invoice)+'</div></div>'
+      + '<div style="flex:1;min-width:180px;"><div style="font-size:16px;font-weight:800;">'+esc(rekName)+'</div><div style="font-size:11px;color:var(--text3);">'+esc(b.client)+'</div></div>'
+      + '<div style="flex:1;text-align:center;">'+stBadge+'</div>'
+      + '<div style="min-width:80px;text-align:center;"><div style="font-size:10px;color:var(--text3);">'+esc(b.invoice)+'</div></div>'
+      + '<div style="display:flex;gap:6px;align-items:center;">'
       + '<button class="btn btn-p" onclick="openInvoice(\''+b.id+'\')" style="padding:6px 14px;font-size:12px;">🧾 Rēķins</button>'
       + '<button class="btn btn-s" onclick="invChangeStatus(\''+b.id+'\')" style="padding:4px 8px;font-size:9px;">🔄</button>'
       + (function(){
           var url = localStorage.getItem('inv_sheet_'+b.id);
           return url ? '<a href="'+url+'" target="_blank" style="padding:6px 10px;font-size:11px;background:var(--card2);color:var(--text2);border:1px solid var(--border2);border-radius:var(--r);text-decoration:none;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;">📝 Sheets</a>' : '';
         })()
+      + '</div>'
       + '</div>';
   });
   html += '</div>';
