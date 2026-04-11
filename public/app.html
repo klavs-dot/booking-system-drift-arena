@@ -2942,6 +2942,7 @@ window.google={script:{run:window.__gsr__}};
 
 /* Rēķinu statusi */
 .inv-st { padding:4px 10px;border-radius:4px;font-size:10px;font-weight:800;font-family:var(--font-head);letter-spacing:1px;text-transform:uppercase;display:inline-block; }
+.inv-st-lg { font-size:14px;padding:8px 18px;border-radius:6px;letter-spacing:1.5px; }
 .inv-st-send { background:#3d1228;color:#f472b6;border:1px solid #9d174d;animation:invPulseP 2s ease-in-out infinite; }
 .inv-st-sent { background:#2d2003;color:#facc15;border:1px solid #854d0e;animation:invPulseY 2s ease-in-out infinite; }
 .inv-st-wait { background:#0c1e3d;color:#60a5fa;border:1px solid #1d4ed8;animation:invPulseB 2s ease-in-out infinite; }
@@ -5979,11 +5980,10 @@ function renderInvoices() {
     html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">'
       + '<div style="min-width:130px;"><div style="font-size:13px;font-weight:700;color:var(--text);">'+dateFmt+'</div><div style="font-size:11px;color:var(--text3);">'+cleanT(b.timeFrom)+' – '+cleanT(b.timeTo)+'</div></div>'
       + '<div style="flex:1;min-width:180px;"><div style="font-size:16px;font-weight:800;">'+esc(rekName)+'</div><div style="font-size:11px;color:var(--text3);">'+esc(b.client)+'</div></div>'
-      + '<div style="flex:1;text-align:center;">'+stBadge+'</div>'
+      + '<div style="flex:1;text-align:center;"><div style="display:inline-flex;align-items:center;gap:6px;">'+stBadge.replace('inv-st ', 'inv-st inv-st-lg ')+'<button onclick="invChangeStatus(\''+b.id+'\')" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:3px;padding:2px 6px;cursor:pointer;font-size:8px;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border2)\';this.style.color=\'var(--text3)\'">mainīt</button></div></div>'
       + '<div style="min-width:80px;text-align:center;"><div style="font-size:10px;color:var(--text3);">'+esc(b.invoice)+'</div></div>'
       + '<div style="display:flex;gap:6px;align-items:center;">'
       + '<button class="btn btn-p" onclick="openInvoice(\''+b.id+'\')" style="padding:6px 14px;font-size:12px;">🧾 Rēķins</button>'
-      + '<button class="btn btn-s" onclick="invChangeStatus(\''+b.id+'\')" style="padding:4px 8px;font-size:9px;">🔄</button>'
       + (function(){
           var url = localStorage.getItem('inv_sheet_'+b.id);
           return url ? '<a href="'+url+'" target="_blank" style="padding:6px 10px;font-size:11px;background:var(--card2);color:var(--text2);border:1px solid var(--border2);border-radius:var(--r);text-decoration:none;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;">📝 Sheets</a>' : '';
