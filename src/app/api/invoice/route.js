@@ -32,18 +32,17 @@ export async function POST(req) {
     const isTelpa = data.isTelpa;
     const invNumber = data.invNumber || 'Rēķins';
 
-    // 1. Atrast Šablons sheet ID
+    // 1. Atrast Šablons
     const meta = await sheets.spreadsheets.get({ spreadsheetId: INVOICE_SHEET_ID });
     const templateSheet = meta.data.sheets.find(s => s.properties.title === 'Šablons');
     if (!templateSheet) {
       return NextResponse.json({ ok: false, error: 'Šablons nav atrasts!' }, { status: 400 });
     }
-    const templateSheetId = templateSheet.properties.sheetId;
 
     // 2. Kopēt šablonu
     const copyRes = await sheets.spreadsheets.sheets.copyTo({
       spreadsheetId: INVOICE_SHEET_ID,
-      sheetId: templateSheetId,
+      sheetId: templateSheet.properties.sheetId,
       resource: { destinationSpreadsheetId: INVOICE_SHEET_ID }
     });
     const newSheetId = copyRes.data.sheetId;
@@ -86,7 +85,88 @@ export async function POST(req) {
     const netGrand = grandTotal / 1.21;
     const vatGrand = grandTotal - netGrand;
 
-    // 5. Find-and-replace placeholders
+    // 5. Nolasīt šablona saturu lai atrastu tabulas header rindu
+    const sheetData = await sheets.spreadsheets.values.get({
+      spreadsheetId: INVOICE_SHEET_ID,
+      range: `'${invNumber}'!A1:F100`,
+    });
+    const rows = sheetData.data.values || [];
+
+    // Atrast rindu kur ir "NOSAUKUMS" (tabulas header)
+    let tableHeaderRow = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i] && rows[i].some(c => String(c).includes('NOSAUKUMS') && !String(c).includes('{{'))) {
+        tableHeaderRow = i;
+        break;
+      }
+    }
+
+    if (tableHeaderRow === -1) {
+      // Fallback — ja nav atrasts, meklē pēc placeholder
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i] && rows[i].some(c => String(c).includes('{{POZ_1'))) {
+          tableHeaderRow = i - 1;
+          break;
+        }
+      }
+    }
+
+    if (tableHeaderRow === -1) tableHeaderRow = 13; // fallback
+
+    // Atrast cik placeholder pozīciju rindu ir šablonā ({{POZ_...}})
+    let placeholderStart = tableHeaderRow + 1;
+    let placeholderEnd = placeholderStart;
+    for (let i = placeholderStart; i < rows.length; i++) {
+      if (rows[i] && rows[i].some(c => String(c).includes('{{POZ_'))) {
+        placeholderEnd = i + 1;
+      } else {
+        break;
+      }
+    }
+    const placeholderCount = placeholderEnd - placeholderStart;
+
+    // 6. Ja vajag vairāk rindu nekā placeholderiem — iespraust papildus
+    const needed = positions.length;
+    const batchRequests = [];
+
+    if (needed > placeholderCount) {
+      const extraRows = needed - placeholderCount;
+      batchRequests.push({
+        insertDimension: {
+          range: {
+            sheetId: newSheetId,
+            dimension: 'ROWS',
+            startIndex: placeholderEnd,
+            endIndex: placeholderEnd + extraRows,
+          },
+          inheritFromBefore: true,
+        }
+      });
+    }
+
+    if (batchRequests.length > 0) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: INVOICE_SHEET_ID,
+        resource: { requests: batchRequests }
+      });
+    }
+
+    // 7. Aizpildīt pozīciju rindas
+    const posValues = positions.map(p => ['', p.name, '', String(p.qty), p.price.toFixed(2), p.sum.toFixed(2)]);
+    // Ja ir mazāk pozīciju nekā placeholder — aizpildīt tukšas
+    while (posValues.length < Math.max(placeholderCount, needed)) {
+      posValues.push(['', '', '', '', '', '']);
+    }
+
+    const posStartRow = placeholderStart + 1; // 1-indexed
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: INVOICE_SHEET_ID,
+      range: `'${invNumber}'!A${posStartRow}:F${posStartRow + posValues.length - 1}`,
+      valueInputOption: 'USER_ENTERED',
+      resource: { values: posValues }
+    });
+
+    // 8. Aizstāt header/footer placeholderus
     const replacements = {
       '{{REKINA_NR}}': invNumber,
       '{{DATUMS}}': data.date || '',
@@ -100,19 +180,9 @@ export async function POST(req) {
       '{{KOPA_APMAKSAI}}': grandTotal.toFixed(2) + ' EUR',
     };
 
-    // Pozīcijas 1-5
-    for (let i = 1; i <= 5; i++) {
-      const p = positions[i - 1];
-      replacements['{{POZ_' + i + '_NOSAUKUMS}}'] = p ? p.name : '';
-      replacements['{{POZ_' + i + '_DAUDZ}}'] = p ? String(p.qty) : '';
-      replacements['{{POZ_' + i + '_CENA}}'] = p ? p.price.toFixed(2) : '';
-      replacements['{{POZ_' + i + '_SUMMA}}'] = p ? p.sum.toFixed(2) : '';
-    }
-
-    // Batch find-and-replace
     const replaceRequests = Object.entries(replacements).map(([find, replace]) => ({
       findReplace: {
-        find: find,
+        find,
         replacement: replace,
         sheetId: newSheetId,
         matchCase: true,
@@ -120,12 +190,49 @@ export async function POST(req) {
       }
     }));
 
-    await sheets.spreadsheets.batchUpdate({
-      spreadsheetId: INVOICE_SHEET_ID,
-      resource: { requests: replaceRequests }
-    });
+    // Notīrīt arī neizmantotos POZ placeholderus
+    for (let i = 1; i <= 200; i++) {
+      ['NOSAUKUMS', 'DAUDZ', 'CENA', 'SUMMA'].forEach(f => {
+        replaceRequests.push({
+          findReplace: {
+            find: '{{POZ_' + i + '_' + f + '}}',
+            replacement: '',
+            sheetId: newSheetId,
+            matchCase: true,
+            matchEntireCell: false,
+          }
+        });
+      });
+    }
 
-    // 6. Eksportēt kā PDF
+    // Sūta pa 100 lai nepārsniedz API limitus
+    for (let i = 0; i < replaceRequests.length; i += 100) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: INVOICE_SHEET_ID,
+        resource: { requests: replaceRequests.slice(i, i + 100) }
+      });
+    }
+
+    // 9. Formatēt jaunās pozīciju rindas ar oranžām malām
+    const orange = { red: 0.91, green: 0.30, blue: 0.05, alpha: 1 };
+    const borderStyle = { style: 'SOLID', color: orange };
+    const formatRequests = [];
+    for (let r = placeholderStart; r < placeholderStart + needed; r++) {
+      formatRequests.push({
+        updateBorders: {
+          range: { sheetId: newSheetId, startRowIndex: r, endRowIndex: r + 1, startColumnIndex: 1, endColumnIndex: 6 },
+          top: borderStyle, bottom: borderStyle, left: borderStyle, right: borderStyle,
+        }
+      });
+    }
+    if (formatRequests.length > 0) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: INVOICE_SHEET_ID,
+        resource: { requests: formatRequests }
+      });
+    }
+
+    // 10. Eksportēt PDF
     const authClient = await auth.getClient();
     const token = await authClient.getAccessToken();
 
@@ -140,7 +247,7 @@ export async function POST(req) {
     });
 
     if (!pdfRes.ok) {
-      return NextResponse.json({ ok: false, error: 'PDF eksports neizdevās: ' + pdfRes.status }, { status: 500 });
+      return NextResponse.json({ ok: false, error: 'PDF eksports: ' + pdfRes.status }, { status: 500 });
     }
 
     const pdfBuffer = await pdfRes.arrayBuffer();
