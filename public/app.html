@@ -6135,18 +6135,21 @@ function invAddDrink() {
   document.getElementById('inv_drink_name').value = '';
   document.getElementById('inv_drink_qty').value = '1';
   document.getElementById('inv_drink_price').value = '';
+  invOnChange();
   invRenderDrinks();
   invRecalc();
 }
 
 function invRemoveDrink(idx) {
   _invDrinks.splice(idx, 1);
+  invOnChange();
   invRenderDrinks();
   invRecalc();
 }
 
 function invDrinkPriceChange(idx, val) {
   _invDrinks[idx].price = parseFloat(val) || 0;
+  invOnChange();
   invRecalc();
 }
 
