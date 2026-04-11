@@ -5966,6 +5966,10 @@ function renderInvoices() {
       + '<div style="min-width:60px;"><div style="font-size:10px;color:var(--text3);">'+esc(b.invoice)+'</div></div>'
       + (isTelpa ? '<div style="font-size:10px;color:#22c55e;">🏢 Telpu noma</div>' : '')
       + '<button class="btn btn-p" onclick="openInvoice(\''+b.id+'\')" style="padding:6px 14px;font-size:12px;">🧾 Rēķins</button>'
+      + (function(){
+          var url = localStorage.getItem('inv_sheet_'+b.id);
+          return url ? '<a href="'+url+'" target="_blank" style="padding:6px 10px;font-size:11px;background:var(--card2);color:var(--text2);border:1px solid var(--border2);border-radius:var(--r);text-decoration:none;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;">📝 Sheets</a>' : '';
+        })()
       + '</div>';
   });
   html += '</div>';
@@ -6139,7 +6143,7 @@ function invGeneratePDF() {
   // Saglabāt rēķina numuru
   localStorage.setItem('inv_count_'+data.dateKey, data.dayCount);
 
-  ovl('Ģenerē rēķinu...');
+  ovl('Ģenerē rēķinu Google Sheets...');
   fetch('/api/invoice', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
@@ -6155,10 +6159,14 @@ function invGeneratePDF() {
       link.download = data.invNumber.replace(/[#\/]/g,'_')+'.pdf';
       link.click();
       localStorage.setItem('inv_sent_'+_invBooking.id, '1');
-      toast('✓ Rēķins lejupielādēts: '+data.invNumber, 'ok');
+      // Rādīt Sheets linku
+      if (res.sheetUrl) {
+        localStorage.setItem('inv_sheet_'+_invBooking.id, res.sheetUrl);
+      }
+      toast('✓ Rēķins ģenerēts: '+data.invNumber, 'ok');
       renderInvoices();
     } else {
-      toast('Kļūda ģenerējot PDF: '+(res.error||''), 'err');
+      toast('Kļūda: '+(res.error||'Nezināma kļūda'), 'err');
     }
   })
   .catch(function(e){ hovl(); toast('Kļūda: '+e.message, 'err'); });
