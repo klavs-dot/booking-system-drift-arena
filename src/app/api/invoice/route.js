@@ -115,7 +115,6 @@ export async function POST(req) {
         find: find,
         replacement: replace,
         sheetId: newSheetId,
-        allSheets: false,
         matchCase: true,
         matchEntireCell: false,
       }
