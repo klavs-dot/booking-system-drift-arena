@@ -6334,7 +6334,9 @@ function invDownloadPDF() {
     var link = document.createElement('a');
     link.href = pdfData;
     var num = localStorage.getItem('inv_number_'+b.id) || 'rekins';
-    link.download = num.replace(/[#\/]/g,'_')+'.pdf';
+    var rek2 = null; try{rek2=b.rekviziti?JSON.parse(b.rekviziti):null;}catch(e){}
+    var cName = (rek2&&rek2.name?rek2.name:b.client).replace(/[^a-zA-ZāčēģīķļņšūžĀČĒĢĪĶĻŅŠŪŽ0-9 ]/g,'').replace(/\s+/g,'_');
+    link.download = cName+'_'+b.date+'.pdf';
     link.click();
   } else {
     invGeneratePDF();
@@ -6417,7 +6419,9 @@ function invGeneratePDF() {
       localStorage.setItem('inv_pdf_'+_invBooking.id, res.pdf);
       var link = document.createElement('a');
       link.href = res.pdf;
-      link.download = data.invNumber.replace(/[#\/]/g,'_')+'.pdf';
+      var rek2 = null; try{rek2=_invBooking.rekviziti?JSON.parse(_invBooking.rekviziti):null;}catch(e){}
+      var cName = (rek2&&rek2.name?rek2.name:_invBooking.client).replace(/[^a-zA-ZāčēģīķļņšūžĀČĒĢĪĶĻŅŠŪŽ0-9 ]/g,'').replace(/\s+/g,'_');
+      link.download = cName+'_'+_invBooking.date+'.pdf';
       link.click();
       localStorage.setItem('inv_sent_'+_invBooking.id, '1');
       localStorage.setItem('inv_sent_date_'+_invBooking.id, new Date().toISOString().slice(0,10));
