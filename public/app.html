@@ -2730,9 +2730,12 @@ window.google={script:{run:window.__gsr__}};
 
 <!-- ══ RĒĶINI ══ -->
 <div class="view" id="view-invoices">
-  <div class="phdr">
-    <div class="ptitle">RĒĶINI</div>
-    <div class="psub">Rēķinu ģenerēšana un pārvaldība</div>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+    <div class="phdr" style="margin:0;padding:0;">
+      <div class="ptitle">RĒĶINI</div>
+      <div class="psub">Rēķinu ģenerēšana un pārvaldība</div>
+    </div>
+    <button class="btn btn-p" onclick="openStandaloneInvoice()" style="padding:10px 20px;font-size:13px;">＋ Jauns rēķins</button>
   </div>
 
   <!-- Statistika -->
@@ -6101,6 +6104,7 @@ function invChangeStatus(id) {
 function openInvoice(id) {
   var b = ALL.find(function(x){return x.id===id;});
   if (!b) return;
+  _invStandalone = false;
   _invBooking = b;
   _invDrinks = [];
   document.getElementById('inv_booking_id').value = id;
@@ -6317,6 +6321,63 @@ var _invGenerated = false;
 var _invEditing = false;
 var _invOther = [];
 var _invBlockOff = { rides: false, drinks: false, other: true };
+var _invStandalone = false;
+
+function openStandaloneInvoice() {
+  _invStandalone = true;
+  _invBooking = null;
+  _invDrinks = [];
+  _invOther = [];
+  _invBlockOff = {rides:true, drinks:true, other:false};
+  _invGenerated = false;
+  _invEditing = false;
+
+  var fakeId = 'standalone_'+Date.now();
+  document.getElementById('inv_booking_id').value = fakeId;
+
+  document.getElementById('inv-booking-info').innerHTML =
+    '<div style="background:var(--card);border:1px solid var(--accent);border-radius:var(--r);padding:12px 16px;">'
+    + '<div style="font-size:15px;font-weight:800;color:var(--accent);">📝 Brīvs rēķins</div>'
+    + '<div style="font-size:12px;color:var(--text3);margin-top:4px;">Ievadi saņēmēja datus un pozīcijas</div>'
+    + '<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
+    + '<div class="field"><label>Saņēmēja nosaukums</label><input type="text" id="inv_sa_name" placeholder="SIA Nosaukums"></div>'
+    + '<div class="field"><label>Reģ. Nr.</label><input type="text" id="inv_sa_reg" placeholder="40000000000"></div>'
+    + '<div class="field"><label>PVN Nr.</label><input type="text" id="inv_sa_pvn" placeholder="LV40000000000"></div>'
+    + '<div class="field"><label>Adrese</label><input type="text" id="inv_sa_addr" placeholder="Pilsēta, iela, LV-0000"></div>'
+    + '<div class="field"><label>E-pasts</label><input type="email" id="inv_sa_email" placeholder="info@uznemums.lv"></div>'
+    + '<div class="field"><label>Telefons</label><input type="text" id="inv_sa_phone" placeholder="+371 20000000"></div>'
+    + '</div>'
+    + '</div>';
+
+  document.getElementById('inv_rides_qty').value = 0;
+  document.getElementById('inv_rides_price').value = '';
+  var telpaCb = document.getElementById('inv_telpa');
+  if (telpaCb) telpaCb.checked = false;
+
+  // Sinhronizēt toggles
+  ['rides','drinks','other'].forEach(function(block) {
+    var body = document.getElementById('inv_'+block+'_body');
+    var btn = document.getElementById('inv_'+block+'_toggle');
+    if (body && btn) {
+      if (_invBlockOff[block]) {
+        body.style.display = 'none';
+        btn.textContent = 'Ieslēgt'; btn.style.border='1px solid #16a34a'; btn.style.background='#0d2e16'; btn.style.color='#22c55e';
+      } else {
+        body.style.display = '';
+        btn.textContent = 'Izslēgt'; btn.style.border='1px solid var(--border2)'; btn.style.background='none'; btn.style.color='var(--text3)';
+      }
+    }
+  });
+
+  invRenderDrinks();
+  invRenderOther();
+  invRecalc();
+  invRenderButtons();
+  openM('M_INV');
+
+  document.getElementById('inv_rides_qty').oninput = function(){ invOnChange(); invRecalc(); };
+  document.getElementById('inv_rides_price').oninput = function(){ invOnChange(); invRecalc(); };
+}
 
 function invToggleBlock(block) {
   _invBlockOff[block] = !_invBlockOff[block];
@@ -6436,9 +6497,29 @@ function invDownloadPDF() {
 
 function invGetData() {
   var b = _invBooking;
-  if (!b) return null;
   var rek = null;
-  try { rek = b.rekviziti ? JSON.parse(b.rekviziti) : null; } catch(e){}
+  var client = '', email = '', phone = '', bookingDate = '', bookingTime = '', people = '';
+
+  if (_invStandalone) {
+    // Standalone — dati no formas
+    var saName = (document.getElementById('inv_sa_name')||{}).value || '';
+    var saReg = (document.getElementById('inv_sa_reg')||{}).value || '';
+    var saPvn = (document.getElementById('inv_sa_pvn')||{}).value || '';
+    var saAddr = (document.getElementById('inv_sa_addr')||{}).value || '';
+    email = (document.getElementById('inv_sa_email')||{}).value || '';
+    phone = (document.getElementById('inv_sa_phone')||{}).value || '';
+    client = saName || 'Klients';
+    rek = {name: saName, reg: saReg, pvn: saPvn, addr: saAddr};
+  } else {
+    if (!b) return null;
+    try { rek = b.rekviziti ? JSON.parse(b.rekviziti) : null; } catch(e){}
+    client = b.client;
+    email = b.email || '';
+    phone = b.phone || '';
+    bookingDate = b.date;
+    bookingTime = cleanT(b.timeFrom)+' – '+cleanT(b.timeTo);
+    people = b.people;
+  }
 
   var ridesQty = _invBlockOff.rides ? 0 : (parseInt(document.getElementById('inv_rides_qty').value) || 0);
   var ridesPrice = _invBlockOff.rides ? 0 : (parseFloat(document.getElementById('inv_rides_price').value) || 0);
@@ -6446,8 +6527,9 @@ function invGetData() {
   var activeDrinks = _invBlockOff.drinks ? [] : _invDrinks.filter(function(d){return d.price > 0;});
   var activeOther = _invBlockOff.other ? [] : _invOther.filter(function(d){return d.price > 0;});
 
-  // Rēķina numurs — vienreiz per booking
-  var existingNumber = localStorage.getItem('inv_number_'+b.id);
+  // Rēķina numurs
+  var bid = b ? b.id : document.getElementById('inv_booking_id').value;
+  var existingNumber = localStorage.getItem('inv_number_'+bid);
   var invNumber, dateKey, dayCount;
   if (existingNumber) {
     invNumber = existingNumber;
@@ -6468,11 +6550,11 @@ function invGetData() {
     dayCount: dayCount,
     date: new Date().toLocaleDateString('lv-LV'),
     dueDate: new Date(Date.now() + 5*24*60*60*1000).toLocaleDateString('lv-LV'),
-    client: b.client,
-    email: b.email || '',
-    bookingDate: b.date,
-    bookingTime: cleanT(b.timeFrom)+' – '+cleanT(b.timeTo),
-    people: b.people,
+    client: client,
+    email: email,
+    bookingDate: bookingDate,
+    bookingTime: bookingTime,
+    people: people,
     rek: rek,
     isTelpa: isTelpa,
     rides: {qty: ridesQty, price: ridesPrice, total: ridesQty * ridesPrice},
@@ -6498,7 +6580,7 @@ function invGeneratePDF() {
   if (grandTotal <= 0) { toast('Ievadi vismaz vienu pozīciju ar cenu!', 'warn'); return; }
 
   localStorage.setItem('inv_count_'+data.dateKey, data.dayCount);
-  localStorage.setItem('inv_number_'+_invBooking.id, data.invNumber);
+  localStorage.setItem('inv_number_'+(_invBooking?_invBooking.id:document.getElementById('inv_booking_id').value), data.invNumber);
 
   ovl('Ģenerē rēķinu Google Sheets...');
   fetch('/api/invoice', {
@@ -6510,19 +6592,20 @@ function invGeneratePDF() {
   .then(function(res){
     hovl();
     if (res.ok && res.pdf) {
-      localStorage.setItem('inv_pdf_'+_invBooking.id, res.pdf);
+      localStorage.setItem('inv_pdf_'+(_invBooking?_invBooking.id:document.getElementById('inv_booking_id').value), res.pdf);
       var link = document.createElement('a');
       link.href = res.pdf;
-      var rek2 = null; try{rek2=_invBooking.rekviziti?JSON.parse(_invBooking.rekviziti):null;}catch(e){}
-      var cName = (rek2&&rek2.name?rek2.name:_invBooking.client).replace(/[^a-zA-ZāčēģīķļņšūžĀČĒĢĪĶĻŅŠŪŽ0-9 ]/g,'').replace(/\s+/g,'_');
-      link.download = cName+'_'+_invBooking.date+'.pdf';
+      var rek2 = null; try{rek2=_invBooking?JSON.parse(_invBooking.rekviziti):data.rek;}catch(e){rek2=data.rek;}
+      var cName = (rek2&&rek2.name?rek2.name:(data.client||'rekins')).replace(/[^a-zA-ZāčēģīķļņšūžĀČĒĢĪĶĻŅŠŪŽ0-9 ]/g,'').replace(/\s+/g,'_');
+      var fDate = _invBooking ? _invBooking.date : new Date().toISOString().slice(0,10);
+      link.download = cName+'_'+fDate+'.pdf';
       link.click();
-      localStorage.setItem('inv_sent_'+_invBooking.id, '1');
-      localStorage.setItem('inv_sent_date_'+_invBooking.id, new Date().toISOString().slice(0,10));
+      localStorage.setItem('inv_sent_'+(_invBooking?_invBooking.id:document.getElementById('inv_booking_id').value), '1');
+      localStorage.setItem('inv_sent_date_'+(_invBooking?_invBooking.id:document.getElementById('inv_booking_id').value), new Date().toISOString().slice(0,10));
       var gt = data.rides.total + data.drinks.reduce(function(s,d){return s+d.qty*d.price;},0) + (data.other||[]).reduce(function(s,d){return s+d.qty*d.price;},0);
-      localStorage.setItem('inv_total_'+_invBooking.id, gt.toFixed(2));
+      localStorage.setItem('inv_total_'+(_invBooking?_invBooking.id:document.getElementById('inv_booking_id').value), gt.toFixed(2));
       // Saglabāt rēķina datus lai var labot
-      localStorage.setItem('inv_data_'+_invBooking.id, JSON.stringify({
+      localStorage.setItem('inv_data_'+(_invBooking?_invBooking.id:document.getElementById('inv_booking_id').value), JSON.stringify({
         ridesQty: data.rides.qty,
         ridesPrice: data.rides.price,
         drinks: _invDrinks,
@@ -6530,7 +6613,7 @@ function invGeneratePDF() {
         isTelpa: data.isTelpa,
         blockOff: _invBlockOff
       }));
-      if (res.sheetUrl) localStorage.setItem('inv_sheet_'+_invBooking.id, res.sheetUrl);
+      if (res.sheetUrl) localStorage.setItem('inv_sheet_'+(_invBooking?_invBooking.id:document.getElementById('inv_booking_id').value), res.sheetUrl);
       _invGenerated = true;
       _invEditing = false;
       invRenderButtons();
