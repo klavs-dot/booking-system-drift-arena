@@ -2939,6 +2939,18 @@ window.google={script:{run:window.__gsr__}};
   25% { transform:translateX(-8px); }
   75% { transform:translateX(8px); }
 }
+
+/* Rēķinu statusi */
+.inv-st { padding:4px 10px;border-radius:4px;font-size:10px;font-weight:800;font-family:var(--font-head);letter-spacing:1px;text-transform:uppercase;display:inline-block; }
+.inv-st-send { background:#3d1228;color:#f472b6;border:1px solid #9d174d;animation:invPulseP 2s ease-in-out infinite; }
+.inv-st-sent { background:#2d2003;color:#facc15;border:1px solid #854d0e;animation:invPulseY 2s ease-in-out infinite; }
+.inv-st-wait { background:#0c1e3d;color:#60a5fa;border:1px solid #1d4ed8;animation:invPulseB 2s ease-in-out infinite; }
+.inv-st-late { background:#3b0808;color:#ef4444;border:1px solid #dc2626;animation:invStrobe .4s linear infinite; }
+.inv-st-paid { background:#0d2e16;color:#22c55e;border:1px solid #16a34a; }
+@keyframes invPulseP { 0%,100%{box-shadow:0 0 0 0 rgba(244,114,182,0.4);} 50%{box-shadow:0 0 0 8px rgba(244,114,182,0);} }
+@keyframes invPulseY { 0%,100%{box-shadow:0 0 0 0 rgba(250,204,21,0.4);} 50%{box-shadow:0 0 0 8px rgba(250,204,21,0);} }
+@keyframes invPulseB { 0%,100%{box-shadow:0 0 0 0 rgba(96,165,250,0.4);} 50%{box-shadow:0 0 0 8px rgba(96,165,250,0);} }
+@keyframes invStrobe { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
 </style>
 </div>
 
@@ -4520,7 +4532,7 @@ function renderCardReadonly(b) {
     +   '<div class="bmeta-r">&#128222; '+esc(b.phone||'—')+'</div>'
     +   (b.email ? '<div class="bmeta-r">&#128231; '+esc(b.email)+'</div>' : '')
     +   '<div class="bmeta-r" style="font-size:17px;font-weight:700;color:#fff;">&#128101; '+b.people+' cilv.</div>'
-    +   (b.invoice ? '<div class="bmeta-r">&#128179; '+esc(b.invoice)+'</div>' : '')
+    +   (b.invoice ? '<div class="bmeta-r">&#128179; '+esc(b.invoice)+' '+((b.invoice.includes('rēķin')||b.invoice.includes('rēķīn'))?getInvStatusBadge(b):'')+'</div>' : '')
     +   (b.comment ? '<div class="bcmt-s">&#128172; '+esc(b.comment)+'</div>' : '')
     +   (b.admin ? '<div class="badm">&#128105;&#8205;&#128188; '+esc(b.admin)+' &middot; '+esc(b.accepted)+'</div>' : '')
     + '</div>'
@@ -4745,7 +4757,7 @@ function renderCard(b, nowMin) {
     +   '<div class="bmeta-r">&#128222; '+esc(b.phone||'—')+'</div>'
     +   (b.email ? '<div class="bmeta-r">&#128231; '+esc(b.email)+'</div>' : '')
     +   '<div class="bmeta-r" style="font-size:17px;font-weight:700;color:#fff;">&#128101; '+b.people+' cilv.</div>'
-    +   (b.invoice ? '<div class="bmeta-r">&#128179; '+esc(b.invoice)+'</div>' : '')
+    +   (b.invoice ? '<div class="bmeta-r">&#128179; '+esc(b.invoice)+' '+((b.invoice.includes('rēķin')||b.invoice.includes('rēķīn'))?getInvStatusBadge(b):'')+'</div>' : '')
     +   (b.invEmail ? '<div class="bmeta-r" style="color:var(--yellow);">&#128231; Rēķins: '+esc(b.invEmail)+'</div>' : '')
     +   (b.comment ? '<div class="bcmt-s">&#128172; '+esc(b.comment)+'</div>' : '')
     +   (b.admin ? '<div class="badm">&#128105;&#8205;&#128188; '+esc(b.admin)+' &middot; '+esc(b.accepted)+'</div>' : '')
@@ -5942,7 +5954,6 @@ var _invBooking = null;
 function renderInvoices() {
   var el = document.getElementById('INV_LIST');
   if (!el) return;
-  // Filtrē rezervācijas ar rēķinu
   var inv = ALL.filter(function(b) {
     return b.status !== 'Atcelta' && b.invoice && (b.invoice.includes('rēķin') || b.invoice.includes('rēķīn'));
   }).sort(function(a,b){ return a.date < b.date ? 1 : -1; });
@@ -5957,21 +5968,23 @@ function renderInvoices() {
     var rek = null;
     try { rek = b.rekviziti ? JSON.parse(b.rekviziti) : null; } catch(e){}
     var rekName = rek ? (rek.name || '—') : '—';
-    var isTelpa = rek && rek.telpa;
-    var invSent = localStorage.getItem('inv_sent_'+b.id);
-    var statusBadge = invSent
-      ? '<span style="background:#0d2e16;color:#22c55e;border:1px solid #22c55e;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;">✓ NOSŪTĪTS</span>'
-      : '<span style="background:#2d1e03;color:#facc15;border:1px solid #854d0e;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;">⏳ GAIDA</span>';
+
+    // Datuma formāts: dd. mēnesis, gggg
+    var dp = b.date.split('-');
+    var dateFmt = parseInt(dp[2])+'. '+MLV[parseInt(dp[1])-1]+', '+dp[0];
+
+    // Statuss
+    var stBadge = getInvStatusBadge(b);
 
     html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">'
-      + '<div style="min-width:90px;"><div style="font-size:13px;font-weight:700;color:var(--text);">'+esc(b.date)+'</div><div style="font-size:11px;color:var(--text3);">'+cleanT(b.timeFrom)+' – '+cleanT(b.timeTo)+'</div></div>'
+      + '<div style="min-width:130px;"><div style="font-size:13px;font-weight:700;color:var(--text);">'+dateFmt+'</div><div style="font-size:11px;color:var(--text3);">'+cleanT(b.timeFrom)+' – '+cleanT(b.timeTo)+'</div></div>'
       + '<div style="flex:1;min-width:150px;"><div style="font-size:14px;font-weight:700;">'+esc(rekName)+'</div><div style="font-size:11px;color:var(--text3);">'+esc(b.client)+'</div></div>'
       + '<div style="min-width:80px;text-align:center;"><div style="font-size:11px;color:var(--text3);">Cilv.</div><div style="font-size:18px;font-weight:700;">'+b.people+'</div></div>'
       + '<div style="min-width:80px;text-align:center;"><div style="font-size:11px;color:var(--text3);">Braucieni</div><div style="font-size:18px;font-weight:700;color:var(--accent);">'+(b.rides||0)+'</div></div>'
-      + '<div style="min-width:100px;text-align:center;">'+statusBadge+'</div>'
-      + '<div style="min-width:60px;"><div style="font-size:10px;color:var(--text3);">'+esc(b.invoice)+'</div></div>'
-      + (isTelpa ? '<div style="font-size:10px;color:#22c55e;">🏢 Telpu noma</div>' : '')
+      + '<div style="min-width:160px;text-align:center;">'+stBadge+'</div>'
+      + '<div style="min-width:80px;"><div style="font-size:10px;color:var(--text3);">'+esc(b.invoice)+'</div></div>'
       + '<button class="btn btn-p" onclick="openInvoice(\''+b.id+'\')" style="padding:6px 14px;font-size:12px;">🧾 Rēķins</button>'
+      + '<button class="btn btn-s" onclick="invChangeStatus(\''+b.id+'\')" style="padding:4px 8px;font-size:9px;">🔄</button>'
       + (function(){
           var url = localStorage.getItem('inv_sheet_'+b.id);
           return url ? '<a href="'+url+'" target="_blank" style="padding:6px 10px;font-size:11px;background:var(--card2);color:var(--text2);border:1px solid var(--border2);border-radius:var(--r);text-decoration:none;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;">📝 Sheets</a>' : '';
@@ -5980,6 +5993,83 @@ function renderInvoices() {
   });
   html += '</div>';
   el.innerHTML = html;
+}
+
+function getInvStatus(b) {
+  // Manuāli uzstādīts statuss
+  var manual = localStorage.getItem('inv_status_'+b.id);
+  if (manual) return manual;
+
+  var invSent = localStorage.getItem('inv_sent_'+b.id);
+  var isPre = b.invoice && b.invoice.includes('priekš');
+  var now = new Date();
+  var today = now.toISOString().slice(0,10);
+
+  if (!invSent) {
+    // Nav nosūtīts
+    if (isPre) return 'send'; // Priekšapmaksa — uzreiz jāsūta
+    if (b.status === 'Notikusi' || b.date < today) return 'send'; // Pēcapmaksa un pasākums beidzies
+    return 'pending';
+  }
+
+  // Ir nosūtīts — pārbaudīt apmaksas termiņu
+  var dueDate = localStorage.getItem('inv_due_'+b.id);
+  if (!dueDate) {
+    // Aprēķināt termiņu
+    if (isPre) {
+      // Priekšapmaksa — dienu pirms rezervācijas
+      var bd = new Date(b.date);
+      bd.setDate(bd.getDate() - 1);
+      dueDate = bd.toISOString().slice(0,10);
+    } else {
+      // Pēcapmaksa — 5 dienas pēc nosūtīšanas
+      var sentDate = localStorage.getItem('inv_sent_date_'+b.id) || today;
+      var dd = new Date(sentDate);
+      dd.setDate(dd.getDate() + 5);
+      dueDate = dd.toISOString().slice(0,10);
+    }
+    localStorage.setItem('inv_due_'+b.id, dueDate);
+  }
+
+  if (today > dueDate) return 'late'; // Kavē
+  return 'wait'; // Gaidam apmaksu
+}
+
+function getInvStatusBadge(b) {
+  var st = getInvStatus(b);
+  switch(st) {
+    case 'send': return '<span class="inv-st inv-st-send">📩 Nosūtīt rēķinu</span>';
+    case 'sent': return '<span class="inv-st inv-st-sent">📨 Rēķins nosūtīts</span>';
+    case 'wait': return '<span class="inv-st inv-st-wait">⏳ Gaidam apmaksu</span>';
+    case 'late': return '<span class="inv-st inv-st-late">🚨 Kavē maksājumu</span>';
+    case 'paid': return '<span class="inv-st inv-st-paid">✅ Apmaksāts</span>';
+    case 'pending': return '<span class="inv-st" style="color:var(--text3);border:1px solid var(--border2);">— Gaida</span>';
+    default: return '';
+  }
+}
+
+function invChangeStatus(id) {
+  // PIN pārbaude
+  var pin = prompt('Ievadi PIN kodu:');
+  if (pin !== _masterPin) { toast('Nepareizs PIN!', 'err'); return; }
+
+  var current = getInvStatus(ALL.find(function(b){return b.id===id;}));
+  var statuses = ['send','sent','wait','late','paid'];
+  var labels = ['Nosūtīt rēķinu','Rēķins nosūtīts','Gaidam apmaksu','Kavē maksājumu','Apmaksāts'];
+  var idx = statuses.indexOf(current);
+  var nextIdx = (idx + 1) % statuses.length;
+
+  var choice = prompt('Izvēlies statusu (1-5):\n1. '+labels[0]+'\n2. '+labels[1]+'\n3. '+labels[2]+'\n4. '+labels[3]+'\n5. '+labels[4]+'\n\nPašreizējais: '+labels[Math.max(idx,0)]);
+  var ci = parseInt(choice);
+  if (ci >= 1 && ci <= 5) {
+    localStorage.setItem('inv_status_'+id, statuses[ci-1]);
+    if (ci === 5) {
+      // Apmaksāts — saglabā datumu
+      localStorage.setItem('inv_paid_date_'+id, new Date().toISOString().slice(0,10));
+    }
+    renderInvoices();
+    toast('✓ Statuss mainīts', 'ok');
+  }
 }
 
 function openInvoice(id) {
@@ -6276,6 +6366,7 @@ function invGeneratePDF() {
       link.download = data.invNumber.replace(/[#\/]/g,'_')+'.pdf';
       link.click();
       localStorage.setItem('inv_sent_'+_invBooking.id, '1');
+      localStorage.setItem('inv_sent_date_'+_invBooking.id, new Date().toISOString().slice(0,10));
       if (res.sheetUrl) localStorage.setItem('inv_sheet_'+_invBooking.id, res.sheetUrl);
       _invGenerated = true;
       _invEditing = false;
