@@ -2735,6 +2735,12 @@ window.google={script:{run:window.__gsr__}};
     <div class="psub">Rēķinu ģenerēšana un pārvaldība</div>
   </div>
 
+  <!-- Statistika -->
+  <div id="INV_STATS" style="margin-top:12px;"></div>
+
+  <!-- Brīdinājumu tabulas -->
+  <div id="INV_ALERTS" style="margin-top:16px;"></div>
+
   <!-- Rēķinu saraksts -->
   <div id="INV_LIST" style="margin-top:16px;"></div>
 
@@ -5700,130 +5706,6 @@ function setInvFilter(f, btn) {
   renderInvoiceTable();
 }
 
-function renderInvoices() {
-  renderInvoiceAlerts();
-  renderInvoiceTable();
-}
-
-function renderInvoiceAlerts() {
-  const inv = ALL.filter(b => b.status !== 'Atcelta' && isInvoice(b));
-
-  // Nenosūtītie
-  const unsent = inv.filter(b => !b.invSent);
-  document.getElementById('INV_UNSENT_CNT').textContent = unsent.length;
-  document.getElementById('INV_UNSENT_LIST').innerHTML = unsent.length
-    ? unsent.map(b => `
-      <div class="inv-alert-row">
-        <div class="inv-ar-time">${fmtDate(b.date)}<br>${cleanT(b.timeFrom)}–${cleanT(b.timeTo)}</div>
-        <div>
-          <div class="inv-ar-name">${esc(b.client)}</div>
-          <div class="inv-ar-email">${esc(b.invEmail||b.email||'—')}</div>
-          <div class="inv-ar-phone">${esc(b.phone)}</div>
-        </div>
-        <button class="btn btn-ok btn-sm" style="font-size:10px;white-space:nowrap" onclick="quickInvSent('${b.id}')">✓ Nosūtīts</button>
-      </div>`).join('')
-    : '<div class="inv-ar-empty">✅ Nav nenosūtītu rēķinu</div>';
-
-  // Nosūtīti bet neapmaksāti
-  const unpaid = inv.filter(b => b.invSent && !b.invPaid);
-  document.getElementById('INV_UNPAID_CNT').textContent = unpaid.length;
-  document.getElementById('INV_UNPAID_LIST').innerHTML = unpaid.length
-    ? unpaid.map(b => `
-      <div class="inv-alert-row">
-        <div class="inv-ar-time">${fmtDate(b.date)}<br>${cleanT(b.timeFrom)}–${cleanT(b.timeTo)}</div>
-        <div>
-          <div class="inv-ar-name">${esc(b.client)}</div>
-          <div class="inv-ar-email">${esc(b.invEmail||b.email||'—')}</div>
-          <div class="inv-ar-phone">${esc(b.phone)}</div>
-        </div>
-        <button class="btn btn-ok btn-sm" style="font-size:10px;white-space:nowrap" onclick="quickInvPaid('${b.id}')">✓ Apmaksāts</button>
-      </div>`).join('')
-    : '<div class="inv-ar-empty">✅ Visi nosūtītie rēķini ir apmaksāti</div>';
-}
-
-function renderInvoiceTable() {
-  const q = (document.getElementById('INV_SEARCH')?.value || '').toLowerCase();
-  let rows = ALL.filter(b => b.status !== 'Atcelta');
-
-  // Filtrs
-  if (_invFilter === 'invoice') rows = rows.filter(b => isInvoice(b));
-  else if (_invFilter === 'unsent')  rows = rows.filter(b => isInvoice(b) && !b.invSent);
-  else if (_invFilter === 'unpaid')  rows = rows.filter(b => isInvoice(b) && b.invSent && !b.invPaid);
-  else if (_invFilter === 'paid')    rows = rows.filter(b => isInvoice(b) && b.invPaid);
-
-  // Meklēšana
-  if (q) rows = rows.filter(b =>
-    b.client.toLowerCase().includes(q) ||
-    (b.invEmail||'').toLowerCase().includes(q) ||
-    (b.email||'').toLowerCase().includes(q) ||
-    b.date.includes(q)
-  );
-
-  // Kārtot pēc datuma desc
-  rows.sort((a,b) => b.date.localeCompare(a.date));
-
-  const tbody = document.getElementById('INV_TBODY');
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--text3);padding:24px;font-family:var(--font-head);font-size:11px;letter-spacing:2px;text-transform:uppercase">Nav ierakstu</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = rows.map(b => {
-    const isInv = isInvoice(b);
-    const rekShort = b.rekviziti ? (b.rekviziti.length > 40 ? b.rekviziti.slice(0,40)+'…' : b.rekviziti) : '—';
-    const sentCb = `<input type="checkbox" class="inv-cb inv-cb-sent" ${b.invSent?'checked':''} onchange="setInvSent('${b.id}',this.checked)" title="Rēķins nosūtīts">`;
-    const paidCb = `<input type="checkbox" class="inv-cb inv-cb-paid" ${b.invPaid?'checked':''} onchange="setInvPaid('${b.id}',this.checked)" title="Rēķins apmaksāts">`;
-    return `<tr class="${isInv?'inv-r-invoice':''}">
-      <td style="white-space:nowrap;font-family:var(--font-head);font-weight:700">${fmtDate(b.date)}<br><span style="color:var(--text2);font-size:11px">${cleanT(b.timeFrom)}–${cleanT(b.timeTo)}</span></td>
-      <td><b>${esc(b.client)}</b><br><span style="color:var(--text2);font-size:11px">💳 ${esc(b.invoice)}</span></td>
-      <td><div class="inv-rekviziti-short" title="${esc(b.rekviziti)}">${esc(rekShort)}</div></td>
-      <td>${esc(b.phone)}</td>
-      <td style="font-size:11px">${esc(b.invEmail||b.email||'—')}</td>
-      <td style="text-align:center;font-family:var(--font-head);font-weight:900">${b.people}</td>
-      <td style="font-size:11px;color:var(--yellow)">${esc(b.food||'—')}</td>
-      <td style="font-size:11px;color:var(--text2)">${esc(b.comment||'—')}</td>
-      <td style="text-align:center">${sentCb}</td>
-      <td style="text-align:center">${paidCb}</td>
-    </tr>`;
-  }).join('');
-}
-
-function isInvoice(b) {
-  return b.invoice && b.invoice.toLowerCase().includes('rēķin');
-}
-
-function fmtDate(ds) {
-  if (!ds) return '—';
-  const [y,m,d] = ds.split('-');
-  return `${parseInt(d)}. ${MLV[parseInt(m)-1]}`;
-}
-
-function setInvSent(id, val) {
-  window.__gsr__
-    .withSuccessHandler(r => { loadAll(true); })
-    .withFailureHandler(e => toast('Kļūda: ' + e.message, 'err'))
-    .sSetInvSent(id, val);
-}
-
-function setInvPaid(id, val) {
-  window.__gsr__
-    .withSuccessHandler(r => { loadAll(true); })
-    .withFailureHandler(e => toast('Kļūda: ' + e.message, 'err'))
-    .sSetInvPaid(id, val);
-}
-
-function quickInvSent(id) {
-  window.__gsr__
-    .withSuccessHandler(r => { loadAll(true); })
-    .sSetInvSent(id, true);
-}
-
-function quickInvPaid(id) {
-  window.__gsr__
-    .withSuccessHandler(r => { loadAll(true); })
-    .sSetInvPaid(id, true);
-}
-
 // Rekvizītu mini-modal (vienkāršs prompt → alert aizstāts ar modal)
 function openRek(id) {
   const b = ALL.find(x => x.id === id);
@@ -5973,6 +5855,70 @@ function renderInvoices() {
   var inv = ALL.filter(function(b) {
     return b.status !== 'Atcelta' && b.invoice && (b.invoice.includes('rēķin') || b.invoice.includes('rēķīn'));
   }).sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+
+  // ── STATISTIKA ──
+  var statsEl = document.getElementById('INV_STATS');
+  if (statsEl && inv.length) {
+    var waitTotal = 0, waitCount = 0, lateTotal = 0, lateCount = 0, paidTotal = 0, paidCount = 0;
+    inv.forEach(function(b) {
+      var st = getInvStatus(b);
+      var t = parseFloat(localStorage.getItem('inv_total_'+b.id)) || 0;
+      if (st === 'wait') { waitTotal += t; waitCount++; }
+      else if (st === 'late') { lateTotal += t; lateCount++; }
+      else if (st === 'paid') { paidTotal += t; paidCount++; }
+    });
+    statsEl.innerHTML = '<div style="display:flex;gap:16px;flex-wrap:wrap;">'
+      + (waitCount ? '<div style="background:#0c1e3d;border:1px solid #1d4ed8;border-radius:var(--r);padding:12px 18px;flex:1;min-width:200px;"><div style="font-size:10px;color:#60a5fa;font-weight:700;font-family:var(--font-head);letter-spacing:1px;">⏳ GAIDAM APMAKSU</div><div style="font-size:24px;font-weight:800;color:#60a5fa;font-family:var(--font-head);margin-top:4px;">'+waitTotal.toFixed(2)+' €</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">no '+waitCount+' rēķiniem</div></div>' : '')
+      + (lateCount ? '<div style="background:#3b0808;border:1px solid #dc2626;border-radius:var(--r);padding:12px 18px;flex:1;min-width:200px;"><div style="font-size:10px;color:#ef4444;font-weight:700;font-family:var(--font-head);letter-spacing:1px;">🚨 KAVĒ MAKSĀJUMU</div><div style="font-size:24px;font-weight:800;color:#ef4444;font-family:var(--font-head);margin-top:4px;">'+lateTotal.toFixed(2)+' €</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">no '+lateCount+' rēķiniem</div></div>' : '')
+      + (paidCount ? '<div style="background:#0d2e16;border:1px solid #16a34a;border-radius:var(--r);padding:12px 18px;flex:1;min-width:200px;"><div style="font-size:10px;color:#22c55e;font-weight:700;font-family:var(--font-head);letter-spacing:1px;">✅ APMAKSĀTS</div><div style="font-size:24px;font-weight:800;color:#22c55e;font-family:var(--font-head);margin-top:4px;">'+paidTotal.toFixed(2)+' €</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">no '+paidCount+' rēķiniem</div></div>' : '')
+      + '</div>';
+  } else if (statsEl) { statsEl.innerHTML = ''; }
+
+  // ── BRĪDINĀJUMU TABULAS ──
+  var alertsEl = document.getElementById('INV_ALERTS');
+  if (alertsEl && inv.length) {
+    var toSend = inv.filter(function(b){ return getInvStatus(b)==='send'; });
+    var late = inv.filter(function(b){ return getInvStatus(b)==='late'; });
+
+    var aHtml = '';
+    if (toSend.length || late.length) {
+      aHtml += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">';
+      // Nosūtīt rēķinu
+      aHtml += '<div style="border:1px solid #9d174d;border-radius:var(--r);overflow:hidden;">'
+        + '<div style="background:#3d1228;padding:8px 14px;font-size:11px;font-weight:800;color:#f472b6;font-family:var(--font-head);letter-spacing:1px;">📩 NOSŪTĪT RĒĶINU ('+toSend.length+')</div>';
+      if (toSend.length) {
+        toSend.forEach(function(b) {
+          var dp = b.date.split('-');
+          aHtml += '<div style="padding:6px 14px;border-top:1px solid #9d174d33;display:flex;justify-content:space-between;align-items:center;">'
+            + '<div><span style="font-size:12px;font-weight:700;">'+parseInt(dp[2])+'. '+MLV[parseInt(dp[1])-1]+'</span> <span style="font-size:11px;color:var(--text3);">'+esc(b.client)+'</span></div>'
+            + '<button class="btn btn-p" onclick="openInvoice(\''+b.id+'\')" style="padding:3px 10px;font-size:10px;">🧾</button>'
+            + '</div>';
+        });
+      } else {
+        aHtml += '<div style="padding:12px 14px;color:var(--text3);font-size:11px;">✅ Nav</div>';
+      }
+      aHtml += '</div>';
+
+      // Kavē maksājumu
+      aHtml += '<div style="border:1px solid #dc2626;border-radius:var(--r);overflow:hidden;">'
+        + '<div style="background:#3b0808;padding:8px 14px;font-size:11px;font-weight:800;color:#ef4444;font-family:var(--font-head);letter-spacing:1px;">🚨 KAVĒ MAKSĀJUMU ('+late.length+')</div>';
+      if (late.length) {
+        late.forEach(function(b) {
+          var dp = b.date.split('-');
+          var rek2 = null; try{rek2=b.rekviziti?JSON.parse(b.rekviziti):null;}catch(e){}
+          var nm = (rek2&&rek2.name)?rek2.name:b.client;
+          aHtml += '<div style="padding:6px 14px;border-top:1px solid #dc262633;display:flex;justify-content:space-between;align-items:center;">'
+            + '<div><span style="font-size:12px;font-weight:700;color:#ef4444;">'+esc(nm)+'</span> <span style="font-size:11px;color:var(--text3);">'+parseInt(dp[2])+'. '+MLV[parseInt(dp[1])-1]+'</span></div>'
+            + '<button class="btn btn-p" onclick="openInvoice(\''+b.id+'\')" style="padding:3px 10px;font-size:10px;">🧾</button>'
+            + '</div>';
+        });
+      } else {
+        aHtml += '<div style="padding:12px 14px;color:var(--text3);font-size:11px;">✅ Nav</div>';
+      }
+      aHtml += '</div></div>';
+    }
+    alertsEl.innerHTML = aHtml;
+  } else if (alertsEl) { alertsEl.innerHTML = ''; }
 
   if (!inv.length) {
     el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3);font-family:var(--font-head);font-size:12px;letter-spacing:2px;text-transform:uppercase;">Nav rezervāciju ar rēķinu</div>';
