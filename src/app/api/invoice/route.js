@@ -2,6 +2,7 @@ import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
 
 const INVOICE_SHEET_ID = process.env.INVOICE_SHEET_ID || '1w_XA_aIyXyZzGLzUbgaMllTUtu8BkwxmA5bsXeeayPA';
+const KITCHEN_SHEET_ID = process.env.KITCHEN_SHEET_ID || '1NKAVFUaEHZM-xzVTJOvZBlK45P8f78xLM3mzsWynAuk';
 
 function getAuth() {
   let credentials = process.env.GOOGLE_SERVICE_ACCOUNT;
@@ -21,6 +22,10 @@ export const maxDuration = 30;
 
 export async function POST(req) {
   try {
+    const url = new URL(req.url);
+    const isKitchen = url.searchParams.get('kitchen') === '1';
+    const sheetId = isKitchen ? KITCHEN_SHEET_ID : INVOICE_SHEET_ID;
+
     const data = await req.json();
     const auth = getAuth();
     const sheets = google.sheets({ version: 'v4', auth });
@@ -33,7 +38,7 @@ export async function POST(req) {
     const invNumber = data.invNumber || 'Rēķins';
 
     // 1. Atrast Šablons
-    const meta = await sheets.spreadsheets.get({ spreadsheetId: INVOICE_SHEET_ID });
+    const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
     const templateSheet = meta.data.sheets.find(s => s.properties.title === 'Šablons');
     if (!templateSheet) {
       return NextResponse.json({ ok: false, error: 'Šablons nav atrasts!' }, { status: 400 });
@@ -43,7 +48,7 @@ export async function POST(req) {
     const existingSheet = meta.data.sheets.find(s => s.properties.title === invNumber);
     if (existingSheet) {
       await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: INVOICE_SHEET_ID,
+        spreadsheetId: sheetId,
         resource: {
           requests: [{ deleteSheet: { sheetId: existingSheet.properties.sheetId } }]
         }
@@ -52,15 +57,15 @@ export async function POST(req) {
 
     // 3. Kopēt šablonu
     const copyRes = await sheets.spreadsheets.sheets.copyTo({
-      spreadsheetId: INVOICE_SHEET_ID,
+      spreadsheetId: sheetId,
       sheetId: templateSheet.properties.sheetId,
-      resource: { destinationSpreadsheetId: INVOICE_SHEET_ID }
+      resource: { destinationSpreadsheetId: sheetId }
     });
     const newSheetId = copyRes.data.sheetId;
 
     // 4. Pārsaukt un pārvietot
     await sheets.spreadsheets.batchUpdate({
-      spreadsheetId: INVOICE_SHEET_ID,
+      spreadsheetId: sheetId,
       resource: {
         requests: [
           { updateSheetProperties: { properties: { sheetId: newSheetId, title: invNumber, index: 1 }, fields: 'title,index' } }
@@ -108,7 +113,7 @@ export async function POST(req) {
 
     // 5. Nolasīt šablona saturu lai atrastu tabulas header rindu
     const sheetData = await sheets.spreadsheets.values.get({
-      spreadsheetId: INVOICE_SHEET_ID,
+      spreadsheetId: sheetId,
       range: `'${invNumber}'!A1:F100`,
     });
     const rows = sheetData.data.values || [];
@@ -167,7 +172,7 @@ export async function POST(req) {
 
     if (batchRequests.length > 0) {
       await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: INVOICE_SHEET_ID,
+        spreadsheetId: sheetId,
         resource: { requests: batchRequests }
       });
     }
@@ -181,7 +186,7 @@ export async function POST(req) {
 
     const posStartRow = placeholderStart + 1; // 1-indexed
     await sheets.spreadsheets.values.update({
-      spreadsheetId: INVOICE_SHEET_ID,
+      spreadsheetId: sheetId,
       range: `'${invNumber}'!A${posStartRow}:F${posStartRow + posValues.length - 1}`,
       valueInputOption: 'USER_ENTERED',
       resource: { values: posValues }
@@ -229,7 +234,7 @@ export async function POST(req) {
     // Sūta pa 100 lai nepārsniedz API limitus
     for (let i = 0; i < replaceRequests.length; i += 100) {
       await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: INVOICE_SHEET_ID,
+        spreadsheetId: sheetId,
         resource: { requests: replaceRequests.slice(i, i + 100) }
       });
     }
@@ -248,7 +253,7 @@ export async function POST(req) {
     }
     if (formatRequests.length > 0) {
       await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: INVOICE_SHEET_ID,
+        spreadsheetId: sheetId,
         resource: { requests: formatRequests }
       });
     }
@@ -257,7 +262,7 @@ export async function POST(req) {
     const authClient = await auth.getClient();
     const token = await authClient.getAccessToken();
 
-    const pdfUrl = `https://docs.google.com/spreadsheets/d/${INVOICE_SHEET_ID}/export?`
+    const pdfUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?`
       + `format=pdf&gid=${newSheetId}`
       + `&size=A4&portrait=true`
       + `&fitw=true&gridlines=false`
@@ -277,7 +282,7 @@ export async function POST(req) {
     return NextResponse.json({
       ok: true,
       pdf: pdfBase64,
-      sheetUrl: `https://docs.google.com/spreadsheets/d/${INVOICE_SHEET_ID}/edit#gid=${newSheetId}`,
+      sheetUrl: `https://docs.google.com/spreadsheets/d/${sheetId}/edit#gid=${newSheetId}`,
       invNumber
     });
 

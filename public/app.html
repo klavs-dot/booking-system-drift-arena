@@ -2212,6 +2212,7 @@ window.google={script:{run:window.__gsr__}};
     <button class="nb" id="nb-schedule" onclick="goNav('schedule',this)">🗓️ Grafiks</button>
     <button class="nb" id="nb-day" style="display:none;"></button>
     <button class="nb" id="nb-invoices" onclick="goNav('invoices',this)">🧾 Rēķini</button>
+    <button class="nb" id="nb-kitchen" onclick="goNav('kitchen',this)">🍽️ Virtuves rēķini</button>
     <div class="nb-new-wrap">
       <button class="nb nb-new" id="nb-new" onclick="goNav('new',this)">＋ Jauna rezervācija</button>
     </div>
@@ -2875,6 +2876,114 @@ window.google={script:{run:window.__gsr__}};
     <div id="inv_buttons" style="display:flex;gap:12px;justify-content:flex-end;"></div>
 
     <input type="hidden" id="inv_booking_id">
+  </div>
+</div>
+
+<!-- ══ VIRTUVES RĒĶINI ══ -->
+<div class="view" id="view-kitchen">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+    <div class="phdr" style="margin:0;padding:0;">
+      <div class="ptitle">VIRTUVES RĒĶINI</div>
+      <div class="psub">Ēdienu rēķini — atsevišķa grāmatvedība</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <button class="btn btn-s" onclick="document.getElementById('kit_export_panel').style.display=document.getElementById('kit_export_panel').style.display==='none'?'block':'none'" style="padding:8px 14px;font-size:11px;">📁 Eksportēt ZIP</button>
+      <button class="btn btn-p" onclick="openKitchenInvoice(null)" style="padding:10px 20px;font-size:13px;">＋ Jauns virtuves rēķins</button>
+    </div>
+  </div>
+
+  <!-- Eksporta panelis -->
+  <div id="kit_export_panel" style="display:none;margin-top:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;">
+    <div style="font-family:var(--font-head);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;">📁 Virtuves rēķinu eksports</div>
+    <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;">
+      <div class="field" style="margin:0;"><label style="font-size:9px;">No</label><input type="date" id="kit_exp_from" style="padding:6px;font-size:12px;width:140px;"></div>
+      <div class="field" style="margin:0;"><label style="font-size:9px;">Līdz</label><input type="date" id="kit_exp_to" style="padding:6px;font-size:12px;width:140px;"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
+      <button class="btn btn-p" onclick="kitExportZip('custom_all')" style="padding:8px 16px;font-size:12px;">📁 Visus atlasītajā periodā</button>
+      <button class="btn" onclick="kitExportZip('custom_paid')" style="padding:8px 16px;font-size:12px;background:#0d2e16;color:#22c55e;border:1px solid #16a34a;font-weight:700;">✅ Tikai apmaksātos</button>
+      <button class="btn" onclick="kitExportZip('lastmonth')" style="padding:8px 16px;font-size:12px;background:#0c1e3d;color:#60a5fa;border:1px solid #1d4ed8;font-weight:700;">📅 Pagājušā mēneša</button>
+    </div>
+    <div id="kit_export_status" style="margin-top:8px;font-size:11px;color:var(--text3);"></div>
+  </div>
+
+  <!-- Statistika -->
+  <div id="KIT_STATS" style="margin-top:12px;"></div>
+
+  <!-- Saraksts -->
+  <div id="KIT_LIST" style="margin-top:16px;"></div>
+</div>
+
+<!-- ══ VIRTUVES RĒĶINA MODĀLIS ══ -->
+<div class="mbg" id="M_KIT">
+  <div class="mbox" style="max-width:800px;background:#111;position:relative;max-height:90vh;overflow-y:auto;">
+    <button onclick="closeM('M_KIT')" style="position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border2);color:var(--text2);width:32px;height:32px;border-radius:var(--r);cursor:pointer;font-size:16px;z-index:10;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">✕</button>
+
+    <div style="font-family:var(--font-head);font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;">🍽️ VIRTUVES RĒĶINS</div>
+    <div id="kit-booking-info" style="margin-bottom:16px;"></div>
+
+    <!-- Ēdienu pozīcijas -->
+    <div class="wiz-block" style="background:#1a1a1a;">
+      <div class="wiz-block-title">🍕 Ēdieni</div>
+      <div id="kit_food_list"></div>
+      <div id="kit_food_subtotal" style="text-align:right;padding:8px 0;font-size:13px;color:#fff;font-weight:700;"></div>
+      <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
+        <div class="wform-row3">
+          <div class="field"><label>Nosaukums</label><input type="text" id="kit_food_name" placeholder="Pica, burgeri..."></div>
+          <div class="field"><label>Daudzums</label><input type="number" id="kit_food_qty" min="1" value="1"></div>
+          <div class="field"><label>Cena ar PVN (EUR)</label>
+            <div style="display:flex;gap:6px;">
+              <input type="number" id="kit_food_price" min="0" step="0.01" placeholder="5.00" style="flex:1;">
+              <button class="btn btn-p" onclick="kitAddFood()" style="padding:6px 14px;">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Citi -->
+    <div class="wiz-block" style="background:#1a1a1a;position:relative;">
+      <div class="wiz-block-title">📦 Citi</div>
+      <button id="kit_other_toggle" onclick="kitToggleOther()" style="position:absolute;top:10px;right:12px;padding:3px 10px;font-size:9px;border-radius:3px;cursor:pointer;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;border:1px solid #16a34a;background:#0d2e16;color:#22c55e;">Ieslēgt</button>
+      <div id="kit_other_body" style="display:none;">
+        <div id="kit_other_list"></div>
+        <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
+          <div class="wform-row3">
+            <div class="field"><label>Nosaukums</label><input type="text" id="kit_other_name" placeholder="Apkalpošana..."></div>
+            <div class="field"><label>Daudzums</label><input type="number" id="kit_other_qty" min="1" value="1"></div>
+            <div class="field"><label>Cena ar PVN (EUR)</label>
+              <div style="display:flex;gap:6px;">
+                <input type="number" id="kit_other_price" min="0" step="0.01" placeholder="10.00" style="flex:1;">
+                <button class="btn btn-p" onclick="kitAddOther()" style="padding:6px 14px;">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kopsavilkums -->
+    <div class="wiz-block" style="background:#1a1a1a;">
+      <div class="wiz-block-title">📊 Kopsavilkums</div>
+      <div id="kit_summary" style="font-size:13px;color:var(--text2);"></div>
+      <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:11px;color:var(--text3);">KOPĀ AR PVN</div>
+          <div id="kit_grand_total" style="font-size:32px;font-weight:800;color:var(--accent);font-family:var(--font-head);">0.00 €</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--text3);">Bez PVN (21%)</div>
+          <div id="kit_net_total" style="font-size:18px;font-weight:700;color:var(--text2);">0.00 €</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">PVN summa</div>
+          <div id="kit_vat_total" style="font-size:14px;color:var(--text3);">0.00 €</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="kit_validation_warn" style="display:none;padding:10px 14px;background:#2d1e03;border:1px solid #854d0e;border-radius:var(--r);color:#facc15;font-size:12px;margin-bottom:12px;font-weight:600;"></div>
+
+    <div id="kit_buttons" style="display:flex;gap:12px;justify-content:flex-end;"></div>
+    <input type="hidden" id="kit_booking_id">
   </div>
 </div>
 
@@ -4410,6 +4519,7 @@ window.onload = function() {
 // ================================================================
 function goNav(name, btn) {
   if (name === 'invoices') { setTimeout(renderInvoices, 50); }
+  if (name === 'kitchen') { setTimeout(renderKitchen, 50); }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
@@ -6721,6 +6831,228 @@ function invSendEmail() {
     window.open('mailto:'+email+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body), '_blank');
   }, 500);
 }
+
+// ══ VIRTUVES RĒĶINU SISTĒMA ══
+var _kitFoods = [];
+var _kitOther = [];
+var _kitBooking = null;
+var _kitGenerated = false;
+var _kitEditing = false;
+var _kitOtherOff = true;
+
+function renderKitchen() {
+  var el = document.getElementById('KIT_LIST');
+  if (!el) return;
+  // Filtrē rezervācijas ar ēdieniem (ne PRECIZES/UZ_VIETAS)
+  var items = ALL.filter(function(b) {
+    return b.status !== 'Atcelta' && b.food && b.food !== 'PRECIZES' && b.food !== 'UZ_VIETAS' && b.food.trim();
+  });
+  // Standalone virtuves rēķini
+  var ksList = []; try{ksList=JSON.parse(localStorage.getItem('kit_standalone_list')||'[]');}catch(e){}
+  ksList.forEach(function(si){ items.push(si); });
+
+  items.sort(function(a,b){
+    var stA = getKitStatus(a); var stB = getKitStatus(b);
+    if (stA==='pending'&&stB!=='pending') return 1;
+    if (stB==='pending'&&stA!=='pending') return -1;
+    return (a.date||'')<(b.date||'')?1:-1;
+  });
+
+  if (!items.length) { el.innerHTML='<div style="padding:40px;text-align:center;color:var(--text3);font-family:var(--font-head);font-size:12px;letter-spacing:2px;text-transform:uppercase;">Nav rezervāciju ar ēdieniem</div>'; return; }
+
+  var html='<div style="display:flex;flex-direction:column;gap:8px;">';
+  items.forEach(function(b) {
+    var rek=null; try{rek=b.rekviziti?JSON.parse(b.rekviziti):null;}catch(e){}
+    var rekName=rek?(rek.name||'—'):'—';
+    var dp=(b.date||'').split('-');
+    var dateFmt=dp.length===3?parseInt(dp[2])+'. '+MLV[parseInt(dp[1])-1]+', '+dp[0]:'—';
+    var stBadge=getKitStatusBadge(b);
+    var kitTotal=localStorage.getItem('kit_total_'+b.id);
+
+    html+='<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;display:grid;grid-template-columns:140px 1fr 100px 280px auto;align-items:center;gap:16px;">'
+      +'<div><div style="font-size:13px;font-weight:700;color:var(--text);">'+dateFmt+'</div><div style="font-size:11px;color:var(--text3);">'+cleanT(b.timeFrom||'')+' – '+cleanT(b.timeTo||'')+'</div></div>'
+      +'<div><div style="font-size:16px;font-weight:800;">'+esc(rekName)+'</div><div style="font-size:11px;color:var(--text3);">'+esc(b.client||'')+'</div></div>'
+      +(kitTotal?'<div style="text-align:center;"><div style="font-size:11px;color:var(--text3);">Summa</div><div style="font-size:20px;font-weight:800;color:var(--accent);font-family:var(--font-head);">'+kitTotal+' €</div></div>':'<div></div>')
+      +'<div style="text-align:center;"><div style="display:inline-flex;align-items:center;gap:6px;">'+stBadge.replace('inv-st ','inv-st inv-st-lg ')+'<button onclick="kitChangeStatus(\''+b.id+'\')" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:3px;padding:2px 6px;cursor:pointer;font-size:8px;font-family:var(--font-head);font-weight:700;" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border2)\'">mainīt</button></div></div>'
+      +'<div style="display:flex;gap:6px;align-items:center;"><button class="btn btn-p" onclick="openKitchenInvoice(\''+b.id+'\')" style="padding:6px 14px;font-size:12px;">🍽️ Rēķins</button>'
+      +(function(){var url=localStorage.getItem('kit_sheet_'+b.id);return url?'<a href="'+url+'" target="_blank" style="padding:6px 10px;font-size:11px;background:var(--card2);color:var(--text2);border:1px solid var(--border2);border-radius:var(--r);text-decoration:none;font-family:var(--font-head);font-weight:700;">📝</a>':'';})()
+      +'</div></div>';
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+function getKitStatus(b) {
+  var manual=localStorage.getItem('kit_status_'+b.id); if(manual) return manual;
+  var sent=localStorage.getItem('kit_sent_'+b.id);
+  var today=new Date().toISOString().slice(0,10);
+  if(!sent) { if(b.status==='Notikusi'||(b.date&&b.date<today)) return 'send'; return 'pending'; }
+  var due=localStorage.getItem('kit_due_'+b.id);
+  if(!due){var sd=localStorage.getItem('kit_sent_date_'+b.id)||today;var dd=new Date(sd);dd.setDate(dd.getDate()+5);due=dd.toISOString().slice(0,10);localStorage.setItem('kit_due_'+b.id,due);}
+  if(today>due) return 'late';
+  return 'wait';
+}
+
+function getKitStatusBadge(b) {
+  var st=getKitStatus(b);
+  switch(st) {
+    case 'send': return '<span class="inv-st inv-st-send">📩 Nosūtīt rēķinu</span>';
+    case 'wait': return '<span class="inv-st inv-st-wait">⏳ Gaidam apmaksu</span>';
+    case 'late': return '<span class="inv-st inv-st-late">🚨 Kavē maksājumu</span>';
+    case 'paid': return '<span class="inv-st inv-st-paid">✅ Apmaksāts</span>';
+    case 'pending': return '<span class="inv-st" style="color:var(--text3);border:1px solid var(--border2);">📅 Rezervācija vēl nav notikusi</span>';
+    default: return '';
+  }
+}
+
+function kitChangeStatus(id) {
+  var pin=prompt('Ievadi PIN kodu:');if(pin!==_masterPin){toast('Nepareizs PIN!','err');return;}
+  var choice=prompt('1. Nosūtīt rēķinu\n2. Gaidam apmaksu\n3. Kavē maksājumu\n4. Apmaksāts\n\nIzvēlies (1-4):');
+  var statuses=['send','wait','late','paid'];
+  var ci=parseInt(choice);
+  if(ci>=1&&ci<=4){localStorage.setItem('kit_status_'+id,statuses[ci-1]);if(ci===4)localStorage.setItem('kit_paid_date_'+id,new Date().toISOString().slice(0,10));renderKitchen();toast('✓ Statuss mainīts','ok');}
+}
+
+function openKitchenInvoice(id) {
+  _kitOtherOff=true;
+  _kitOther=[];
+  _kitFoods=[];
+  _kitEditing=false;
+
+  if(id) {
+    var b=ALL.find(function(x){return x.id===id;});
+    if(!b) { // Meklēt standalone
+      var ksList=[];try{ksList=JSON.parse(localStorage.getItem('kit_standalone_list')||'[]');}catch(e){}
+      b=ksList.find(function(x){return x.id===id;});
+    }
+    if(!b) return;
+    _kitBooking=b;
+    document.getElementById('kit_booking_id').value=id;
+    var rek=null;try{rek=b.rekviziti?JSON.parse(b.rekviziti):null;}catch(e){}
+    var siaName=(rek&&rek.name)?rek.name:'⚠️ Nav rekvizītu';
+    document.getElementById('kit-booking-info').innerHTML='<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;"><div style="font-size:17px;font-weight:800;color:#fff;">'+esc(siaName)+'</div><div style="font-size:12px;color:var(--text2);margin-top:4px;">'+esc(b.date||'')+' · '+esc(b.client||'')+'</div></div>';
+
+    var saved=null;try{saved=JSON.parse(localStorage.getItem('kit_data_'+id));}catch(e){}
+    if(saved){_kitFoods=saved.foods||[];_kitOther=saved.other||[];_kitOtherOff=saved.otherOff!==false;}
+    else if(b.food&&b.food!=='PRECIZES'&&b.food!=='UZ_VIETAS'){
+      b.food.split(',').map(function(s){return s.trim();}).filter(Boolean).forEach(function(item){
+        var qm=item.match(/^(.+?)\s+x(\d+)$/);_kitFoods.push({name:qm?qm[1]:item,qty:qm?parseInt(qm[2]):1,price:0});
+      });
+    }
+  } else {
+    _kitBooking=null;
+    var fakeId='kit_'+Date.now();
+    document.getElementById('kit_booking_id').value=fakeId;
+    document.getElementById('kit-booking-info').innerHTML='<div style="background:var(--card);border:1px solid var(--accent);border-radius:var(--r);padding:12px 16px;"><div style="font-size:15px;font-weight:800;color:var(--accent);">📝 Brīvs virtuves rēķins</div><div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div class="field"><label>Saņēmēja nosaukums</label><input type="text" id="kit_sa_name" placeholder="SIA Nosaukums"></div><div class="field"><label>Reģ. Nr.</label><input type="text" id="kit_sa_reg"></div><div class="field"><label>PVN Nr.</label><input type="text" id="kit_sa_pvn"></div><div class="field"><label>Adrese</label><input type="text" id="kit_sa_addr"></div><div class="field"><label>E-pasts</label><input type="email" id="kit_sa_email"></div><div class="field"><label>Telefons</label><input type="text" id="kit_sa_phone"></div></div></div>';
+  }
+
+  _kitGenerated=!!localStorage.getItem('kit_sent_'+(id||document.getElementById('kit_booking_id').value));
+
+  // Toggle sync
+  var ob=document.getElementById('kit_other_body');var obt=document.getElementById('kit_other_toggle');
+  if(ob&&obt){if(_kitOtherOff){ob.style.display='none';obt.textContent='Ieslēgt';obt.style.border='1px solid #16a34a';obt.style.background='#0d2e16';obt.style.color='#22c55e';}else{ob.style.display='';obt.textContent='Izslēgt';obt.style.border='1px solid var(--border2)';obt.style.background='none';obt.style.color='var(--text3)';}}
+
+  kitRenderFoods();kitRenderOther();kitRecalc();kitRenderButtons();openM('M_KIT');
+}
+
+function kitToggleOther(){_kitOtherOff=!_kitOtherOff;var ob=document.getElementById('kit_other_body');var obt=document.getElementById('kit_other_toggle');if(_kitOtherOff){ob.style.display='none';obt.textContent='Ieslēgt';obt.style.border='1px solid #16a34a';obt.style.background='#0d2e16';obt.style.color='#22c55e';}else{ob.style.display='';obt.textContent='Izslēgt';obt.style.border='1px solid var(--border2)';obt.style.background='none';obt.style.color='var(--text3)';} kitOnChange();kitRecalc();}
+
+function kitAddFood(){var n=document.getElementById('kit_food_name').value.trim();var q=parseInt(document.getElementById('kit_food_qty').value)||1;var p=parseFloat(document.getElementById('kit_food_price').value)||0;if(!n)return;_kitFoods.push({name:n,qty:q,price:p});document.getElementById('kit_food_name').value='';document.getElementById('kit_food_qty').value='1';document.getElementById('kit_food_price').value='';kitOnChange();kitRenderFoods();kitRecalc();}
+function kitRemoveFood(i){_kitFoods.splice(i,1);kitOnChange();kitRenderFoods();kitRecalc();}
+function kitFoodPriceChange(i,v){_kitFoods[i].price=parseFloat(v)||0;kitOnChange();kitRecalc();}
+function kitFoodQtyChange(i,v){_kitFoods[i].qty=parseInt(v)||1;kitOnChange();kitRenderFoods();kitRecalc();}
+function kitAddOther(){var n=document.getElementById('kit_other_name').value.trim();var q=parseInt(document.getElementById('kit_other_qty').value)||1;var p=parseFloat(document.getElementById('kit_other_price').value)||0;if(!n)return;_kitOther.push({name:n,qty:q,price:p});document.getElementById('kit_other_name').value='';document.getElementById('kit_other_qty').value='1';document.getElementById('kit_other_price').value='';kitOnChange();kitRenderOther();kitRecalc();}
+function kitRemoveOther(i){_kitOther.splice(i,1);kitOnChange();kitRenderOther();kitRecalc();}
+function kitOtherPriceChange(i,v){_kitOther[i].price=parseFloat(v)||0;kitOnChange();kitRecalc();}
+function kitOtherQtyChange(i,v){_kitOther[i].qty=parseInt(v)||1;kitOnChange();kitRenderOther();kitRecalc();}
+
+function kitRenderItems(list,prefix){var el=document.getElementById(prefix+'_list');if(!list.length){el.innerHTML='<div style="color:var(--text3);font-size:12px;">Nav pozīciju</div>';return;}var html='';list.forEach(function(d,i){var lt=d.qty*d.price;html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);"><span style="flex:1;font-size:13px;color:var(--text);min-width:100px;">'+esc(d.name)+'</span><input type="number" min="1" value="'+d.qty+'" style="width:55px;padding:5px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:12px;text-align:center;" oninput="'+prefix.replace('kit_','kit')+'QtyChange('+i+',this.value)"><span style="font-size:11px;color:var(--text3);">x</span><input type="number" min="0" step="0.01" value="'+(d.price||'')+'" placeholder="Cena" style="width:80px;padding:5px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:12px;text-align:center;" oninput="'+prefix.replace('kit_','kit')+'PriceChange('+i+',this.value)"><span style="min-width:70px;text-align:right;font-size:13px;color:'+(lt>0?'#fff':'var(--text3)')+';font-weight:700;">'+(lt>0?lt.toFixed(2)+' €':'—')+'</span><button onclick="'+prefix.replace('kit_','kit')+'Remove('+i+')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;">✕</button></div>';});el.innerHTML=html;}
+function kitRenderFoods(){kitRenderItems(_kitFoods,'kit_food');}
+function kitRenderOther(){kitRenderItems(_kitOther,'kit_other');}
+function kitFoodRemove(i){kitRemoveFood(i);}function kitOtherRemove(i){kitRemoveOther(i);}
+function kitFoodQtyChange(i,v){_kitFoods[i].qty=parseInt(v)||1;kitOnChange();kitRenderFoods();kitRecalc();}
+function kitFoodPriceChange(i,v){_kitFoods[i].price=parseFloat(v)||0;kitOnChange();kitRecalc();}
+function kitOtherQtyChange(i,v){_kitOther[i].qty=parseInt(v)||1;kitOnChange();kitRenderOther();kitRecalc();}
+function kitOtherPriceChange(i,v){_kitOther[i].price=parseFloat(v)||0;kitOnChange();kitRecalc();}
+
+function kitRecalc(){
+  var foodTotal=_kitFoods.reduce(function(s,d){return s+d.qty*d.price;},0);
+  var otherTotal=_kitOtherOff?0:_kitOther.reduce(function(s,d){return s+d.qty*d.price;},0);
+  var sub=document.getElementById('kit_food_subtotal');
+  if(_kitFoods.length>0&&foodTotal>0)sub.innerHTML='Ēdieni kopā: <span style="font-size:16px;">'+foodTotal.toFixed(2)+' €</span>';else sub.innerHTML='';
+  var gt=foodTotal+otherTotal;var nt=gt/1.21;var vt=gt-nt;
+  document.getElementById('kit_grand_total').textContent=gt.toFixed(2)+' €';
+  document.getElementById('kit_net_total').textContent=nt.toFixed(2)+' €';
+  document.getElementById('kit_vat_total').textContent=vt.toFixed(2)+' €';
+  var lines=[];
+  _kitFoods.forEach(function(d){if(d.price>0)lines.push('<div>🍕 '+esc(d.name)+': '+d.qty+' x '+d.price.toFixed(2)+' = <b>'+(d.qty*d.price).toFixed(2)+' €</b></div>');});
+  if(!_kitOtherOff)_kitOther.forEach(function(d){if(d.price>0)lines.push('<div>📦 '+esc(d.name)+': '+d.qty+' x '+d.price.toFixed(2)+' = <b>'+(d.qty*d.price).toFixed(2)+' €</b></div>');});
+  document.getElementById('kit_summary').innerHTML=lines.join('')||'<div style="color:var(--text3);">Ievadi cenas</div>';
+  // Validācija
+  var issues=[];_kitFoods.forEach(function(d){if(d.qty>0&&d.price<=0)issues.push(d.name);});
+  if(!_kitOtherOff)_kitOther.forEach(function(d){if(d.qty>0&&d.price<=0)issues.push(d.name);});
+  var w=document.getElementById('kit_validation_warn');
+  if(issues.length){w.style.display='block';w.textContent='⚠️ Nav cenas: '+issues.join(', ');}else w.style.display='none';
+  return issues.length===0;
+}
+
+function kitOnChange(){if(_kitGenerated&&!_kitEditing){_kitEditing=true;kitRenderButtons();}}
+
+function kitRenderButtons(){
+  var el=document.getElementById('kit_buttons');
+  var h='<button class="btn btn-s" onclick="closeM(\'M_KIT\')" style="padding:10px 20px;">Atcelt</button>';
+  if(!_kitGenerated)h+='<button class="btn btn-p" onclick="kitGenerate()" style="padding:10px 24px;">🍽️ Ģenerēt rēķinu</button>';
+  else if(_kitEditing){h+='<button class="btn btn-s" onclick="_kitEditing=false;kitRenderButtons();" style="padding:10px 20px;">↩ Atcelt labošanu</button>';h+='<button class="btn btn-p" onclick="kitGenerate()" style="padding:10px 24px;">🔄 Labot rēķinu</button>';}
+  else{h+='<button class="btn" onclick="kitDownload()" style="padding:10px 20px;background:#0d2e16;color:#22c55e;border:1px solid #22c55e;font-weight:700;">📄 Lejupielādēt</button>';h+='<button class="btn btn-p" onclick="kitSendEmail()" style="padding:10px 24px;">📧 Nosūtīt uz e-pastu</button>';}
+  el.innerHTML=h;
+}
+
+function kitGenerate(){
+  if(!kitRecalc()){toast('Ievadi cenu visām pozīcijām!','warn');return;}
+  var bid=_kitBooking?_kitBooking.id:document.getElementById('kit_booking_id').value;
+  var rek=null;
+  if(_kitBooking){try{rek=_kitBooking.rekviziti?JSON.parse(_kitBooking.rekviziti):null;}catch(e){}}
+  else{var n=(document.getElementById('kit_sa_name')||{}).value||'';rek={name:n,reg:(document.getElementById('kit_sa_reg')||{}).value||'',pvn:(document.getElementById('kit_sa_pvn')||{}).value||'',addr:(document.getElementById('kit_sa_addr')||{}).value||''};}
+
+  // Numurs
+  var existNum=localStorage.getItem('kit_number_'+bid);var invNumber,dateKey,dayCount;
+  if(existNum){invNumber=existNum;var m=existNum.match(/#(\d+\/\d+\/\d+)-(\d+)/);dateKey=m?m[1]:'';dayCount=m?parseInt(m[2]):1;}
+  else{var t=new Date();var dd=p2(t.getDate()),mm=p2(t.getMonth()+1),yy=String(t.getFullYear()).slice(2);dateKey=dd+'/'+mm+'/'+yy;dayCount=parseInt(localStorage.getItem('kit_count_'+dateKey)||'0')+1;invNumber='VirtRēķins#'+dateKey+'-'+dayCount;}
+
+  var foods=_kitFoods.filter(function(d){return d.price>0;});
+  var other=_kitOtherOff?[]:_kitOther.filter(function(d){return d.price>0;});
+  var data={invNumber:invNumber,date:new Date().toLocaleDateString('lv-LV'),dueDate:new Date(Date.now()+5*24*60*60*1000).toLocaleDateString('lv-LV'),client:_kitBooking?_kitBooking.client:(rek?rek.name:''),rek:rek,rides:{qty:0,price:0,total:0},drinks:foods,other:other,isTelpa:false,sender:{name:'SIA "DA LIEPĀJA"',pvn:'LV40203522098',reg:'40203522098',addr:'Liepāja, Ganību 197/205, LV-3407',bank:'Luminor Bank AS Latvijas filiāle',swift:'RIKOLV2X',account:'LV81RIKO0001080210823'},sheetId:'KITCHEN'};
+
+  localStorage.setItem('kit_count_'+dateKey,dayCount);
+  localStorage.setItem('kit_number_'+bid,invNumber);
+
+  ovl('Ģenerē virtuves rēķinu...');
+  fetch('/api/invoice?kitchen=1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+  .then(function(r){return r.json();})
+  .then(function(res){
+    hovl();
+    if(res.ok&&res.pdf){
+      localStorage.setItem('kit_pdf_'+bid,res.pdf);
+      var link=document.createElement('a');link.href=res.pdf;
+      var cName=(rek&&rek.name?rek.name:'rekins').replace(/[^a-zA-ZāčēģīķļņšūžĀČĒĢĪĶĻŅŠŪŽ0-9 ]/g,'').replace(/\s+/g,'_');
+      link.download='Virtuve_'+cName+'_'+new Date().toISOString().slice(0,10)+'.pdf';link.click();
+      localStorage.setItem('kit_sent_'+bid,'1');
+      localStorage.setItem('kit_sent_date_'+bid,new Date().toISOString().slice(0,10));
+      var gt=foods.reduce(function(s,d){return s+d.qty*d.price;},0)+other.reduce(function(s,d){return s+d.qty*d.price;},0);
+      localStorage.setItem('kit_total_'+bid,gt.toFixed(2));
+      localStorage.setItem('kit_data_'+bid,JSON.stringify({foods:_kitFoods,other:_kitOther,otherOff:_kitOtherOff}));
+      if(res.sheetUrl)localStorage.setItem('kit_sheet_'+bid,res.sheetUrl);
+      if(!_kitBooking){var ksList=[];try{ksList=JSON.parse(localStorage.getItem('kit_standalone_list')||'[]');}catch(e){}if(!ksList.find(function(x){return x.id===bid;})){ksList.unshift({id:bid,date:new Date().toISOString().slice(0,10),timeFrom:'',timeTo:'',client:rek?rek.name:'',phone:'',email:(document.getElementById('kit_sa_email')||{}).value||'',food:'standalone',status:'Aktīva',rekviziti:JSON.stringify(rek),_standalone:true});localStorage.setItem('kit_standalone_list',JSON.stringify(ksList));}}
+      _kitGenerated=true;_kitEditing=false;kitRenderButtons();toast('✓ Virtuves rēķins ģenerēts','ok');renderKitchen();
+    }else{toast('Kļūda: '+(res.error||''),'err');}
+  }).catch(function(e){hovl();toast('Kļūda: '+e.message,'err');});
+}
+
+function kitDownload(){var bid=_kitBooking?_kitBooking.id:document.getElementById('kit_booking_id').value;var pdf=localStorage.getItem('kit_pdf_'+bid);if(pdf){var link=document.createElement('a');link.href=pdf;link.download='Virtuve_rekins.pdf';link.click();}else kitGenerate();}
+function kitSendEmail(){var email='';if(_kitBooking){email=_kitBooking.email||'';}else{email=(document.getElementById('kit_sa_email')||{}).value||'';}if(!email){toast('Nav e-pasta!','warn');return;}kitDownload();setTimeout(function(){window.open('mailto:'+email+'?subject='+encodeURIComponent('Drift Arena Virtuves Rēķins')+'&body='+encodeURIComponent('Sveiki,\n\nPielikumā nosūtam rēķinu par ēdināšanu.\n\nAr cieņu,\nDrift Arena komanda'),'_blank');},500);}
+
+function kitExportZip(mode){var items=ALL.filter(function(b){return b.status!=='Atcelta'&&b.food&&b.food!=='PRECIZES'&&b.food!=='UZ_VIETAS';});var ksList=[];try{ksList=JSON.parse(localStorage.getItem('kit_standalone_list')||'[]');}catch(e){}ksList.forEach(function(si){items.push(si);});var fromDate,toDate,label,paidOnly;if(mode==='lastmonth'){var now=new Date();fromDate=new Date(now.getFullYear(),now.getMonth()-1,1).toISOString().slice(0,10);toDate=new Date(now.getFullYear(),now.getMonth(),0).toISOString().slice(0,10);label='Virtuve_apmaksatie_'+MLV[now.getMonth()-1<0?11:now.getMonth()-1];paidOnly=true;}else{fromDate=document.getElementById('kit_exp_from').value;toDate=document.getElementById('kit_exp_to').value;if(!fromDate||!toDate){toast('Ievadi datumus!','warn');return;}paidOnly=(mode==='custom_paid');label='Virtuve_'+(paidOnly?'apmaksatie_':'visi_')+fromDate+'_'+toDate;}var filtered=items.filter(function(b){if(paidOnly&&getKitStatus(b)!=='paid')return false;if(!paidOnly&&!localStorage.getItem('kit_sent_'+b.id))return false;var d=localStorage.getItem('kit_sent_date_'+b.id)||b.date||'';return d>=fromDate&&d<=toDate;});if(!filtered.length){document.getElementById('kit_export_status').innerHTML='<span style="color:#facc15;">⚠️ Nav rēķinu šajā periodā</span>';return;}var files=[];filtered.forEach(function(b){var pdf=localStorage.getItem('kit_pdf_'+b.id);if(pdf)files.push({name:'Virtuve_'+(b.client||'rekins').replace(/\s+/g,'_')+'_'+(b.date||'')+'.pdf',data:pdf});});if(!files.length){document.getElementById('kit_export_status').innerHTML='<span style="color:var(--red);">❌ Nav PDF</span>';return;}if(!window.JSZip){var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';s.onload=function(){buildKitZip(files,label);};document.head.appendChild(s);}else buildKitZip(files,label);}
+function buildKitZip(files,label){var zip=new JSZip();files.forEach(function(f){zip.file(f.name,f.data.split(',')[1],{base64:true});});zip.generateAsync({type:'blob'}).then(function(blob){var link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=label+'.zip';link.click();document.getElementById('kit_export_status').innerHTML='<span style="color:#22c55e;">✅ '+files.length+' rēķini</span>';});}
 
 // ══ RĒĶINU ZIP EKSPORTS ══
 function invExportZip(mode) {

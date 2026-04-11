@@ -2,6 +2,7 @@ import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
 
 const INVOICE_SHEET_ID = process.env.INVOICE_SHEET_ID || '1w_XA_aIyXyZzGLzUbgaMllTUtu8BkwxmA5bsXeeayPA';
+const KITCHEN_SHEET_ID = process.env.KITCHEN_SHEET_ID || '1NKAVFUaEHZM-xzVTJOvZBlK45P8f78xLM3mzsWynAuk';
 
 function getAuth() {
   let credentials = process.env.GOOGLE_SERVICE_ACCOUNT;
@@ -14,13 +15,17 @@ function getAuth() {
   });
 }
 
-export async function GET() {
+export async function GET(req) {
   try {
+    const url = new URL(req.url);
+    const isKitchen = url.searchParams.get('kitchen') === '1';
+    const sheetId = isKitchen ? KITCHEN_SHEET_ID : INVOICE_SHEET_ID;
+
     const auth = getAuth();
     const sheets = google.sheets({ version: 'v4', auth });
 
     // Pārbaudīt vai Šablons jau eksistē
-    const meta = await sheets.spreadsheets.get({ spreadsheetId: INVOICE_SHEET_ID });
+    const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
     const existing = meta.data.sheets.map(s => s.properties.title);
     
     if (existing.includes('Šablons')) {
@@ -31,7 +36,7 @@ export async function GET() {
     const firstSheetId = meta.data.sheets[0].properties.sheetId;
     
     await sheets.spreadsheets.batchUpdate({
-      spreadsheetId: INVOICE_SHEET_ID,
+      spreadsheetId: sheetId,
       resource: {
         requests: [
           // Pārsaukt
@@ -54,7 +59,7 @@ export async function GET() {
     const lightGray = { red: 0.95, green: 0.95, blue: 0.95 };
 
     await sheets.spreadsheets.values.update({
-      spreadsheetId: INVOICE_SHEET_ID,
+      spreadsheetId: sheetId,
       range: 'Šablons!A1:F30',
       valueInputOption: 'USER_ENTERED',
       resource: {
@@ -91,7 +96,7 @@ export async function GET() {
 
     // Formatēšana
     await sheets.spreadsheets.batchUpdate({
-      spreadsheetId: INVOICE_SHEET_ID,
+      spreadsheetId: sheetId,
       resource: {
         requests: [
           // DRIFT ARENA virsraksts — oranžs, liels, bold
