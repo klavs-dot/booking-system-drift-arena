@@ -6130,6 +6130,7 @@ function openInvoice(id) {
     + '<div style="font-size:17px;font-weight:800;color:#fff;">'+esc(siaName)+'</div>'
     + '<div style="font-size:12px;color:var(--text2);margin-top:4px;">'+esc(b.date)+' · '+cleanT(b.timeFrom)+'–'+cleanT(b.timeTo)+' · '+b.people+' cilv.</div>'
     + '<div style="font-size:11px;color:var(--text3);margin-top:2px;">'+esc(b.client)+(rek&&rek.reg?' · '+esc(rek.reg):'')+'</div>'
+    + (b.phone ? '<div style="font-size:12px;color:var(--text2);margin-top:2px;">📞 '+esc(b.phone)+'</div>' : '')
     + (b.email ? '<div style="font-size:12px;color:#facc15;margin-top:4px;">📧 '+esc(b.email)+'</div>' : '')
     + '</div>'
     + '<button class="btn btn-s" onclick="openRekForm(\''+b.id+'\');closeM(\'M_INV\');" style="padding:5px 12px;font-size:10px;white-space:nowrap;">✏️ Labot rekvizītus</button>'
