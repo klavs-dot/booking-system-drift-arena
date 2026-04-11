@@ -5907,8 +5907,12 @@ function renderInvoices() {
           var dp = b.date.split('-');
           var rek2 = null; try{rek2=b.rekviziti?JSON.parse(b.rekviziti):null;}catch(e){}
           var nm = (rek2&&rek2.name)?rek2.name:b.client;
-          aHtml += '<div style="padding:6px 14px;border-top:1px solid #dc262633;display:flex;justify-content:space-between;align-items:center;">'
-            + '<div><span style="font-size:12px;font-weight:700;color:#ef4444;">'+esc(nm)+'</span> <span style="font-size:11px;color:var(--text3);">'+parseInt(dp[2])+'. '+MLV[parseInt(dp[1])-1]+'</span></div>'
+          aHtml += '<div style="padding:8px 14px;border-top:1px solid #dc262633;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">'
+            + '<div style="flex:1;min-width:200px;"><span style="font-size:13px;font-weight:700;color:#ef4444;">'+esc(nm)+'</span> <span style="font-size:11px;color:var(--text3);">'+parseInt(dp[2])+'. '+MLV[parseInt(dp[1])-1]+'</span>'
+            + '<div style="margin-top:4px;">'
+            + (b.phone ? '<span style="font-size:13px;font-weight:800;color:#ef4444;animation:invStrobe .4s linear infinite;margin-right:12px;">📞 '+esc(b.phone)+'</span>' : '')
+            + (b.email ? '<span style="font-size:12px;font-weight:700;color:#ef4444;animation:invStrobe .6s linear infinite;">📧 '+esc(b.email)+'</span>' : '')
+            + '</div></div>'
             + '<button class="btn btn-p" onclick="openInvoice(\''+b.id+'\')" style="padding:3px 10px;font-size:10px;">🧾</button>'
             + '</div>';
         });
