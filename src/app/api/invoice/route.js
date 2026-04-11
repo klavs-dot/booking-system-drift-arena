@@ -49,12 +49,12 @@ export async function POST(req) {
     });
     const newSheetId = copyRes.data.sheetId;
 
-    // 3. Pārsaukt jauno lapu
+    // 3. Pārsaukt jauno lapu un pārvietot uz pozīciju 1 (aiz Šablona)
     await sheets.spreadsheets.batchUpdate({
       spreadsheetId: INVOICE_SHEET_ID,
       resource: {
         requests: [
-          { updateSheetProperties: { properties: { sheetId: newSheetId, title: invNumber }, fields: 'title' } }
+          { updateSheetProperties: { properties: { sheetId: newSheetId, title: invNumber, index: 1 }, fields: 'title,index' } }
         ]
       }
     });
