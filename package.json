@@ -9,7 +9,7 @@
   "dependencies": {
     "googleapis": "^140.0.1",
     "next": "^15.0.0",
-    "pdfmake": "^0.3.7",
+    "pdfkit": "^0.18.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   }

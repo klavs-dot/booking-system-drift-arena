@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import PdfPrinter from 'pdfmake';
+import PDFDocument from 'pdfkit';
 import path from 'path';
 import fs from 'fs';
 
@@ -8,213 +8,155 @@ export const maxDuration = 30;
 export async function POST(req) {
   try {
     const data = await req.json();
-
-    const fontsDir = path.join(process.cwd(), 'node_modules', 'pdfmake', 'build', 'fonts', 'Roboto');
-    const fonts = {
-      Roboto: {
-        normal: path.join(fontsDir, 'Roboto-Regular.ttf'),
-        bold: path.join(fontsDir, 'Roboto-Medium.ttf'),
-        italics: path.join(fontsDir, 'Roboto-Italic.ttf'),
-        bolditalics: path.join(fontsDir, 'Roboto-MediumItalic.ttf'),
-      }
-    };
-    const printer = new PdfPrinter(fonts);
-
     const s = data.sender || {};
     const rek = data.rek || {};
     const rides = data.rides || { qty: 0, price: 0, total: 0 };
     const drinks = data.drinks || [];
     const isTelpa = data.isTelpa;
 
+    const doc = new PDFDocument({ size: 'A4', margin: 40 });
+    const chunks = [];
+    doc.on('data', c => chunks.push(c));
+
+    const W = 515; // usable width
+    const M = 40;
+    let y = 40;
+
+    // --- Logo ---
+    try {
+      const logoPath = path.join(process.cwd(), 'public', 'da_logo.png');
+      if (fs.existsSync(logoPath)) {
+        doc.image(logoPath, M, y, { width: 80 });
+      }
+    } catch (e) {}
+
+    // --- Invoice number ---
+    doc.fontSize(16).font('Helvetica-Bold').fillColor('#333')
+       .text(data.invNumber || '', M, y + 5, { align: 'right', width: W });
+    doc.fontSize(9).font('Helvetica').fillColor('#666')
+       .text('Izrakstits: ' + (data.date || ''), M, y + 28, { align: 'right', width: W })
+       .text('Apmaksas termins: ' + (data.dueDate || ''), M, y + 40, { align: 'right', width: W });
+
+    y += 60;
+
+    // --- Orange line ---
+    doc.moveTo(M, y).lineTo(M + W, y).strokeColor('#E84D0E').lineWidth(1.5).stroke();
+    y += 12;
+
+    // --- Sender / Receiver ---
+    const colW = W / 2;
+    doc.fontSize(7).font('Helvetica-Bold').fillColor('#999')
+       .text('NOSUTITAJS', M, y)
+       .text('SANEMEJS', M + colW + 10, y);
+    y += 12;
+
+    doc.fontSize(9).font('Helvetica-Bold').fillColor('#333')
+       .text(s.name || '', M, y);
+    doc.font('Helvetica').fontSize(8).fillColor('#555');
+    const sLines = [
+      'PVN Nr: ' + (s.pvn || ''), 'Reg. Nr: ' + (s.reg || ''),
+      s.addr || '', (s.bank || '') + '; ' + (s.swift || ''),
+      'Konts: ' + (s.account || '')
+    ];
+    let sy = y + 14;
+    sLines.forEach(l => { doc.text(l, M, sy); sy += 11; });
+
+    // Receiver
     const recLines = [];
     if (rek.name) recLines.push(rek.name);
-    if (rek.reg) recLines.push('Reģ. Nr: ' + rek.reg);
+    if (rek.reg) recLines.push('Reg. Nr: ' + rek.reg);
     if (rek.pvn) recLines.push('PVN Nr: ' + rek.pvn);
     if (rek.addr) recLines.push(rek.addr);
     if (!recLines.length) recLines.push(data.client || '');
 
-    const tableBody = [
-      [
-        { text: 'NOSAUKUMS', style: 'thdr' },
-        { text: 'DAUDZ. (GAB.)', style: 'thdr', alignment: 'center' },
-        { text: 'CENA BEZ PVN (EUR)', style: 'thdr', alignment: 'right' },
-        { text: 'SUMMA', style: 'thdr', alignment: 'right' },
-      ]
-    ];
+    doc.fontSize(9).font('Helvetica-Bold').fillColor('#333')
+       .text(recLines[0] || '', M + colW + 10, y);
+    doc.font('Helvetica').fontSize(8).fillColor('#555');
+    let ry = y + 14;
+    recLines.slice(1).forEach(l => { doc.text(l, M + colW + 10, ry); ry += 11; });
+
+    y = Math.max(sy, ry) + 14;
+
+    // --- Table ---
+    const cols = [M, M + 240, M + 320, M + 420, M + W];
+    const colWidths = [240, 80, 100, W - 420];
+
+    // Header
+    doc.rect(M, y, W, 22).fill('#E84D0E');
+    doc.fontSize(8).font('Helvetica-Bold').fillColor('#FFF')
+       .text('NOSAUKUMS', cols[0] + 6, y + 7)
+       .text('DAUDZ. (GAB.)', cols[1] + 4, y + 7)
+       .text('CENA BEZ PVN', cols[2] + 4, y + 7)
+       .text('SUMMA', cols[3] + 4, y + 7, { width: colWidths[3] - 8, align: 'right' });
+    y += 24;
 
     let grandTotal = 0;
+    doc.font('Helvetica').fontSize(9).fillColor('#333');
+
+    function addRow(name, qty, priceWithVat) {
+      const lineTotal = qty * priceWithVat;
+      const net = lineTotal / 1.21;
+      const unitNet = priceWithVat / 1.21;
+      doc.rect(M, y - 2, W, 20).strokeColor('#E84D0E').lineWidth(0.3).stroke();
+      doc.text(name, cols[0] + 6, y + 3)
+         .text(String(qty), cols[1] + 4, y + 3, { width: 70, align: 'center' })
+         .text(unitNet.toFixed(2), cols[2] + 4, y + 3, { width: 90, align: 'right' })
+         .text(net.toFixed(2), cols[3] + 4, y + 3, { width: colWidths[3] - 8, align: 'right' });
+      y += 22;
+      grandTotal += lineTotal;
+    }
 
     if (isTelpa) {
       const total = rides.total + drinks.reduce((sum, d) => sum + d.qty * d.price, 0);
-      const net = total / 1.21;
-      tableBody.push([
-        'Telpu noma',
-        { text: '1', alignment: 'center' },
-        { text: net.toFixed(2), alignment: 'right' },
-        { text: net.toFixed(2), alignment: 'right' },
-      ]);
-      grandTotal = total;
+      addRow('Telpu noma', 1, total);
     } else {
-      if (rides.total > 0) {
-        const rNet = rides.total / 1.21;
-        tableBody.push([
-          'Braucieni',
-          { text: String(rides.qty), alignment: 'center' },
-          { text: (rides.price / 1.21).toFixed(2), alignment: 'right' },
-          { text: rNet.toFixed(2), alignment: 'right' },
-        ]);
-        grandTotal += rides.total;
-      }
-      drinks.forEach(d => {
-        const lineTotal = d.qty * d.price;
-        const lineNet = lineTotal / 1.21;
-        tableBody.push([
-          d.name || '',
-          { text: String(d.qty), alignment: 'center' },
-          { text: (d.price / 1.21).toFixed(2), alignment: 'right' },
-          { text: lineNet.toFixed(2), alignment: 'right' },
-        ]);
-        grandTotal += lineTotal;
-      });
+      if (rides.total > 0) addRow('Braucieni', rides.qty, rides.price);
+      drinks.forEach(d => { if (d.price > 0) addRow(d.name || 'Dzeriens', d.qty, d.price); });
     }
 
-    if (tableBody.length < 3) {
-      tableBody.push(['', '', '', '']);
+    // Empty row if only 1 item
+    if (grandTotal > 0) {
+      doc.rect(M, y - 2, W, 20).strokeColor('#E84D0E').lineWidth(0.3).stroke();
+      y += 22;
     }
 
+    y += 8;
+
+    // --- Totals ---
     const netGrand = grandTotal / 1.21;
     const vatGrand = grandTotal - netGrand;
+    const tx = M + 300;
 
-    let logoContent = null;
-    try {
-      const logoPath = path.join(process.cwd(), 'public', 'da_logo.png');
-      if (fs.existsSync(logoPath)) {
-        const logoData = fs.readFileSync(logoPath);
-        logoContent = 'data:image/png;base64,' + logoData.toString('base64');
-      }
-    } catch (e) { /* nav logo */ }
+    doc.moveTo(tx, y).lineTo(M + W, y).strokeColor('#E84D0E').lineWidth(0.5).stroke();
+    y += 8;
 
-    const docDefinition = {
-      pageSize: 'A4',
-      pageMargins: [40, 40, 40, 40],
-      defaultStyle: { font: 'Roboto', fontSize: 9, color: '#333' },
-      styles: {
-        thdr: { bold: true, fontSize: 8, color: '#FFFFFF' },
-      },
-      content: [
-        {
-          columns: [
-            logoContent
-              ? { image: logoContent, width: 80 }
-              : { text: 'DRIFT ARENA', fontSize: 22, bold: true, color: '#E84D0E' },
-            {
-              stack: [
-                { text: data.invNumber || '', fontSize: 16, bold: true, color: '#333', alignment: 'right' },
-                { text: 'Izrakstīts: ' + (data.date || ''), fontSize: 9, color: '#666', alignment: 'right', margin: [0, 4, 0, 0] },
-                { text: 'Apmaksas termiņš: ' + (data.dueDate || ''), fontSize: 9, color: '#666', alignment: 'right' },
-              ]
-            }
-          ]
-        },
-        { text: ' ', fontSize: 8 },
-        { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1.5, lineColor: '#E84D0E' }] },
-        { text: ' ', fontSize: 8 },
-        {
-          columns: [
-            {
-              width: '50%',
-              stack: [
-                { text: 'NOSŪTĪTĀJS', fontSize: 8, bold: true, color: '#999', margin: [0, 0, 0, 4] },
-                { text: s.name || '', fontSize: 10, bold: true },
-                'PVN Nr: ' + (s.pvn || ''),
-                'Reģ. Nr: ' + (s.reg || ''),
-                s.addr || '',
-                (s.bank || '') + '; ' + (s.swift || ''),
-                'Konts: ' + (s.account || ''),
-              ]
-            },
-            {
-              width: '50%',
-              stack: [
-                { text: 'SAŅĒMĒJS', fontSize: 8, bold: true, color: '#999', margin: [0, 0, 0, 4] },
-                ...recLines.map((l, i) => i === 0 ? { text: l, fontSize: 10, bold: true } : l)
-              ]
-            }
-          ]
-        },
-        { text: ' ', fontSize: 12 },
-        {
-          table: {
-            headerRows: 1,
-            widths: ['*', 70, 110, 80],
-            body: tableBody,
-          },
-          layout: {
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => '#E84D0E',
-            vLineColor: () => '#E84D0E',
-            fillColor: (i) => i === 0 ? '#E84D0E' : null,
-            paddingLeft: () => 8,
-            paddingRight: () => 8,
-            paddingTop: () => 5,
-            paddingBottom: () => 5,
-          }
-        },
-        { text: ' ', fontSize: 10 },
-        {
-          columns: [
-            { text: '', width: '*' },
-            {
-              width: 220,
-              stack: [
-                { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 220, y2: 0, lineWidth: 0.5, lineColor: '#E84D0E' }] },
-                { text: ' ', fontSize: 4 },
-                {
-                  columns: [
-                    { text: 'Summa bez PVN:', width: 130, fontSize: 10 },
-                    { text: netGrand.toFixed(2) + ' EUR', alignment: 'right', fontSize: 10 }
-                  ]
-                },
-                {
-                  columns: [
-                    { text: 'PVN 21%:', width: 130, fontSize: 10 },
-                    { text: vatGrand.toFixed(2) + ' EUR', alignment: 'right', fontSize: 10 }
-                  ]
-                },
-                { text: ' ', fontSize: 6 },
-                { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 220, y2: 0, lineWidth: 1, lineColor: '#E84D0E' }] },
-                { text: ' ', fontSize: 4 },
-                {
-                  columns: [
-                    { text: 'KOPĀ APMAKSAI:', width: 130, fontSize: 13, bold: true, color: '#E84D0E' },
-                    { text: grandTotal.toFixed(2) + ' EUR', alignment: 'right', fontSize: 13, bold: true, color: '#E84D0E' }
-                  ]
-                },
-              ]
-            }
-          ]
-        }
-      ]
-    };
+    doc.fontSize(10).font('Helvetica').fillColor('#333');
+    doc.text('Summa bez PVN:', tx, y);
+    doc.text(netGrand.toFixed(2) + ' EUR', tx, y, { width: W - 300, align: 'right' });
+    y += 14;
+    doc.text('PVN 21%:', tx, y);
+    doc.text(vatGrand.toFixed(2) + ' EUR', tx, y, { width: W - 300, align: 'right' });
+    y += 6;
 
-    const pdfDoc = printer.createPdfKitDocument(docDefinition);
-    const chunks = [];
+    doc.moveTo(tx, y).lineTo(M + W, y).strokeColor('#E84D0E').lineWidth(1).stroke();
+    y += 8;
+
+    doc.fontSize(13).font('Helvetica-Bold').fillColor('#E84D0E');
+    doc.text('KOPA APMAKSAI:', tx, y);
+    doc.text(grandTotal.toFixed(2) + ' EUR', tx, y, { width: W - 300, align: 'right' });
+
+    doc.end();
+
     return new Promise((resolve) => {
-      pdfDoc.on('data', chunk => chunks.push(chunk));
-      pdfDoc.on('end', () => {
-        const pdfBuffer = Buffer.concat(chunks);
-        const pdfBase64 = 'data:application/pdf;base64,' + pdfBuffer.toString('base64');
-        resolve(NextResponse.json({ ok: true, pdf: pdfBase64 }));
+      doc.on('end', () => {
+        const buf = Buffer.concat(chunks);
+        const b64 = 'data:application/pdf;base64,' + buf.toString('base64');
+        resolve(NextResponse.json({ ok: true, pdf: b64 }));
       });
-      pdfDoc.on('error', err => {
-        resolve(NextResponse.json({ ok: false, error: err.message }, { status: 500 }));
-      });
-      pdfDoc.end();
     });
 
   } catch (e) {
-    console.error('Invoice PDF error:', e.message, e.stack);
+    console.error('Invoice error:', e.message, e.stack);
     return NextResponse.json({ ok: false, error: e.message }, { status: 500 });
   }
 }
