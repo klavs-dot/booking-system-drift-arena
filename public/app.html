@@ -2753,6 +2753,8 @@ window.google={script:{run:window.__gsr__}};
     <button onclick="closeM('M_INV')" style="position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border2);color:var(--text2);width:32px;height:32px;border-radius:var(--r);cursor:pointer;font-size:16px;z-index:10;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">✕</button>
 
     <div style="font-family:var(--font-head);font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;">🧾 RĒĶINA SAGATAVOŠANA</div>
+    
+    <!-- Header info ar SIA nosaukumu -->
     <div id="inv-booking-info" style="margin-bottom:16px;"></div>
 
     <!-- Braucienu pozīcija -->
@@ -2761,7 +2763,7 @@ window.google={script:{run:window.__gsr__}};
       <div class="wform-row3">
         <div class="field"><label>Braucienu skaits</label><input type="number" id="inv_rides_qty" min="0" value="0"></div>
         <div class="field"><label>Cena par braucienu (ar PVN, EUR)</label><input type="number" id="inv_rides_price" min="0" step="0.01" value="0" placeholder="piem. 5.00"></div>
-        <div class="field"><label>Summa ar PVN</label><div id="inv_rides_total" style="font-size:22px;font-weight:700;color:var(--accent);padding-top:8px;">0.00 €</div></div>
+        <div class="field"><label>Summa ar PVN</label><div id="inv_rides_total" style="font-size:22px;font-weight:700;color:#fff;padding-top:8px;">0.00 €</div></div>
       </div>
     </div>
 
@@ -2769,13 +2771,16 @@ window.google={script:{run:window.__gsr__}};
     <div class="wiz-block" style="background:#1a1a1a;">
       <div class="wiz-block-title">🍸 Dzērieni</div>
       <div id="inv_drinks_list"></div>
-      <div class="wform-row3" style="margin-top:8px;">
-        <div class="field"><label>Nosaukums</label><input type="text" id="inv_drink_name" placeholder="Cola, Pepsi..."></div>
-        <div class="field"><label>Daudzums</label><input type="number" id="inv_drink_qty" min="1" value="1"></div>
-        <div class="field"><label>Cena ar PVN (EUR)</label>
-          <div style="display:flex;gap:6px;">
-            <input type="number" id="inv_drink_price" min="0" step="0.01" value="0" placeholder="2.50" style="flex:1;">
-            <button class="btn btn-p" onclick="invAddDrink()" style="padding:6px 14px;">+</button>
+      <div id="inv_drinks_subtotal" style="text-align:right;padding:8px 0;font-size:13px;color:#fff;font-weight:700;"></div>
+      <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
+        <div class="wform-row3">
+          <div class="field"><label>Nosaukums</label><input type="text" id="inv_drink_name" placeholder="Cola, Pepsi..."></div>
+          <div class="field"><label>Daudzums</label><input type="number" id="inv_drink_qty" min="1" value="1"></div>
+          <div class="field"><label>Cena ar PVN (EUR)</label>
+            <div style="display:flex;gap:6px;">
+              <input type="number" id="inv_drink_price" min="0" step="0.01" placeholder="2.50" style="flex:1;">
+              <button class="btn btn-p" onclick="invAddDrink()" style="padding:6px 14px;">+</button>
+            </div>
           </div>
         </div>
       </div>
@@ -2808,12 +2813,13 @@ window.google={script:{run:window.__gsr__}};
       </label>
     </div>
 
-    <!-- Pogas -->
-    <div style="display:flex;gap:12px;justify-content:flex-end;">
-      <button class="btn btn-s" onclick="closeM('M_INV')" style="padding:10px 20px;">Atcelt</button>
-      <button class="btn" onclick="invGeneratePDF()" style="padding:10px 20px;background:#0d2e16;color:#22c55e;border:1px solid #22c55e;font-weight:700;">📄 Lejupielādēt PDF</button>
-      <button class="btn btn-p" onclick="invSendEmail()" style="padding:10px 20px;">📧 Nosūtīt uz e-pastu</button>
+    <!-- Validācijas brīdinājums -->
+    <div id="inv_validation_warn" style="display:none;padding:10px 14px;background:#2d1e03;border:1px solid #854d0e;border-radius:var(--r);color:#facc15;font-size:12px;margin-bottom:12px;font-weight:600;">
+      ⚠️ Ievadi cenu visām pozīcijām!
     </div>
+
+    <!-- Pogas -->
+    <div id="inv_buttons" style="display:flex;gap:12px;justify-content:flex-end;"></div>
 
     <input type="hidden" id="inv_booking_id">
   </div>
@@ -5983,15 +5989,19 @@ function openInvoice(id) {
   _invDrinks = [];
   document.getElementById('inv_booking_id').value = id;
 
-  // Aizpildīt info
+  // Aizpildīt info — SIA nosaukums baltā, nevis vārds
   var rek = null;
   try { rek = b.rekviziti ? JSON.parse(b.rekviziti) : null; } catch(e){}
+  var siaName = (rek && rek.name) ? rek.name : '⚠️ Nav rekvizītu';
   document.getElementById('inv-booking-info').innerHTML =
-    '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;">'
-    + '<div style="font-size:15px;font-weight:700;">'+esc(b.client)+'</div>'
+    '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;">'
+    + '<div>'
+    + '<div style="font-size:17px;font-weight:800;color:#fff;">'+esc(siaName)+'</div>'
     + '<div style="font-size:12px;color:var(--text2);margin-top:4px;">'+esc(b.date)+' · '+cleanT(b.timeFrom)+'–'+cleanT(b.timeTo)+' · '+b.people+' cilv.</div>'
-    + (rek && rek.name ? '<div style="font-size:12px;color:var(--text3);margin-top:4px;">'+esc(rek.name)+(rek.reg?' · '+esc(rek.reg):'')+'</div>' : '')
-    + (b.email ? '<div style="font-size:12px;color:var(--accent);margin-top:4px;">📧 '+esc(b.email)+'</div>' : '')
+    + '<div style="font-size:11px;color:var(--text3);margin-top:2px;">'+esc(b.client)+(rek&&rek.reg?' · '+esc(rek.reg):'')+'</div>'
+    + (b.email ? '<div style="font-size:12px;color:#facc15;margin-top:4px;">📧 '+esc(b.email)+'</div>' : '')
+    + '</div>'
+    + '<button class="btn btn-s" onclick="openRekForm(\''+b.id+'\');closeM(\'M_INV\');" style="padding:5px 12px;font-size:10px;white-space:nowrap;">✏️ Labot rekvizītus</button>'
     + '</div>';
 
   // Braucieni
@@ -6013,13 +6023,17 @@ function openInvoice(id) {
     });
   }
 
+  // Stāvoklis — vai jau ģenerēts
+  _invGenerated = !!localStorage.getItem('inv_sent_'+b.id);
+  _invEditing = false;
+
   invRenderDrinks();
   invRecalc();
+  invRenderButtons();
   openM('M_INV');
 
-  // Pievienot input listeners
-  document.getElementById('inv_rides_qty').oninput = invRecalc;
-  document.getElementById('inv_rides_price').oninput = invRecalc;
+  document.getElementById('inv_rides_qty').oninput = function(){ invOnChange(); invRecalc(); };
+  document.getElementById('inv_rides_price').oninput = function(){ invOnChange(); invRecalc(); };
 }
 
 function invAddDrink() {
@@ -6048,6 +6062,7 @@ function invDrinkPriceChange(idx, val) {
 
 function invDrinkQtyChange(idx, val) {
   _invDrinks[idx].qty = parseInt(val) || 1;
+  invOnChange();
   invRenderDrinks();
   invRecalc();
 }
@@ -6063,7 +6078,7 @@ function invRenderDrinks() {
       + '<input type="number" min="1" value="'+d.qty+'" style="width:55px;padding:5px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:12px;text-align:center;" oninput="invDrinkQtyChange('+i+',this.value)">'
       + '<span style="font-size:11px;color:var(--text3);">x</span>'
       + '<input type="number" min="0" step="0.01" value="'+(d.price||'')+'" placeholder="Cena" style="width:80px;padding:5px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:12px;text-align:center;" oninput="invDrinkPriceChange('+i+',this.value)">'
-      + '<span style="min-width:70px;text-align:right;font-size:13px;color:'+(lineTotal>0?'var(--accent)':'var(--text3)')+';font-weight:700;">'+(lineTotal>0?lineTotal.toFixed(2)+' €':'—')+'</span>'
+      + '<span style="min-width:70px;text-align:right;font-size:13px;color:'+(lineTotal>0?'#fff':'var(--text3)')+';font-weight:700;">'+(lineTotal>0?lineTotal.toFixed(2)+' €':'—')+'</span>'
       + '<button onclick="invRemoveDrink('+i+')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;">✕</button>'
       + '</div>';
   });
@@ -6075,9 +6090,19 @@ function invRecalc() {
   var ridesPrice = parseFloat(document.getElementById('inv_rides_price').value) || 0;
   var ridesTotal = ridesQty * ridesPrice;
 
+  // Braucienu summa — balta
   document.getElementById('inv_rides_total').textContent = ridesTotal.toFixed(2) + ' €';
 
   var drinksTotal = _invDrinks.reduce(function(s,d){return s + d.qty * d.price;}, 0);
+
+  // Dzērienu kopsumma
+  var dsSub = document.getElementById('inv_drinks_subtotal');
+  if (_invDrinks.length > 0 && drinksTotal > 0) {
+    dsSub.innerHTML = 'Dzērieni kopā: <span style="font-size:16px;">'+drinksTotal.toFixed(2)+' €</span>';
+  } else {
+    dsSub.innerHTML = '';
+  }
+
   var grandTotal = ridesTotal + drinksTotal;
   var netTotal = grandTotal / 1.21;
   var vatTotal = grandTotal - netTotal;
@@ -6090,7 +6115,7 @@ function invRecalc() {
   var isTelpa = document.getElementById('inv_telpa').checked;
   var lines = [];
   if (isTelpa) {
-    lines.push('<div>🏢 Telpu noma — <b>'+grandTotal.toFixed(2)+' €</b> (ar PVN)</div>');
+    lines.push('<div>🏢 Telpu noma — <b>'+grandTotal.toFixed(2)+' €</b></div>');
   } else {
     if (ridesTotal > 0) lines.push('<div>🏁 Braucieni: '+ridesQty+' x '+ridesPrice.toFixed(2)+' = <b>'+ridesTotal.toFixed(2)+' €</b></div>');
     _invDrinks.forEach(function(d) {
@@ -6098,6 +6123,78 @@ function invRecalc() {
     });
   }
   document.getElementById('inv_summary').innerHTML = lines.join('') || '<div style="color:var(--text3);">Ievadi cenas lai redzētu kopsavilkumu</div>';
+
+  // Validācija
+  invValidate();
+}
+
+function invValidate() {
+  var ridesQty = parseInt(document.getElementById('inv_rides_qty').value) || 0;
+  var ridesPrice = parseFloat(document.getElementById('inv_rides_price').value) || 0;
+  var warn = document.getElementById('inv_validation_warn');
+  var issues = [];
+
+  if (ridesQty > 0 && ridesPrice <= 0) issues.push('Braucieniem nav cenas');
+  _invDrinks.forEach(function(d) {
+    if (d.qty > 0 && d.price <= 0) issues.push(d.name + ' — nav cenas');
+  });
+
+  if (issues.length > 0) {
+    warn.style.display = 'block';
+    warn.textContent = '⚠️ ' + issues.join('; ');
+    return false;
+  }
+  warn.style.display = 'none';
+  return true;
+}
+
+function invOnChange() {
+  if (_invGenerated && !_invEditing) {
+    _invEditing = true;
+    invRenderButtons();
+  }
+}
+
+var _invGenerated = false;
+var _invEditing = false;
+
+function invRenderButtons() {
+  var el = document.getElementById('inv_buttons');
+  var html = '<button class="btn btn-s" onclick="closeM(\'M_INV\')" style="padding:10px 20px;">Atcelt</button>';
+
+  if (!_invGenerated) {
+    // Pirmā reize — Ģenerēt
+    html += '<button class="btn btn-p" onclick="invGeneratePDF()" style="padding:10px 24px;">🧾 Ģenerēt rēķinu</button>';
+  } else if (_invEditing) {
+    // Labošana
+    html += '<button class="btn btn-s" onclick="invCancelEdit()" style="padding:10px 20px;">↩ Atcelt labošanu</button>';
+    html += '<button class="btn btn-p" onclick="invGeneratePDF()" style="padding:10px 24px;">🔄 Labot rēķinu</button>';
+  } else {
+    // Ģenerēts — lejupielādēt/nosūtīt
+    html += '<button class="btn" onclick="invDownloadPDF()" style="padding:10px 20px;background:#0d2e16;color:#22c55e;border:1px solid #22c55e;font-weight:700;">📄 Lejupielādēt rēķinu</button>';
+    html += '<button class="btn btn-p" onclick="invSendEmail()" style="padding:10px 24px;">📧 Nosūtīt uz e-pastu</button>';
+  }
+  el.innerHTML = html;
+}
+
+function invCancelEdit() {
+  _invEditing = false;
+  invRenderButtons();
+}
+
+function invDownloadPDF() {
+  var b = _invBooking;
+  if (!b) return;
+  var pdfData = localStorage.getItem('inv_pdf_'+b.id);
+  if (pdfData) {
+    var link = document.createElement('a');
+    link.href = pdfData;
+    var num = localStorage.getItem('inv_number_'+b.id) || 'rekins';
+    link.download = num.replace(/[#\/]/g,'_')+'.pdf';
+    link.click();
+  } else {
+    invGeneratePDF();
+  }
 }
 
 function invGetData() {
@@ -6110,18 +6207,28 @@ function invGetData() {
   var ridesPrice = parseFloat(document.getElementById('inv_rides_price').value) || 0;
   var isTelpa = document.getElementById('inv_telpa').checked;
 
-  // Rēķina numurs: dd/mm/gg-N
-  var today = new Date();
-  var dd = p2(today.getDate()), mm = p2(today.getMonth()+1), yy = String(today.getFullYear()).slice(2);
-  var dateKey = dd+'/'+mm+'/'+yy;
-  var dayCount = parseInt(localStorage.getItem('inv_count_'+dateKey) || '0') + 1;
+  // Rēķina numurs — vienreiz per booking
+  var existingNumber = localStorage.getItem('inv_number_'+b.id);
+  var invNumber, dateKey, dayCount;
+  if (existingNumber) {
+    invNumber = existingNumber;
+    var m = existingNumber.match(/#(\d+\/\d+\/\d+)-(\d+)/);
+    dateKey = m ? m[1] : '';
+    dayCount = m ? parseInt(m[2]) : 1;
+  } else {
+    var today = new Date();
+    var dd = p2(today.getDate()), mm = p2(today.getMonth()+1), yy = String(today.getFullYear()).slice(2);
+    dateKey = dd+'/'+mm+'/'+yy;
+    dayCount = parseInt(localStorage.getItem('inv_count_'+dateKey) || '0') + 1;
+    invNumber = 'Rēķins#'+dateKey+'-'+dayCount;
+  }
 
   return {
-    invNumber: 'Rēķins#'+dateKey+'-'+dayCount,
+    invNumber: invNumber,
     dateKey: dateKey,
     dayCount: dayCount,
-    date: today.toLocaleDateString('lv-LV'),
-    dueDate: new Date(today.getTime() + 5*24*60*60*1000).toLocaleDateString('lv-LV'),
+    date: new Date().toLocaleDateString('lv-LV'),
+    dueDate: new Date(Date.now() + 5*24*60*60*1000).toLocaleDateString('lv-LV'),
     client: b.client,
     email: b.email || '',
     bookingDate: b.date,
@@ -6144,13 +6251,14 @@ function invGetData() {
 }
 
 function invGeneratePDF() {
+  if (!invValidate()) { toast('Ievadi cenu visām pozīcijām!', 'warn'); return; }
   var data = invGetData();
   if (!data) return;
   var grandTotal = data.rides.total + data.drinks.reduce(function(s,d){return s+d.qty*d.price;},0);
   if (grandTotal <= 0) { toast('Ievadi vismaz vienu pozīciju ar cenu!', 'warn'); return; }
 
-  // Saglabāt rēķina numuru
   localStorage.setItem('inv_count_'+data.dateKey, data.dayCount);
+  localStorage.setItem('inv_number_'+_invBooking.id, data.invNumber);
 
   ovl('Ģenerē rēķinu Google Sheets...');
   fetch('/api/invoice', {
@@ -6162,16 +6270,16 @@ function invGeneratePDF() {
   .then(function(res){
     hovl();
     if (res.ok && res.pdf) {
-      // Lejupielādēt PDF
+      localStorage.setItem('inv_pdf_'+_invBooking.id, res.pdf);
       var link = document.createElement('a');
       link.href = res.pdf;
       link.download = data.invNumber.replace(/[#\/]/g,'_')+'.pdf';
       link.click();
       localStorage.setItem('inv_sent_'+_invBooking.id, '1');
-      // Rādīt Sheets linku
-      if (res.sheetUrl) {
-        localStorage.setItem('inv_sheet_'+_invBooking.id, res.sheetUrl);
-      }
+      if (res.sheetUrl) localStorage.setItem('inv_sheet_'+_invBooking.id, res.sheetUrl);
+      _invGenerated = true;
+      _invEditing = false;
+      invRenderButtons();
       toast('✓ Rēķins ģenerēts: '+data.invNumber, 'ok');
       renderInvoices();
     } else {
@@ -6182,15 +6290,20 @@ function invGeneratePDF() {
 }
 
 function invSendEmail() {
-  var data = invGetData();
-  if (!data) return;
-  var email = data.email || (data.rek ? '' : '');
+  var b = _invBooking;
+  if (!b) return;
+  var email = b.email || '';
+  var rek = null;
+  try { rek = b.rekviziti ? JSON.parse(b.rekviziti) : null; } catch(e){}
+  if (rek && rek.email) email = rek.email;
   if (!email) { toast('Nav e-pasta adreses!', 'warn'); return; }
-  // Ģenerē PDF un atver mailto ar pielikumu (vai tikai atver mailto)
-  invGeneratePDF();
+
+  invDownloadPDF();
   setTimeout(function() {
-    window.open('mailto:'+email+'?subject='+encodeURIComponent(data.invNumber+' — '+data.sender.name)+'&body='+encodeURIComponent('Labdien!\n\nPielikumā rēķins '+data.invNumber+'.\n\nApmaksas termiņš: '+data.dueDate+'.\n\nAr cieņu,\n'+data.sender.name), '_blank');
-  }, 1000);
+    var subject = 'Drift Arena Rēķins';
+    var body = 'Sveiki,\n\nPielikumā nosūtam rēķinu.\n\nPriecāsimies par savlaicīgu apmaksu un gaidīsim Jūs ciemos atkal.\n\nAr cieņu,\nDrift Arena komanda';
+    window.open('mailto:'+email+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body), '_blank');
+  }, 500);
 }
 
 // ══ MASTER ADMIN ══
