@@ -24,7 +24,6 @@ export async function POST(req) {
     const data = await req.json();
     const auth = getAuth();
     const sheets = google.sheets({ version: 'v4', auth });
-    const drive = google.drive({ version: 'v3', auth });
 
     const s = data.sender || {};
     const rek = data.rek || {};
@@ -37,11 +36,11 @@ export async function POST(req) {
     const meta = await sheets.spreadsheets.get({ spreadsheetId: INVOICE_SHEET_ID });
     const templateSheet = meta.data.sheets.find(s => s.properties.title === 'Šablons');
     if (!templateSheet) {
-      return NextResponse.json({ ok: false, error: 'Šablons nav atrasts. Izsauc /api/invoice-setup vispirms.' }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Šablons nav atrasts!' }, { status: 400 });
     }
     const templateSheetId = templateSheet.properties.sheetId;
 
-    // 2. Kopēt šablonu kā jaunu lapu
+    // 2. Kopēt šablonu
     const copyRes = await sheets.spreadsheets.sheets.copyTo({
       spreadsheetId: INVOICE_SHEET_ID,
       sheetId: templateSheetId,
@@ -49,7 +48,7 @@ export async function POST(req) {
     });
     const newSheetId = copyRes.data.sheetId;
 
-    // 3. Pārsaukt jauno lapu un pārvietot uz pozīciju 1 (aiz Šablona)
+    // 3. Pārsaukt un pārvietot
     await sheets.spreadsheets.batchUpdate({
       spreadsheetId: INVOICE_SHEET_ID,
       resource: {
@@ -87,57 +86,47 @@ export async function POST(req) {
     const netGrand = grandTotal / 1.21;
     const vatGrand = grandTotal - netGrand;
 
-    // Saņēmēja info
-    const recName = rek.name || data.client || '';
-    const recReg = rek.reg ? 'Reģ. Nr: ' + rek.reg : '';
-    const recPvn = rek.pvn ? 'PVN Nr: ' + rek.pvn : '';
-    const recAddr = rek.addr || '';
+    // 5. Find-and-replace placeholders
+    const replacements = {
+      '{{REKINA_NR}}': invNumber,
+      '{{DATUMS}}': data.date || '',
+      '{{TERMINS}}': data.dueDate || '',
+      '{{SANEMEJS_NOSAUKUMS}}': rek.name || data.client || '',
+      '{{SANEMEJS_REG}}': rek.reg ? 'Reģ. Nr: ' + rek.reg : '',
+      '{{SANEMEJS_PVN}}': rek.pvn ? 'PVN Nr: ' + rek.pvn : '',
+      '{{SANEMEJS_ADRESE}}': rek.addr || '',
+      '{{SUMMA_BEZ_PVN}}': netGrand.toFixed(2) + ' EUR',
+      '{{PVN_SUMMA}}': vatGrand.toFixed(2) + ' EUR',
+      '{{KOPA_APMAKSAI}}': grandTotal.toFixed(2) + ' EUR',
+    };
 
-    // 5. Aizpildīt datus — aizstāt placeholder vērtības
-    const values = [
-      ['', 'DRIFT ARENA', '', '', '', invNumber],
-      ['', 'WOLFTRIKE', '', '', '', ''],
-      ['', '', '', '', 'Izrakstīts:', data.date || ''],
-      ['', '', '', '', 'Apmaksas termiņš:', data.dueDate || ''],
-      ['', '', '', '', '', ''],
-      ['', 'NOSŪTĪTĀJS', '', 'SAŅĒMĒJS', '', ''],
-      ['', s.name || 'SIA "DA LIEPĀJA"', '', recName, '', ''],
-      ['', 'PVN Nr: ' + (s.pvn || 'LV40203522098'), '', recReg, '', ''],
-      ['', 'Reģ. Nr: ' + (s.reg || '40203522098'), '', recPvn, '', ''],
-      ['', s.addr || 'Liepāja, Ganību 197/205, LV-3407', '', recAddr, '', ''],
-      ['', (s.bank || 'Luminor Bank AS Latvijas filiāle') + '; ' + (s.swift || 'RIKOLV2X'), '', '', '', ''],
-      ['', 'Konts: ' + (s.account || 'LV81RIKO0001080210823'), '', '', '', ''],
-      ['', '', '', '', '', ''],
-      ['', 'NOSAUKUMS', '', 'DAUDZ. (GAB.)', 'CENA BEZ PVN (EUR)', 'SUMMA'],
-    ];
-
-    // Pozīcijas (max 5)
-    for (let i = 0; i < 5; i++) {
-      if (i < positions.length) {
-        const p = positions[i];
-        values.push(['', p.name, '', String(p.qty), p.price.toFixed(2), p.sum.toFixed(2)]);
-      } else {
-        values.push(['', '', '', '', '', '']);
-      }
+    // Pozīcijas 1-5
+    for (let i = 1; i <= 5; i++) {
+      const p = positions[i - 1];
+      replacements['{{POZ_' + i + '_NOSAUKUMS}}'] = p ? p.name : '';
+      replacements['{{POZ_' + i + '_DAUDZ}}'] = p ? String(p.qty) : '';
+      replacements['{{POZ_' + i + '_CENA}}'] = p ? p.price.toFixed(2) : '';
+      replacements['{{POZ_' + i + '_SUMMA}}'] = p ? p.sum.toFixed(2) : '';
     }
 
-    // Summas
-    values.push(['', '', '', '', '', '']);
-    values.push(['', '', '', '', 'Summa bez PVN:', netGrand.toFixed(2) + ' EUR']);
-    values.push(['', '', '', '', 'PVN 21%:', vatGrand.toFixed(2) + ' EUR']);
-    values.push(['', '', '', '', 'KOPĀ APMAKSAI:', grandTotal.toFixed(2) + ' EUR']);
-    values.push(['', '', '', '', '', '']);
-    values.push(['', '', '', '', '', '']);
-    values.push(['', 'Rēķins sagatavots elektroniski un ir derīgs bez paraksta.', '', '', '', '']);
+    // Batch find-and-replace
+    const replaceRequests = Object.entries(replacements).map(([find, replace]) => ({
+      findReplace: {
+        find: find,
+        replacement: replace,
+        sheetId: newSheetId,
+        allSheets: false,
+        matchCase: true,
+        matchEntireCell: false,
+      }
+    }));
 
-    await sheets.spreadsheets.values.update({
+    await sheets.spreadsheets.batchUpdate({
       spreadsheetId: INVOICE_SHEET_ID,
-      range: `'${invNumber}'!A1:F26`,
-      valueInputOption: 'USER_ENTERED',
-      resource: { values }
+      resource: { requests: replaceRequests }
     });
 
-    // 6. Eksportēt kā PDF (tikai šo lapu)
+    // 6. Eksportēt kā PDF
     const authClient = await auth.getClient();
     const token = await authClient.getAccessToken();
 
