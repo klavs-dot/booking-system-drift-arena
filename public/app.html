@@ -2952,6 +2952,21 @@ window.google={script:{run:window.__gsr__}};
 @keyframes invPulseY { 0%,100%{box-shadow:0 0 0 0 rgba(250,204,21,0.4);} 50%{box-shadow:0 0 0 8px rgba(250,204,21,0);} }
 @keyframes invPulseB { 0%,100%{box-shadow:0 0 0 0 rgba(96,165,250,0.4);} 50%{box-shadow:0 0 0 8px rgba(96,165,250,0);} }
 @keyframes invStrobe { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+/* Rēķinu nav poga — sarkans alert */
+.nb-inv-alert {
+  border: 2px solid var(--red) !important;
+  animation: invNavGlitch 2s ease-in-out infinite;
+}
+@keyframes invNavGlitch {
+  0%,100% { transform:scale(1); box-shadow:0 0 0 0 rgba(239,68,68,0); }
+  10% { transform:scale(1.15); box-shadow:0 0 12px rgba(239,68,68,0.6); }
+  13% { transform:scale(1); }
+  20% { transform:scale(1.15); box-shadow:0 0 12px rgba(239,68,68,0.6); }
+  23% { transform:scale(1); }
+  30% { transform:scale(1.15); box-shadow:0 0 12px rgba(239,68,68,0.6); }
+  33% { transform:scale(1); box-shadow:0 0 0 0 rgba(239,68,68,0); }
+}
 </style>
 </div>
 
@@ -4357,7 +4372,7 @@ function goNav(name, btn) {
 function loadAll(silent) {
   if (!silent) ovl('Ielādē rezervācijas...');
   window.__gsr__
-    .withSuccessHandler(r => { ALL = JSON.parse(r); hovl(); renderCal(); renderToday(); updateStats(); if (document.getElementById('view-invoices').classList.contains('active')) renderInvoices(); })
+    .withSuccessHandler(r => { ALL = JSON.parse(r); hovl(); renderCal(); renderToday(); updateStats(); checkInvAlerts(); if (document.getElementById('view-invoices').classList.contains('active')) renderInvoices(); })
     .withFailureHandler(e => { hovl(); toast('Kļūda ielādējot: ' + e.message, 'err'); })
     .sGetAll();
 }
@@ -5999,6 +6014,26 @@ function renderInvoices() {
   });
   html += '</div>';
   el.innerHTML = html;
+
+  // Alert nav pogā ja ir nenosūtīti rēķini
+  var hasUnsent = inv.some(function(b) { return getInvStatus(b) === 'send'; });
+  var navBtn = document.getElementById('nb-invoices');
+  if (navBtn) {
+    if (hasUnsent) navBtn.classList.add('nb-inv-alert');
+    else navBtn.classList.remove('nb-inv-alert');
+  }
+}
+
+function checkInvAlerts() {
+  var inv = ALL.filter(function(b) {
+    return b.status !== 'Atcelta' && b.invoice && (b.invoice.includes('rēķin') || b.invoice.includes('rēķīn'));
+  });
+  var hasUnsent = inv.some(function(b) { return getInvStatus(b) === 'send'; });
+  var navBtn = document.getElementById('nb-invoices');
+  if (navBtn) {
+    if (hasUnsent) navBtn.classList.add('nb-inv-alert');
+    else navBtn.classList.remove('nb-inv-alert');
+  }
 }
 
 function getInvStatus(b) {
