@@ -6046,15 +6046,24 @@ function invDrinkPriceChange(idx, val) {
   invRecalc();
 }
 
+function invDrinkQtyChange(idx, val) {
+  _invDrinks[idx].qty = parseInt(val) || 1;
+  invRenderDrinks();
+  invRecalc();
+}
+
 function invRenderDrinks() {
   var el = document.getElementById('inv_drinks_list');
   if (!_invDrinks.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;">Nav dzērienu</div>'; return; }
   var html = '';
   _invDrinks.forEach(function(d, i) {
+    var lineTotal = d.qty * d.price;
     html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">'
-      + '<span style="flex:1;font-size:13px;color:var(--text);">'+esc(d.name)+' x'+d.qty+'</span>'
-      + '<input type="number" min="0" step="0.01" value="'+(d.price||'')+'" placeholder="Cena ar PVN" style="width:100px;padding:5px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:12px;text-align:center;" oninput="invDrinkPriceChange('+i+',this.value)">'
-      + '<span style="min-width:60px;text-align:right;font-size:12px;color:var(--text2);">'+(d.qty * d.price).toFixed(2)+' €</span>'
+      + '<span style="flex:1;font-size:13px;color:var(--text);min-width:100px;">'+esc(d.name)+'</span>'
+      + '<input type="number" min="1" value="'+d.qty+'" style="width:55px;padding:5px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:12px;text-align:center;" oninput="invDrinkQtyChange('+i+',this.value)">'
+      + '<span style="font-size:11px;color:var(--text3);">x</span>'
+      + '<input type="number" min="0" step="0.01" value="'+(d.price||'')+'" placeholder="Cena" style="width:80px;padding:5px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:12px;text-align:center;" oninput="invDrinkPriceChange('+i+',this.value)">'
+      + '<span style="min-width:70px;text-align:right;font-size:13px;color:'+(lineTotal>0?'var(--accent)':'var(--text3)')+';font-weight:700;">'+(lineTotal>0?lineTotal.toFixed(2)+' €':'—')+'</span>'
       + '<button onclick="invRemoveDrink('+i+')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;">✕</button>'
       + '</div>';
   });
