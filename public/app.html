@@ -2749,8 +2749,11 @@ window.google={script:{run:window.__gsr__}};
       <div style="display:flex;gap:8px;align-items:flex-end;">
         <div class="field" style="margin:0;"><label style="font-size:9px;">No</label><input type="date" id="inv_exp_from" style="padding:6px;font-size:12px;width:140px;"></div>
         <div class="field" style="margin:0;"><label style="font-size:9px;">Līdz</label><input type="date" id="inv_exp_to" style="padding:6px;font-size:12px;width:140px;"></div>
-        <button class="btn btn-p" onclick="invExportZip('custom')" style="padding:8px 16px;font-size:12px;">📁 Lejupielādēt</button>
       </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:12px;">
+      <button class="btn btn-p" onclick="invExportZip('custom_all')" style="padding:8px 16px;font-size:12px;">📁 Visus atlasītajā periodā</button>
+      <button class="btn" onclick="invExportZip('custom_paid')" style="padding:8px 16px;font-size:12px;background:#0d2e16;color:#22c55e;border:1px solid #16a34a;font-weight:700;">✅ Tikai apmaksātos atlasītajā periodā</button>
     </div>
     <div id="inv_export_status" style="margin-top:8px;font-size:11px;color:var(--text3);"></div>
   </div>
@@ -6726,29 +6729,34 @@ function invExportZip(mode) {
   var inv = ALL.filter(function(b) {
     return b.status !== 'Atcelta' && b.invoice && (b.invoice.includes('rēķin') || b.invoice.includes('rēķīn'));
   });
-  // Pievienot standalone
   var sList = []; try{sList=JSON.parse(localStorage.getItem('inv_standalone_list')||'[]');}catch(e){}
   sList.forEach(function(si){ inv.push(si); });
 
-  var fromDate, toDate, label;
+  var fromDate, toDate, label, paidOnly;
   if (mode === 'lastmonth') {
     var now = new Date();
     fromDate = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().slice(0,10);
     toDate = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().slice(0,10);
-    label = 'Rekini_' + MLV[now.getMonth()-1<0?11:now.getMonth()-1] + '_' + (now.getMonth()===0?now.getFullYear()-1:now.getFullYear());
+    label = 'Rekini_apmaksatie_' + MLV[now.getMonth()-1<0?11:now.getMonth()-1] + '_' + (now.getMonth()===0?now.getFullYear()-1:now.getFullYear());
+    paidOnly = true;
   } else {
     fromDate = document.getElementById('inv_exp_from').value;
     toDate = document.getElementById('inv_exp_to').value;
     if (!fromDate || !toDate) { toast('Ievadi abus datumus!', 'warn'); return; }
-    label = 'Rekini_' + fromDate + '_lidz_' + toDate;
+    paidOnly = (mode === 'custom_paid');
+    label = 'Rekini_' + (paidOnly ? 'apmaksatie_' : 'visi_') + fromDate + '_lidz_' + toDate;
   }
 
-  // Filtrēt — tikai apmaksātie norādītajā periodā
   var filtered = inv.filter(function(b) {
-    var st = getInvStatus(b);
-    if (st !== 'paid') return false;
-    var paidDate = localStorage.getItem('inv_paid_date_'+b.id) || b.date || '';
-    return paidDate >= fromDate && paidDate <= toDate;
+    if (paidOnly) {
+      var st = getInvStatus(b);
+      if (st !== 'paid') return false;
+    } else {
+      // Visi kuriem ir ģenerēts rēķins
+      if (!localStorage.getItem('inv_sent_'+b.id)) return false;
+    }
+    var invDate = localStorage.getItem('inv_sent_date_'+b.id) || b.date || '';
+    return invDate >= fromDate && invDate <= toDate;
   });
 
   if (!filtered.length) {
