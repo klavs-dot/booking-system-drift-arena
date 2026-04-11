@@ -2744,16 +2744,14 @@ window.google={script:{run:window.__gsr__}};
   <!-- Eksporta panelis -->
   <div id="inv_export_panel" style="display:none;margin-top:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;">
     <div style="font-family:var(--font-head);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;">📁 Rēķinu eksports grāmatvedībai</div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
-      <button class="btn" onclick="invExportZip('lastmonth')" style="padding:8px 16px;background:#0c1e3d;color:#60a5fa;border:1px solid #1d4ed8;font-weight:700;">📅 Pagājušā mēneša apmaksātie</button>
-      <div style="display:flex;gap:8px;align-items:flex-end;">
-        <div class="field" style="margin:0;"><label style="font-size:9px;">No</label><input type="date" id="inv_exp_from" style="padding:6px;font-size:12px;width:140px;"></div>
-        <div class="field" style="margin:0;"><label style="font-size:9px;">Līdz</label><input type="date" id="inv_exp_to" style="padding:6px;font-size:12px;width:140px;"></div>
-      </div>
+    <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;">
+      <div class="field" style="margin:0;"><label style="font-size:9px;">No</label><input type="date" id="inv_exp_from" style="padding:6px;font-size:12px;width:140px;"></div>
+      <div class="field" style="margin:0;"><label style="font-size:9px;">Līdz</label><input type="date" id="inv_exp_to" style="padding:6px;font-size:12px;width:140px;"></div>
     </div>
-    <div style="display:flex;gap:10px;margin-top:12px;">
+    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
       <button class="btn btn-p" onclick="invExportZip('custom_all')" style="padding:8px 16px;font-size:12px;">📁 Visus atlasītajā periodā</button>
       <button class="btn" onclick="invExportZip('custom_paid')" style="padding:8px 16px;font-size:12px;background:#0d2e16;color:#22c55e;border:1px solid #16a34a;font-weight:700;">✅ Tikai apmaksātos atlasītajā periodā</button>
+      <button class="btn" onclick="invExportZip('lastmonth')" style="padding:8px 16px;font-size:12px;background:#0c1e3d;color:#60a5fa;border:1px solid #1d4ed8;font-weight:700;">📅 Pagājušā mēneša apmaksātie</button>
     </div>
     <div id="inv_export_status" style="margin-top:8px;font-size:11px;color:var(--text3);"></div>
   </div>
