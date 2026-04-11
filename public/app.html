@@ -5883,7 +5883,16 @@ function renderInvoices() {
   if (!el) return;
   var inv = ALL.filter(function(b) {
     return b.status !== 'Atcelta' && b.invoice && (b.invoice.includes('rēķin') || b.invoice.includes('rēķīn'));
-  }).sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+  });
+
+  // Pievienot standalone rēķinus no localStorage
+  var standaloneList = [];
+  try { standaloneList = JSON.parse(localStorage.getItem('inv_standalone_list') || '[]'); } catch(e){}
+  standaloneList.forEach(function(si) {
+    inv.push(si);
+  });
+
+  inv.sort(function(a,b){ return (a.date||'') < (b.date||'') ? 1 : -1; });
 
   // ── STATISTIKA ──
   var statsEl = document.getElementById('INV_STATS');
@@ -6614,6 +6623,28 @@ function invGeneratePDF() {
         blockOff: _invBlockOff
       }));
       if (res.sheetUrl) localStorage.setItem('inv_sheet_'+(_invBooking?_invBooking.id:document.getElementById('inv_booking_id').value), res.sheetUrl);
+      // Saglabāt standalone rēķinu sarakstā
+      if (_invStandalone) {
+        var sid = document.getElementById('inv_booking_id').value;
+        var sList = []; try{sList=JSON.parse(localStorage.getItem('inv_standalone_list')||'[]');}catch(e){}
+        if (!sList.find(function(x){return x.id===sid;})) {
+          sList.unshift({
+            id: sid,
+            date: new Date().toISOString().slice(0,10),
+            timeFrom: '', timeTo: '',
+            client: data.rek ? data.rek.name || data.client : data.client,
+            phone: (document.getElementById('inv_sa_phone')||{}).value||'',
+            email: data.email,
+            people: '',
+            rides: 0,
+            invoice: 'Ar rēķinu - brīvs',
+            rekviziti: JSON.stringify(data.rek),
+            status: 'Aktīva',
+            _standalone: true
+          });
+          localStorage.setItem('inv_standalone_list', JSON.stringify(sList));
+        }
+      }
       _invGenerated = true;
       _invEditing = false;
       invRenderButtons();
@@ -6628,11 +6659,16 @@ function invGeneratePDF() {
 
 function invSendEmail() {
   var b = _invBooking;
-  if (!b) return;
-  var email = b.email || '';
-  var rek = null;
-  try { rek = b.rekviziti ? JSON.parse(b.rekviziti) : null; } catch(e){}
-  if (rek && rek.email) email = rek.email;
+  var email = '';
+  if (_invStandalone) {
+    email = (document.getElementById('inv_sa_email')||{}).value || '';
+  } else {
+    if (!b) return;
+    email = b.email || '';
+    var rek = null;
+    try { rek = b.rekviziti ? JSON.parse(b.rekviziti) : null; } catch(e){}
+    if (rek && rek.email) email = rek.email;
+  }
   if (!email) { toast('Nav e-pasta adreses!', 'warn'); return; }
 
   invDownloadPDF();
