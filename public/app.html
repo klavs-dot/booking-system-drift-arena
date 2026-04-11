@@ -5870,7 +5870,16 @@ function renderInvoices() {
     statsEl.innerHTML = '<div style="display:flex;gap:16px;flex-wrap:wrap;">'
       + (waitCount ? '<div style="background:#0c1e3d;border:1px solid #1d4ed8;border-radius:var(--r);padding:12px 18px;flex:1;min-width:200px;"><div style="font-size:10px;color:#60a5fa;font-weight:700;font-family:var(--font-head);letter-spacing:1px;">⏳ GAIDAM APMAKSU</div><div style="font-size:24px;font-weight:800;color:#60a5fa;font-family:var(--font-head);margin-top:4px;">'+waitTotal.toFixed(2)+' €</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">no '+waitCount+' rēķiniem</div></div>' : '')
       + (lateCount ? '<div style="background:#3b0808;border:1px solid #dc2626;border-radius:var(--r);padding:12px 18px;flex:1;min-width:200px;"><div style="font-size:10px;color:#ef4444;font-weight:700;font-family:var(--font-head);letter-spacing:1px;">🚨 KAVĒ MAKSĀJUMU</div><div style="font-size:24px;font-weight:800;color:#ef4444;font-family:var(--font-head);margin-top:4px;">'+lateTotal.toFixed(2)+' €</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">no '+lateCount+' rēķiniem</div></div>' : '')
-      + (paidCount ? '<div style="background:#0d2e16;border:1px solid #16a34a;border-radius:var(--r);padding:12px 18px;flex:1;min-width:200px;"><div style="font-size:10px;color:#22c55e;font-weight:700;font-family:var(--font-head);letter-spacing:1px;">✅ APMAKSĀTS</div><div style="font-size:24px;font-weight:800;color:#22c55e;font-family:var(--font-head);margin-top:4px;">'+paidTotal.toFixed(2)+' €</div><div style="font-size:11px;color:var(--text3);margin-top:2px;">no '+paidCount+' rēķiniem</div></div>' : '')
+      + (paidCount ? (function(){
+          var paidList = inv.filter(function(b){return getInvStatus(b)==='paid';}).slice(0,5);
+          var rows = paidList.map(function(b){
+            var rk=null;try{rk=b.rekviziti?JSON.parse(b.rekviziti):null;}catch(e){}
+            var nm=(rk&&rk.name)?rk.name:b.client;
+            var t=localStorage.getItem('inv_total_'+b.id)||'0.00';
+            return '<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px;"><span style="color:var(--text2);">'+esc(nm)+'</span><span style="color:#22c55e;font-weight:700;">'+t+' €</span></div>';
+          }).join('');
+          return '<div style="background:#0d2e16;border:1px solid #16a34a;border-radius:var(--r);padding:12px 18px;flex:1;min-width:200px;"><div style="font-size:10px;color:#22c55e;font-weight:700;font-family:var(--font-head);letter-spacing:1px;">✅ PĒDĒJIE APMAKSĀTIE</div><div style="margin-top:8px;">'+rows+'</div></div>';
+        })() : '')
       + '</div>';
   } else if (statsEl) { statsEl.innerHTML = ''; }
 
