@@ -5985,7 +5985,7 @@ function renderInvoices() {
 
     html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;display:grid;grid-template-columns:140px 1fr 100px 280px auto;align-items:center;gap:16px;">'
       + '<div><div style="font-size:13px;font-weight:700;color:var(--text);">'+dateFmt+'</div><div style="font-size:11px;color:var(--text3);">'+cleanT(b.timeFrom)+' – '+cleanT(b.timeTo)+'</div></div>'
-      + '<div><div style="font-size:16px;font-weight:800;">'+esc(rekName)+'</div><div style="font-size:11px;color:var(--text3);">'+esc(b.client)+'</div></div>'
+      + '<div><div style="font-size:16px;font-weight:800;">'+esc(rekName)+'</div><div style="font-size:11px;color:var(--text3);">'+esc(b.client)+'</div><div style="font-size:10px;color:#fff;margin-top:2px;font-weight:700;">'+(b.invoice.includes('priekš')?'⬆ Priekšapmaksa':'⬇ Pēcapmaksa')+'</div></div>'
       + totalCol
       + '<div style="text-align:center;"><div style="display:inline-flex;align-items:center;gap:6px;">'+stBadge.replace('inv-st ', 'inv-st inv-st-lg ')+'<button onclick="invChangeStatus(\''+b.id+'\')" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:3px;padding:2px 6px;cursor:pointer;font-size:8px;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border2)\';this.style.color=\'var(--text3)\'">mainīt</button></div></div>'
       + '<div style="display:flex;gap:6px;align-items:center;justify-content:flex-end;">'
