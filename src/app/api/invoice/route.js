@@ -69,11 +69,13 @@ export async function POST(req) {
     });
 
     // 4. Sagatavot pozīcijas
+    const other = data.other || [];
+
     const positions = [];
     let grandTotal = 0;
 
     if (isTelpa) {
-      const total = rides.total + drinks.reduce((sum, d) => sum + d.qty * d.price, 0);
+      const total = rides.total + drinks.reduce((sum, d) => sum + d.qty * d.price, 0) + other.reduce((sum, d) => sum + d.qty * d.price, 0);
       const net = total / 1.21;
       positions.push({ name: 'Telpu noma', qty: 1, price: net, sum: net });
       grandTotal = total;
@@ -88,6 +90,14 @@ export async function POST(req) {
           const lt = d.qty * d.price;
           const ln = lt / 1.21;
           positions.push({ name: d.name || 'Dzēriens', qty: d.qty, price: d.price / 1.21, sum: ln });
+          grandTotal += lt;
+        }
+      });
+      other.forEach(d => {
+        if (d.price > 0) {
+          const lt = d.qty * d.price;
+          const ln = lt / 1.21;
+          positions.push({ name: d.name || 'Cits', qty: d.qty, price: d.price / 1.21, sum: ln });
           grandTotal += lt;
         }
       });

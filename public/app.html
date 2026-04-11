@@ -2764,9 +2764,10 @@ window.google={script:{run:window.__gsr__}};
     <div id="inv-booking-info" style="margin-bottom:16px;"></div>
 
     <!-- Braucienu pozīcija -->
-    <div class="wiz-block" style="background:#1a1a1a;">
+    <div class="wiz-block" style="background:#1a1a1a;position:relative;">
       <div class="wiz-block-title">🏁 Braucieni</div>
-      <div class="wform-row3">
+      <button id="inv_rides_toggle" onclick="invToggleBlock('rides')" style="position:absolute;top:10px;right:12px;padding:3px 10px;font-size:9px;border-radius:3px;cursor:pointer;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;border:1px solid var(--border2);background:none;color:var(--text3);">Izslēgt</button>
+      <div id="inv_rides_body" class="wform-row3">
         <div class="field"><label>Braucienu skaits</label><input type="number" id="inv_rides_qty" min="0" value="0"></div>
         <div class="field"><label>Cena par braucienu (ar PVN, EUR)</label><input type="number" id="inv_rides_price" min="0" step="0.01" value="0" placeholder="piem. 5.00"></div>
         <div class="field"><label>Summa ar PVN</label><div id="inv_rides_total" style="font-size:22px;font-weight:700;color:#fff;padding-top:8px;">0.00 €</div></div>
@@ -2774,18 +2775,43 @@ window.google={script:{run:window.__gsr__}};
     </div>
 
     <!-- Dzērienu pozīcijas -->
-    <div class="wiz-block" style="background:#1a1a1a;">
+    <div class="wiz-block" style="background:#1a1a1a;position:relative;">
       <div class="wiz-block-title">🍸 Dzērieni</div>
-      <div id="inv_drinks_list"></div>
-      <div id="inv_drinks_subtotal" style="text-align:right;padding:8px 0;font-size:13px;color:#fff;font-weight:700;"></div>
-      <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
-        <div class="wform-row3">
-          <div class="field"><label>Nosaukums</label><input type="text" id="inv_drink_name" placeholder="Cola, Pepsi..."></div>
-          <div class="field"><label>Daudzums</label><input type="number" id="inv_drink_qty" min="1" value="1"></div>
-          <div class="field"><label>Cena ar PVN (EUR)</label>
-            <div style="display:flex;gap:6px;">
-              <input type="number" id="inv_drink_price" min="0" step="0.01" placeholder="2.50" style="flex:1;">
-              <button class="btn btn-p" onclick="invAddDrink()" style="padding:6px 14px;">+</button>
+      <button id="inv_drinks_toggle" onclick="invToggleBlock('drinks')" style="position:absolute;top:10px;right:12px;padding:3px 10px;font-size:9px;border-radius:3px;cursor:pointer;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;border:1px solid var(--border2);background:none;color:var(--text3);">Izslēgt</button>
+      <div id="inv_drinks_body">
+        <div id="inv_drinks_list"></div>
+        <div id="inv_drinks_subtotal" style="text-align:right;padding:8px 0;font-size:13px;color:#fff;font-weight:700;"></div>
+        <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
+          <div class="wform-row3">
+            <div class="field"><label>Nosaukums</label><input type="text" id="inv_drink_name" placeholder="Cola, Pepsi..."></div>
+            <div class="field"><label>Daudzums</label><input type="number" id="inv_drink_qty" min="1" value="1"></div>
+            <div class="field"><label>Cena ar PVN (EUR)</label>
+              <div style="display:flex;gap:6px;">
+                <input type="number" id="inv_drink_price" min="0" step="0.01" placeholder="2.50" style="flex:1;">
+                <button class="btn btn-p" onclick="invAddDrink()" style="padding:6px 14px;">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Citi pozīcijas -->
+    <div class="wiz-block" style="background:#1a1a1a;position:relative;">
+      <div class="wiz-block-title">📦 Citi</div>
+      <button id="inv_other_toggle" onclick="invToggleBlock('other')" style="position:absolute;top:10px;right:12px;padding:3px 10px;font-size:9px;border-radius:3px;cursor:pointer;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;border:1px solid #16a34a;background:#0d2e16;color:#22c55e;">Ieslēgt</button>
+      <div id="inv_other_body" style="display:none;">
+        <div id="inv_other_list"></div>
+        <div id="inv_other_subtotal" style="text-align:right;padding:8px 0;font-size:13px;color:#fff;font-weight:700;"></div>
+        <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
+          <div class="wform-row3">
+            <div class="field"><label>Nosaukums</label><input type="text" id="inv_other_name" placeholder="Apkalpošana, noma..."></div>
+            <div class="field"><label>Daudzums</label><input type="number" id="inv_other_qty" min="1" value="1"></div>
+            <div class="field"><label>Cena ar PVN (EUR)</label>
+              <div style="display:flex;gap:6px;">
+                <input type="number" id="inv_other_price" min="0" step="0.01" placeholder="10.00" style="flex:1;">
+                <button class="btn btn-p" onclick="invAddOther()" style="padding:6px 14px;">+</button>
+              </div>
             </div>
           </div>
         </div>
@@ -6100,18 +6126,21 @@ function openInvoice(id) {
   try { saved = JSON.parse(localStorage.getItem('inv_data_'+id)); } catch(e){}
 
   if (saved) {
-    // Atjaunot saglabātos datus
     document.getElementById('inv_rides_qty').value = saved.ridesQty || 0;
     document.getElementById('inv_rides_price').value = saved.ridesPrice || '';
     _invDrinks = saved.drinks || [];
+    _invOther = saved.other || [];
     var telpaCb = document.getElementById('inv_telpa');
     if (telpaCb) telpaCb.checked = !!saved.isTelpa;
+    if (saved.blockOff) _invBlockOff = saved.blockOff;
+    else _invBlockOff = {rides:false, drinks:false, other:true};
   } else {
-    // Pirmā reize — no rezervācijas datiem
     document.getElementById('inv_rides_qty').value = b.rides || 0;
     document.getElementById('inv_rides_price').value = '';
     var telpaCb = document.getElementById('inv_telpa');
     if (telpaCb) telpaCb.checked = !!(rek && rek.telpa);
+    _invOther = [];
+    _invBlockOff = {rides:false, drinks:false, other:true};
 
     // Dzērieni no rezervācijas
     if (b.drinks && b.drinks !== 'PRECIZES' && b.drinks !== 'UZ_VIETAS') {
@@ -6128,7 +6157,23 @@ function openInvoice(id) {
   _invGenerated = !!localStorage.getItem('inv_sent_'+b.id);
   _invEditing = false;
 
+  // Sinhronizēt toggle pogu stāvokļus
+  ['rides','drinks','other'].forEach(function(block) {
+    var body = document.getElementById('inv_'+block+'_body');
+    var btn = document.getElementById('inv_'+block+'_toggle');
+    if (body && btn) {
+      if (_invBlockOff[block]) {
+        body.style.display = 'none';
+        btn.textContent = 'Ieslēgt'; btn.style.border='1px solid #16a34a'; btn.style.background='#0d2e16'; btn.style.color='#22c55e';
+      } else {
+        body.style.display = '';
+        btn.textContent = 'Izslēgt'; btn.style.border='1px solid var(--border2)'; btn.style.background='none'; btn.style.color='var(--text3)';
+      }
+    }
+  });
+
   invRenderDrinks();
+  invRenderOther();
   invRecalc();
   invRenderButtons();
   openM('M_INV');
@@ -6190,24 +6235,28 @@ function invRenderDrinks() {
 }
 
 function invRecalc() {
-  var ridesQty = parseInt(document.getElementById('inv_rides_qty').value) || 0;
-  var ridesPrice = parseFloat(document.getElementById('inv_rides_price').value) || 0;
+  var ridesQty = _invBlockOff.rides ? 0 : (parseInt(document.getElementById('inv_rides_qty').value) || 0);
+  var ridesPrice = _invBlockOff.rides ? 0 : (parseFloat(document.getElementById('inv_rides_price').value) || 0);
   var ridesTotal = ridesQty * ridesPrice;
 
-  // Braucienu summa — balta
   document.getElementById('inv_rides_total').textContent = ridesTotal.toFixed(2) + ' €';
 
-  var drinksTotal = _invDrinks.reduce(function(s,d){return s + d.qty * d.price;}, 0);
+  var drinksTotal = _invBlockOff.drinks ? 0 : _invDrinks.reduce(function(s,d){return s + d.qty * d.price;}, 0);
+  var otherTotal = _invBlockOff.other ? 0 : _invOther.reduce(function(s,d){return s + d.qty * d.price;}, 0);
 
   // Dzērienu kopsumma
   var dsSub = document.getElementById('inv_drinks_subtotal');
-  if (_invDrinks.length > 0 && drinksTotal > 0) {
+  if (!_invBlockOff.drinks && _invDrinks.length > 0 && drinksTotal > 0) {
     dsSub.innerHTML = 'Dzērieni kopā: <span style="font-size:16px;">'+drinksTotal.toFixed(2)+' €</span>';
-  } else {
-    dsSub.innerHTML = '';
-  }
+  } else { dsSub.innerHTML = ''; }
 
-  var grandTotal = ridesTotal + drinksTotal;
+  // Citi kopsumma
+  var oSub = document.getElementById('inv_other_subtotal');
+  if (!_invBlockOff.other && _invOther.length > 0 && otherTotal > 0) {
+    oSub.innerHTML = 'Citi kopā: <span style="font-size:16px;">'+otherTotal.toFixed(2)+' €</span>';
+  } else { oSub.innerHTML = ''; }
+
+  var grandTotal = ridesTotal + drinksTotal + otherTotal;
   var netTotal = grandTotal / 1.21;
   var vatTotal = grandTotal - netTotal;
 
@@ -6221,25 +6270,30 @@ function invRecalc() {
   if (isTelpa) {
     lines.push('<div>🏢 Telpu noma — <b>'+grandTotal.toFixed(2)+' €</b></div>');
   } else {
-    if (ridesTotal > 0) lines.push('<div>🏁 Braucieni: '+ridesQty+' x '+ridesPrice.toFixed(2)+' = <b>'+ridesTotal.toFixed(2)+' €</b></div>');
-    _invDrinks.forEach(function(d) {
+    if (!_invBlockOff.rides && ridesTotal > 0) lines.push('<div>🏁 Braucieni: '+ridesQty+' x '+ridesPrice.toFixed(2)+' = <b>'+ridesTotal.toFixed(2)+' €</b></div>');
+    if (!_invBlockOff.drinks) _invDrinks.forEach(function(d) {
       if (d.price > 0) lines.push('<div>🍸 '+esc(d.name)+': '+d.qty+' x '+d.price.toFixed(2)+' = <b>'+(d.qty*d.price).toFixed(2)+' €</b></div>');
+    });
+    if (!_invBlockOff.other) _invOther.forEach(function(d) {
+      if (d.price > 0) lines.push('<div>📦 '+esc(d.name)+': '+d.qty+' x '+d.price.toFixed(2)+' = <b>'+(d.qty*d.price).toFixed(2)+' €</b></div>');
     });
   }
   document.getElementById('inv_summary').innerHTML = lines.join('') || '<div style="color:var(--text3);">Ievadi cenas lai redzētu kopsavilkumu</div>';
 
-  // Validācija
   invValidate();
 }
 
 function invValidate() {
-  var ridesQty = parseInt(document.getElementById('inv_rides_qty').value) || 0;
-  var ridesPrice = parseFloat(document.getElementById('inv_rides_price').value) || 0;
+  var ridesQty = _invBlockOff.rides ? 0 : (parseInt(document.getElementById('inv_rides_qty').value) || 0);
+  var ridesPrice = _invBlockOff.rides ? 0 : (parseFloat(document.getElementById('inv_rides_price').value) || 0);
   var warn = document.getElementById('inv_validation_warn');
   var issues = [];
 
-  if (ridesQty > 0 && ridesPrice <= 0) issues.push('Braucieniem nav cenas');
-  _invDrinks.forEach(function(d) {
+  if (!_invBlockOff.rides && ridesQty > 0 && ridesPrice <= 0) issues.push('Braucieniem nav cenas');
+  if (!_invBlockOff.drinks) _invDrinks.forEach(function(d) {
+    if (d.qty > 0 && d.price <= 0) issues.push(d.name + ' — nav cenas');
+  });
+  if (!_invBlockOff.other) _invOther.forEach(function(d) {
     if (d.qty > 0 && d.price <= 0) issues.push(d.name + ' — nav cenas');
   });
 
@@ -6261,6 +6315,83 @@ function invOnChange() {
 
 var _invGenerated = false;
 var _invEditing = false;
+var _invOther = [];
+var _invBlockOff = { rides: false, drinks: false, other: true };
+
+function invToggleBlock(block) {
+  _invBlockOff[block] = !_invBlockOff[block];
+  var bodyId = 'inv_'+block+'_body';
+  var btnId = 'inv_'+block+'_toggle';
+  var body = document.getElementById(bodyId);
+  var btn = document.getElementById(btnId);
+  if (_invBlockOff[block]) {
+    body.style.display = 'none';
+    btn.textContent = 'Ieslēgt';
+    btn.style.border = '1px solid #16a34a';
+    btn.style.background = '#0d2e16';
+    btn.style.color = '#22c55e';
+  } else {
+    body.style.display = '';
+    btn.textContent = 'Izslēgt';
+    btn.style.border = '1px solid var(--border2)';
+    btn.style.background = 'none';
+    btn.style.color = 'var(--text3)';
+  }
+  invOnChange();
+  invRecalc();
+}
+
+function invAddOther() {
+  var name = document.getElementById('inv_other_name').value.trim();
+  var qty = parseInt(document.getElementById('inv_other_qty').value) || 1;
+  var price = parseFloat(document.getElementById('inv_other_price').value) || 0;
+  if (!name) return;
+  _invOther.push({name:name, qty:qty, price:price});
+  document.getElementById('inv_other_name').value = '';
+  document.getElementById('inv_other_qty').value = '1';
+  document.getElementById('inv_other_price').value = '';
+  invOnChange();
+  invRenderOther();
+  invRecalc();
+}
+
+function invRemoveOther(idx) {
+  _invOther.splice(idx, 1);
+  invOnChange();
+  invRenderOther();
+  invRecalc();
+}
+
+function invOtherPriceChange(idx, val) {
+  _invOther[idx].price = parseFloat(val) || 0;
+  invOnChange();
+  invRecalc();
+}
+
+function invOtherQtyChange(idx, val) {
+  _invOther[idx].qty = parseInt(val) || 1;
+  invOnChange();
+  invRenderOther();
+  invRecalc();
+}
+
+function invRenderOther() {
+  var el = document.getElementById('inv_other_list');
+  if (!_invOther.length) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;">Nav pozīciju</div>'; return; }
+  var html = '';
+  _invOther.forEach(function(d, i) {
+    var lineTotal = d.qty * d.price;
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">'
+      + '<span style="flex:1;font-size:13px;color:var(--text);min-width:100px;">'+esc(d.name)+'</span>'
+      + '<input type="number" min="1" value="'+d.qty+'" style="width:55px;padding:5px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:12px;text-align:center;" oninput="invOtherQtyChange('+i+',this.value)">'
+      + '<span style="font-size:11px;color:var(--text3);">x</span>'
+      + '<input type="number" min="0" step="0.01" value="'+(d.price||'')+'" placeholder="Cena" style="width:80px;padding:5px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:12px;text-align:center;" oninput="invOtherPriceChange('+i+',this.value)">'
+      + '<span style="min-width:70px;text-align:right;font-size:13px;color:'+(lineTotal>0?'#fff':'var(--text3)')+';font-weight:700;">'+(lineTotal>0?lineTotal.toFixed(2)+' €':'—')+'</span>'
+      + '<button onclick="invRemoveOther('+i+')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;">✕</button>'
+      + '</div>';
+  });
+  el.innerHTML = html;
+}
 
 function invRenderButtons() {
   var el = document.getElementById('inv_buttons');
@@ -6309,9 +6440,11 @@ function invGetData() {
   var rek = null;
   try { rek = b.rekviziti ? JSON.parse(b.rekviziti) : null; } catch(e){}
 
-  var ridesQty = parseInt(document.getElementById('inv_rides_qty').value) || 0;
-  var ridesPrice = parseFloat(document.getElementById('inv_rides_price').value) || 0;
+  var ridesQty = _invBlockOff.rides ? 0 : (parseInt(document.getElementById('inv_rides_qty').value) || 0);
+  var ridesPrice = _invBlockOff.rides ? 0 : (parseFloat(document.getElementById('inv_rides_price').value) || 0);
   var isTelpa = document.getElementById('inv_telpa').checked;
+  var activeDrinks = _invBlockOff.drinks ? [] : _invDrinks.filter(function(d){return d.price > 0;});
+  var activeOther = _invBlockOff.other ? [] : _invOther.filter(function(d){return d.price > 0;});
 
   // Rēķina numurs — vienreiz per booking
   var existingNumber = localStorage.getItem('inv_number_'+b.id);
@@ -6343,7 +6476,8 @@ function invGetData() {
     rek: rek,
     isTelpa: isTelpa,
     rides: {qty: ridesQty, price: ridesPrice, total: ridesQty * ridesPrice},
-    drinks: _invDrinks.filter(function(d){return d.price > 0;}),
+    drinks: activeDrinks,
+    other: activeOther,
     sender: {
       name: 'SIA "DA LIEPĀJA"',
       pvn: 'LV40203522098',
@@ -6360,7 +6494,7 @@ function invGeneratePDF() {
   if (!invValidate()) { toast('Ievadi cenu visām pozīcijām!', 'warn'); return; }
   var data = invGetData();
   if (!data) return;
-  var grandTotal = data.rides.total + data.drinks.reduce(function(s,d){return s+d.qty*d.price;},0);
+  var grandTotal = data.rides.total + data.drinks.reduce(function(s,d){return s+d.qty*d.price;},0) + (data.other||[]).reduce(function(s,d){return s+d.qty*d.price;},0);
   if (grandTotal <= 0) { toast('Ievadi vismaz vienu pozīciju ar cenu!', 'warn'); return; }
 
   localStorage.setItem('inv_count_'+data.dateKey, data.dayCount);
@@ -6385,14 +6519,16 @@ function invGeneratePDF() {
       link.click();
       localStorage.setItem('inv_sent_'+_invBooking.id, '1');
       localStorage.setItem('inv_sent_date_'+_invBooking.id, new Date().toISOString().slice(0,10));
-      var gt = data.rides.total + data.drinks.reduce(function(s,d){return s+d.qty*d.price;},0);
+      var gt = data.rides.total + data.drinks.reduce(function(s,d){return s+d.qty*d.price;},0) + (data.other||[]).reduce(function(s,d){return s+d.qty*d.price;},0);
       localStorage.setItem('inv_total_'+_invBooking.id, gt.toFixed(2));
       // Saglabāt rēķina datus lai var labot
       localStorage.setItem('inv_data_'+_invBooking.id, JSON.stringify({
         ridesQty: data.rides.qty,
         ridesPrice: data.rides.price,
         drinks: _invDrinks,
-        isTelpa: data.isTelpa
+        other: _invOther,
+        isTelpa: data.isTelpa,
+        blockOff: _invBlockOff
       }));
       if (res.sheetUrl) localStorage.setItem('inv_sheet_'+_invBooking.id, res.sheetUrl);
       _invGenerated = true;
