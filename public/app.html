@@ -5892,7 +5892,15 @@ function renderInvoices() {
     inv.push(si);
   });
 
-  inv.sort(function(a,b){ return (a.date||'') < (b.date||'') ? 1 : -1; });
+  inv.sort(function(a,b){
+    var stA = getInvStatus(a);
+    var stB = getInvStatus(b);
+    // Pending (rezervācija vēl nav notikusi) uz beigām
+    if (stA === 'pending' && stB !== 'pending') return 1;
+    if (stB === 'pending' && stA !== 'pending') return -1;
+    // Pārējie pēc datuma desc
+    return (a.date||'') < (b.date||'') ? 1 : -1;
+  });
 
   // ── STATISTIKA ──
   var statsEl = document.getElementById('INV_STATS');
@@ -6046,19 +6054,24 @@ function getInvStatus(b) {
   if (!invSent) {
     // Nav nosūtīts
     if (isPre) return 'send'; // Priekšapmaksa — uzreiz jāsūta
-    if (b.status === 'Notikusi' || b.date < today) return 'send'; // Pēcapmaksa un pasākums beidzies
+    if (b.status === 'Notikusi' || (b.date && b.date < today)) return 'send'; // Pēcapmaksa un pasākums beidzies
     return 'pending';
   }
 
   // Ir nosūtīts — pārbaudīt apmaksas termiņu
   var dueDate = localStorage.getItem('inv_due_'+b.id);
   if (!dueDate) {
-    // Aprēķināt termiņu
     if (isPre) {
-      // Priekšapmaksa — dienu pirms rezervācijas
-      var bd = new Date(b.date);
-      bd.setDate(bd.getDate() - 1);
-      dueDate = bd.toISOString().slice(0,10);
+      // Priekšapmaksa — dienu pirms rezervācijas, bet max 10 dienas no nosūtīšanas
+      var sentDate = localStorage.getItem('inv_sent_date_'+b.id) || today;
+      var maxDue = new Date(sentDate);
+      maxDue.setDate(maxDue.getDate() + 10);
+
+      var dayBefore = new Date(b.date);
+      dayBefore.setDate(dayBefore.getDate() - 1);
+
+      // Izvēlas agrāko no: dienu pirms rezervācijas vai 10 dienas pēc nosūtīšanas
+      dueDate = (dayBefore < maxDue ? dayBefore : maxDue).toISOString().slice(0,10);
     } else {
       // Pēcapmaksa — 5 dienas pēc nosūtīšanas
       var sentDate = localStorage.getItem('inv_sent_date_'+b.id) || today;
@@ -6068,6 +6081,9 @@ function getInvStatus(b) {
     }
     localStorage.setItem('inv_due_'+b.id, dueDate);
   }
+
+  // Priekšapmaksa — ja rezervācijas diena ir šodien vai pagātnē un nav apmaksāts
+  if (isPre && b.date && b.date <= today) return 'late';
 
   if (today > dueDate) return 'late'; // Kavē
   return 'wait'; // Gaidam apmaksu
@@ -6558,7 +6574,16 @@ function invGetData() {
     dateKey: dateKey,
     dayCount: dayCount,
     date: new Date().toLocaleDateString('lv-LV'),
-    dueDate: new Date(Date.now() + 5*24*60*60*1000).toLocaleDateString('lv-LV'),
+    dueDate: (function(){
+      var isPre2 = b && b.invoice && b.invoice.includes('priekš');
+      if (isPre2 && b.date) {
+        var maxDue = new Date(Date.now() + 10*24*60*60*1000);
+        var dayBefore = new Date(b.date);
+        dayBefore.setDate(dayBefore.getDate() - 1);
+        return (dayBefore < maxDue ? dayBefore : maxDue).toLocaleDateString('lv-LV');
+      }
+      return new Date(Date.now() + 5*24*60*60*1000).toLocaleDateString('lv-LV');
+    })(),
     client: client,
     email: email,
     bookingDate: bookingDate,
