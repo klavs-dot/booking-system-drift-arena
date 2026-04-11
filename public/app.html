@@ -5977,12 +5977,11 @@ function renderInvoices() {
     // Statuss
     var stBadge = getInvStatusBadge(b);
 
-    html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">'
-      + '<div style="min-width:130px;"><div style="font-size:13px;font-weight:700;color:var(--text);">'+dateFmt+'</div><div style="font-size:11px;color:var(--text3);">'+cleanT(b.timeFrom)+' – '+cleanT(b.timeTo)+'</div></div>'
-      + '<div style="flex:1;min-width:180px;"><div style="font-size:16px;font-weight:800;">'+esc(rekName)+'</div><div style="font-size:11px;color:var(--text3);">'+esc(b.client)+'</div></div>'
-      + '<div style="flex:1;text-align:center;"><div style="display:inline-flex;align-items:center;gap:6px;">'+stBadge.replace('inv-st ', 'inv-st inv-st-lg ')+'<button onclick="invChangeStatus(\''+b.id+'\')" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:3px;padding:2px 6px;cursor:pointer;font-size:8px;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border2)\';this.style.color=\'var(--text3)\'">mainīt</button></div></div>'
-      + '<div style="min-width:80px;text-align:center;"><div style="font-size:10px;color:var(--text3);">'+esc(b.invoice)+'</div></div>'
-      + '<div style="display:flex;gap:6px;align-items:center;">'
+    html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;display:grid;grid-template-columns:140px 1fr 280px auto;align-items:center;gap:16px;">'
+      + '<div><div style="font-size:13px;font-weight:700;color:var(--text);">'+dateFmt+'</div><div style="font-size:11px;color:var(--text3);">'+cleanT(b.timeFrom)+' – '+cleanT(b.timeTo)+'</div></div>'
+      + '<div><div style="font-size:16px;font-weight:800;">'+esc(rekName)+'</div><div style="font-size:11px;color:var(--text3);">'+esc(b.client)+'</div></div>'
+      + '<div style="text-align:center;"><div style="display:inline-flex;align-items:center;gap:6px;">'+stBadge.replace('inv-st ', 'inv-st inv-st-lg ')+'<button onclick="invChangeStatus(\''+b.id+'\')" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:3px;padding:2px 6px;cursor:pointer;font-size:8px;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border2)\';this.style.color=\'var(--text3)\'">mainīt</button></div></div>'
+      + '<div style="display:flex;gap:6px;align-items:center;justify-content:flex-end;">'
       + '<button class="btn btn-p" onclick="openInvoice(\''+b.id+'\')" style="padding:6px 14px;font-size:12px;">🧾 Rēķins</button>'
       + (function(){
           var url = localStorage.getItem('inv_sheet_'+b.id);
@@ -6043,7 +6042,7 @@ function getInvStatusBadge(b) {
     case 'wait': return '<span class="inv-st inv-st-wait">⏳ Gaidam apmaksu</span>';
     case 'late': return '<span class="inv-st inv-st-late">🚨 Kavē maksājumu</span>';
     case 'paid': return '<span class="inv-st inv-st-paid">✅ Apmaksāts</span>';
-    case 'pending': return '<span class="inv-st" style="color:var(--text3);border:1px solid var(--border2);">— Gaida</span>';
+    case 'pending': return '<span class="inv-st" style="color:var(--text3);border:1px solid var(--border2);">📅 Rezervācija vēl nav notikusi</span>';
     default: return '';
   }
 }
