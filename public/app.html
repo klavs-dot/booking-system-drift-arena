@@ -6135,23 +6135,33 @@ function openInvoice(id) {
     + '<button class="btn btn-s" onclick="openRekForm(\''+b.id+'\');closeM(\'M_INV\');" style="padding:5px 12px;font-size:10px;white-space:nowrap;">✏️ Labot rekvizītus</button>'
     + '</div>';
 
-  // Braucieni
-  document.getElementById('inv_rides_qty').value = b.rides || 0;
-  document.getElementById('inv_rides_price').value = '';
+  // Mēģināt ielādēt saglabātos datus
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem('inv_data_'+id)); } catch(e){}
 
-  // Telpu noma
-  var telpaCb = document.getElementById('inv_telpa');
-  if (telpaCb) telpaCb.checked = !!(rek && rek.telpa);
+  if (saved) {
+    // Atjaunot saglabātos datus
+    document.getElementById('inv_rides_qty').value = saved.ridesQty || 0;
+    document.getElementById('inv_rides_price').value = saved.ridesPrice || '';
+    _invDrinks = saved.drinks || [];
+    var telpaCb = document.getElementById('inv_telpa');
+    if (telpaCb) telpaCb.checked = !!saved.isTelpa;
+  } else {
+    // Pirmā reize — no rezervācijas datiem
+    document.getElementById('inv_rides_qty').value = b.rides || 0;
+    document.getElementById('inv_rides_price').value = '';
+    var telpaCb = document.getElementById('inv_telpa');
+    if (telpaCb) telpaCb.checked = !!(rek && rek.telpa);
 
-  // Dzērieni no rezervācijas
-  _invDrinks = [];
-  if (b.drinks && b.drinks !== 'PRECIZES' && b.drinks !== 'UZ_VIETAS') {
-    b.drinks.split(',').map(function(s){return s.trim();}).filter(Boolean).forEach(function(item) {
-      var qm = item.match(/^(.+?)\s+x(\d+)$/);
-      var nm = qm ? qm[1] : item;
-      var qt = qm ? parseInt(qm[2]) : 1;
-      _invDrinks.push({name:nm, qty:qt, price:0});
-    });
+    // Dzērieni no rezervācijas
+    if (b.drinks && b.drinks !== 'PRECIZES' && b.drinks !== 'UZ_VIETAS') {
+      b.drinks.split(',').map(function(s){return s.trim();}).filter(Boolean).forEach(function(item) {
+        var qm = item.match(/^(.+?)\s+x(\d+)$/);
+        var nm = qm ? qm[1] : item;
+        var qt = qm ? parseInt(qm[2]) : 1;
+        _invDrinks.push({name:nm, qty:qt, price:0});
+      });
+    }
   }
 
   // Stāvoklis — vai jau ģenerēts
@@ -6413,6 +6423,13 @@ function invGeneratePDF() {
       localStorage.setItem('inv_sent_date_'+_invBooking.id, new Date().toISOString().slice(0,10));
       var gt = data.rides.total + data.drinks.reduce(function(s,d){return s+d.qty*d.price;},0);
       localStorage.setItem('inv_total_'+_invBooking.id, gt.toFixed(2));
+      // Saglabāt rēķina datus lai var labot
+      localStorage.setItem('inv_data_'+_invBooking.id, JSON.stringify({
+        ridesQty: data.rides.qty,
+        ridesPrice: data.rides.price,
+        drinks: _invDrinks,
+        isTelpa: data.isTelpa
+      }));
       if (res.sheetUrl) localStorage.setItem('inv_sheet_'+_invBooking.id, res.sheetUrl);
       _invGenerated = true;
       _invEditing = false;
