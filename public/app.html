@@ -3167,9 +3167,11 @@ window.google={script:{run:window.__gsr__}};
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 4px;
-  opacity: 0.7;
+  opacity: 0.8;
+  color: #1a1a1a;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.3);
 }
-.day-note-text { color: #1a1a1a; font-weight: 500; }
+.day-note-text { color: #1a1a1a; font-weight: 600; text-shadow: 0 1px 2px rgba(255,255,255,0.2); }
 .day-note-del {
   position: absolute;
   top: 4px;
@@ -3182,7 +3184,9 @@ window.google={script:{run:window.__gsr__}};
   color: #1a1a1a;
 }
 .day-note-del:hover { opacity: 1; }
-.day-note-time { font-size: 10px; opacity: 0.5; margin-top: 4px; }
+.day-note-time { font-size: 10px; opacity: 0.5; margin-top: 4px; color: #1a1a1a; }
+.note-color-btn { transition: all .15s; }
+.note-color-btn.active { border: 3px solid #fff !important; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
 
 @keyframes invNavGlitch {
   0%,100% { transform:scale(1); box-shadow:0 0 0 0 rgba(239,68,68,0); }
@@ -6904,8 +6908,9 @@ var _noteColor = '#facc15';
 
 function noteSetColor(btn) {
   _noteColor = btn.getAttribute('data-color');
-  document.querySelectorAll('.note-color-btn').forEach(function(b){ b.style.border = '2px solid transparent'; });
-  btn.style.border = '2px solid ' + _noteColor;
+  document.querySelectorAll('.note-color-btn').forEach(function(b){ b.classList.remove('active'); b.style.border = '2px solid transparent'; });
+  btn.classList.add('active');
+  btn.style.border = '3px solid #fff';
 }
 
 function openDayNote(dateStr) {
@@ -6915,7 +6920,9 @@ function openDayNote(dateStr) {
   document.getElementById('note_author').value = localStorage.getItem('da_note_author') || '';
   _noteColor = '#facc15';
   document.querySelectorAll('.note-color-btn').forEach(function(b){
-    b.style.border = b.getAttribute('data-color') === _noteColor ? '2px solid '+_noteColor : '2px solid transparent';
+    b.classList.remove('active');
+    b.style.border = '2px solid transparent';
+    if (b.getAttribute('data-color') === _noteColor) { b.classList.add('active'); b.style.border = '3px solid #fff'; }
   });
   openM('M_NOTE');
 }
