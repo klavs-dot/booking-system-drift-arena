@@ -4917,12 +4917,11 @@ function renderCal() {
         if (occ > 0 || hr <= closeHr) {
           const pct = Math.min(100, Math.round(occ / 8 * 100));
           const barColor = occ === 0 ? '#333' : occ >= 4 ? '#ef4444' : occ >= 2 ? '#facc15' : '#22c55e';
-          hourBars += '<div style="display:flex;align-items:center;gap:4px;"><span style="font-size:9px;color:#999;width:32px;">' + p2(hr) + ':00</span><div style="flex:1;height:6px;background:#333;border-radius:3px;"><div style="height:100%;width:' + pct + '%;background:' + barColor + ';border-radius:3px;"></div></div><span style="font-size:9px;color:' + barColor + ';width:14px;text-align:right;font-weight:700;">' + (occ||'') + '</span><span style="font-size:8px;color:#777;width:28px;text-align:right;">' + (pplH>0?pplH+'c':'') + '</span></div>';
+          hourBars += '<div style="display:flex;align-items:center;gap:4px;"><span style="font-size:9px;color:#999;width:32px;">' + p2(hr) + ':00</span><div style="flex:1;height:6px;background:#333;border-radius:3px;"><div style="height:100%;width:' + pct + '%;background:' + barColor + ';border-radius:3px;"></div></div><span style="font-size:10px;color:' + (pplH>0?'#22c55e':'#555') + ';width:22px;text-align:right;font-weight:800;">' + (pplH||'') + '</span><span style="font-size:8px;color:#777;width:22px;text-align:right;">' + (occ>0?occ+'r':'') + '</span></div>';
         }
       }
 
       tooltipContent = '<div style="font-size:10px;color:#999;margin-bottom:4px;">🕐 ' + workFrom + ' – ' + workTo + '</div>'
-        + '<div style="font-size:16px;font-weight:800;color:#22c55e;">' + totalPeople + '<span style="font-size:11px;color:#999;font-weight:400;"> cilv. kopā šajā dienā</span></div>'
         + '<div style="font-size:10px;color:#999;margin:4px 0;">' + resCount + ' rezervācija' + (resCount===1?'':'s') + '</div>'
         + '<div style="display:flex;flex-direction:column;gap:2px;margin-top:6px;">' + hourBars + '</div>';
     }
