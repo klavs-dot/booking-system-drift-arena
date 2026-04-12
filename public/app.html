@@ -2399,6 +2399,18 @@ window.google={script:{run:window.__gsr__}};
             <span class="chk"></span>
             <span>🔒 Slēgtais pasākums</span>
           </label>
+          <label class="wcheck">
+            <input type="checkbox" id="w_kids_party" onchange="wKidsParty(this.checked)">
+            <span class="chk"></span>
+            <span>🎈 Jā, bērnu ballīte</span>
+          </label>
+        </div>
+        <div id="w_kids_sunday_hint" style="display:none;" class="kids-sunday-hint">
+          🧃 Svētdienās bezmaksas PEPSI!
+          <div style="display:flex;gap:8px;margin-top:4px;">
+            <button type="button" class="rides-upsell-btn yes" onclick="wSuggestSunday()">📅 Pārcelt uz svētdienu</button>
+            <button type="button" class="rides-upsell-btn no" onclick="document.getElementById('w_kids_sunday_hint').style.display='none'">Palikt</button>
+          </div>
         </div>
         <div id="outside-times-hint" style="display:none;" class="outside-times-hint">
           <span class="oht-label">Pieejamie laiki ārpus darba laika:</span>
@@ -2442,21 +2454,6 @@ window.google={script:{run:window.__gsr__}};
             </div>
             <div id="w_rides_total" style="margin-top:6px;font-size:12px;color:var(--text3);display:none;">
               Kopā braucieni: <span id="w_rides_total_num" style="color:var(--accent);font-weight:700;">0</span>
-            </div>
-          </div>
-          <div class="field" id="w_kids_party_wrap">
-            <label>🎈 Bērnu ballīte?</label>
-            <label class="fd-mode-check" style="margin-top:8px;">
-              <input type="checkbox" id="w_kids_party" onchange="wKidsParty(this.checked)">
-              <span class="chk"></span>
-              <span>Jā, bērnu ballīte</span>
-            </label>
-            <div id="w_kids_sunday_hint" style="display:none;" class="kids-sunday-hint">
-              🧃 Svētdienās bezmaksas PEPSI!
-              <div style="display:flex;gap:8px;margin-top:4px;">
-                <button type="button" class="rides-upsell-btn yes" onclick="wSuggestSunday()">📅 Pārcelt uz svētdienu</button>
-                <button type="button" class="rides-upsell-btn no" onclick="document.getElementById('w_kids_sunday_hint').style.display='none'">Palikt</button>
-              </div>
             </div>
           </div>
         </div>
