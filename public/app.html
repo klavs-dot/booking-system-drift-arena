@@ -2215,6 +2215,7 @@ window.google={script:{run:window.__gsr__}};
     <button class="nb" id="nb-kitchen" onclick="goNav('kitchen',this)">🍽️ Virtuves rēķini</button>
     <div class="nb-new-wrap">
       <button class="nb nb-new" id="nb-new" onclick="goNav('new',this)">＋ Jauna rezervācija</button>
+      <button class="nb" onclick="openDayNote()" style="font-size:11px;padding:6px 12px;margin-top:4px;background:var(--card2);border:1px solid var(--border2);color:#facc15;">📌 Pievienot piezīmi dienai</button>
     </div>
   </nav>
 </header>
@@ -2987,6 +2988,31 @@ window.google={script:{run:window.__gsr__}};
   </div>
 </div>
 
+<!-- ══ PIEZĪMES MODĀLIS ══ -->
+<div class="mbg" id="M_NOTE">
+  <div class="mbox" style="max-width:500px;background:#111;position:relative;">
+    <button onclick="closeM('M_NOTE')" style="position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border2);color:var(--text2);width:32px;height:32px;border-radius:var(--r);cursor:pointer;font-size:16px;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">✕</button>
+    <div style="font-family:var(--font-head);font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#facc15;margin-bottom:16px;">📌 PIEZĪME DIENAI</div>
+    <div class="field"><label>Datums</label><input type="date" id="note_date" style="font-size:14px;"></div>
+    <div class="field" style="margin-top:12px;"><label>Autors</label><input type="text" id="note_author" placeholder="Tavs vārds" style="font-size:13px;"></div>
+    <div class="field" style="margin-top:12px;"><label>Piezīme</label><textarea id="note_text" placeholder="Raksti piezīmi šai dienai..." style="min-height:100px;font-size:13px;"></textarea></div>
+    <div style="margin-top:8px;">
+      <label style="font-size:11px;color:var(--text3);">Krāsa:</label>
+      <div style="display:flex;gap:6px;margin-top:4px;">
+        <button class="note-color-btn" data-color="#facc15" onclick="noteSetColor(this)" style="background:#facc15;width:28px;height:28px;border-radius:4px;border:2px solid #facc15;cursor:pointer;"></button>
+        <button class="note-color-btn" data-color="#f472b6" onclick="noteSetColor(this)" style="background:#f472b6;width:28px;height:28px;border-radius:4px;border:2px solid transparent;cursor:pointer;"></button>
+        <button class="note-color-btn" data-color="#60a5fa" onclick="noteSetColor(this)" style="background:#60a5fa;width:28px;height:28px;border-radius:4px;border:2px solid transparent;cursor:pointer;"></button>
+        <button class="note-color-btn" data-color="#22c55e" onclick="noteSetColor(this)" style="background:#22c55e;width:28px;height:28px;border-radius:4px;border:2px solid transparent;cursor:pointer;"></button>
+        <button class="note-color-btn" data-color="#f97316" onclick="noteSetColor(this)" style="background:#f97316;width:28px;height:28px;border-radius:4px;border:2px solid transparent;cursor:pointer;"></button>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px;">
+      <button class="btn btn-s" onclick="closeM('M_NOTE')" style="padding:10px 20px;">Atcelt</button>
+      <button class="btn btn-p" onclick="saveNote()" style="padding:10px 24px;">📌 Saglabāt</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ FOOTER ══ -->
 <footer style="margin-top:40px;padding:20px;text-align:center;border-top:1px solid var(--border);background:var(--surface);">
   <div style="font-size:11px;color:var(--text3);font-family:var(--font-head);letter-spacing:1px;margin-bottom:8px;">SIA CALEIDUS</div>
@@ -3120,6 +3146,44 @@ window.google={script:{run:window.__gsr__}};
   border: 2px solid var(--red) !important;
   animation: invNavGlitch 2s ease-in-out infinite;
 }
+@keyframes invNavGlitch {
+
+/* Sticky notes */
+.day-note {
+  position: relative;
+  padding: 12px 16px;
+  border-radius: 2px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.4);
+  transform: rotate(-0.5deg);
+  font-family: 'Barlow', sans-serif;
+}
+.day-note:nth-child(even) { transform: rotate(0.3deg); }
+.day-note-author {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  opacity: 0.7;
+}
+.day-note-text { color: #1a1a1a; font-weight: 500; }
+.day-note-del {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: none;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.4;
+  color: #1a1a1a;
+}
+.day-note-del:hover { opacity: 1; }
+.day-note-time { font-size: 10px; opacity: 0.5; margin-top: 4px; }
+
 @keyframes invNavGlitch {
   0%,100% { transform:scale(1); box-shadow:0 0 0 0 rgba(239,68,68,0); }
   10% { transform:scale(1.15); box-shadow:0 0 12px rgba(239,68,68,0.6); }
@@ -4668,7 +4732,7 @@ function openDay(ds) {
   const list = ALL.filter(b => b.date===ds)
     .sort((a,b) => tmin(a.timeFrom)-tmin(b.timeFrom));
   document.getElementById('DAY_VIEW_LIST').innerHTML =
-    list.length ? list.map(renderCardReadonly).join('') : emptyEl('Nav rezervāciju šajā dienā');
+    renderDayNotes(ds) + (list.length ? list.map(renderCardReadonly).join('') : emptyEl('Nav rezervāciju šajā dienā'));
   goNav('day', document.getElementById('nb-day'));
 }
 
@@ -4762,14 +4826,17 @@ function renderToday() {
       ? '<span class="tl-count">' + active + ' rezervācija' + (active===1?'':'s') + '</span>'
       : '<span class="tl-empty-lbl">Nav rezervāciju</span>';
 
+    var notesHtml = renderDayNotes(ds);
+
     out += '<div class="tl-day' + (i===0?' tl-today':'') + '">'
       + '<div class="tl-day-hdr">'
       +   '<div class="tl-day-left">'
       +     '<span class="tl-rel">' + dayName + '</span>'
       +     '<span class="tl-date">' + dateStr + '</span>'
       +   '</div>'
-      +   '<div class="tl-day-right">' + countHtml + '</div>'
+      +   '<div class="tl-day-right">' + countHtml + '<button onclick="openDayNote(\''+ds+'\')" style="background:none;border:1px solid #facc1555;color:#facc15;padding:2px 8px;border-radius:3px;cursor:pointer;font-size:10px;font-family:var(--font-head);font-weight:700;margin-left:8px;" onmouseover="this.style.borderColor=\'#facc15\'" onmouseout="this.style.borderColor=\'#facc1555\'">📌</button></div>'
       + '</div>'
+      + notesHtml
       + '<div class="tl-cards">' + cardsHtml + '</div>'
       + '</div>';
   }
@@ -6830,6 +6897,74 @@ function invSendEmail() {
     var body = 'Sveiki,\n\nPielikumā nosūtam rēķinu.\n\nPriecāsimies par savlaicīgu apmaksu un gaidīsim Jūs ciemos atkal.\n\nAr cieņu,\nDrift Arena komanda';
     window.open('mailto:'+email+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body), '_blank');
   }, 500);
+}
+
+// ══ DIENAS PIEZĪMES (STICKY NOTES) ══
+var _noteColor = '#facc15';
+
+function noteSetColor(btn) {
+  _noteColor = btn.getAttribute('data-color');
+  document.querySelectorAll('.note-color-btn').forEach(function(b){ b.style.border = '2px solid transparent'; });
+  btn.style.border = '2px solid ' + _noteColor;
+}
+
+function openDayNote(dateStr) {
+  var today = dateStr || new Date().toISOString().slice(0,10);
+  document.getElementById('note_date').value = today;
+  document.getElementById('note_text').value = '';
+  document.getElementById('note_author').value = localStorage.getItem('da_note_author') || '';
+  _noteColor = '#facc15';
+  document.querySelectorAll('.note-color-btn').forEach(function(b){
+    b.style.border = b.getAttribute('data-color') === _noteColor ? '2px solid '+_noteColor : '2px solid transparent';
+  });
+  openM('M_NOTE');
+}
+
+function saveNote() {
+  var date = document.getElementById('note_date').value;
+  var text = document.getElementById('note_text').value.trim();
+  var author = document.getElementById('note_author').value.trim();
+  if (!date || !text) { toast('Ievadi datumu un tekstu!', 'warn'); return; }
+  localStorage.setItem('da_note_author', author);
+
+  var notes = getDayNotes();
+  notes.push({
+    id: 'n_' + Date.now(),
+    date: date,
+    text: text,
+    author: author,
+    color: _noteColor,
+    time: new Date().toLocaleTimeString('lv-LV', {hour:'2-digit', minute:'2-digit'})
+  });
+  localStorage.setItem('da_day_notes', JSON.stringify(notes));
+  closeM('M_NOTE');
+  renderToday();
+  renderCal();
+  toast('📌 Piezīme saglabāta', 'ok');
+}
+
+function getDayNotes() {
+  try { return JSON.parse(localStorage.getItem('da_day_notes') || '[]'); } catch(e) { return []; }
+}
+
+function deleteNote(id) {
+  var notes = getDayNotes().filter(function(n){ return n.id !== id; });
+  localStorage.setItem('da_day_notes', JSON.stringify(notes));
+  renderToday();
+  renderCal();
+}
+
+function renderDayNotes(dateStr) {
+  var notes = getDayNotes().filter(function(n){ return n.date === dateStr; });
+  if (!notes.length) return '';
+  return notes.map(function(n) {
+    return '<div class="day-note" style="background:'+n.color+';">'
+      + '<button class="day-note-del" onclick="deleteNote(\''+n.id+'\')">✕</button>'
+      + '<div class="day-note-author">📌 '+(n.author||'Piezīme')+'</div>'
+      + '<div class="day-note-text">'+esc(n.text)+'</div>'
+      + '<div class="day-note-time">'+esc(n.time||'')+'</div>'
+      + '</div>';
+  }).join('');
 }
 
 // ══ VIRTUVES RĒĶINU SISTĒMA ══
