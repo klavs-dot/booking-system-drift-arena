@@ -4575,8 +4575,8 @@ function wSidebarUpdate() {
     hourRows += '<div style="display:flex;align-items:center;gap:6px;padding:3px 0;'+(inSel?'background:rgba(232,77,14,0.08);border-left:2px solid var(--accent);padding-left:6px;':'')+'">'
       + '<span style="font-size:11px;color:'+(resCnt>0?'var(--text)':'var(--text3)')+';width:36px;font-weight:'+(resCnt>0?'700':'400')+';">'+p2(h)+':00</span>'
       + '<div style="flex:1;height:6px;background:var(--border);border-radius:3px;"><div style="height:100%;width:'+barPct+'%;background:'+barCol+';border-radius:3px;transition:width .3s;"></div></div>'
-      + '<span style="font-size:11px;color:'+barCol+';width:16px;text-align:right;font-weight:700;">'+(resCnt||'')+'</span>'
-      + '<span style="font-size:10px;color:var(--text3);width:32px;text-align:right;">'+(pplCnt>0?pplCnt+' cilv':'')+'</span>'
+      + '<span style="font-size:13px;color:'+(pplCnt>0?'#22c55e':'var(--text3)')+';width:28px;text-align:right;font-weight:800;">'+(pplCnt||'')+'</span>'
+      + '<span style="font-size:10px;color:var(--text3);width:28px;text-align:right;">'+(resCnt>0?resCnt+' rez':'')+'</span>'
       + '</div>';
   }
 
