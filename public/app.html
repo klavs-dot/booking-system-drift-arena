@@ -188,7 +188,7 @@ button{cursor:pointer}
 .cal-tooltip {
   display: none;
   position: absolute;
-  bottom: calc(100% + 8px);
+  top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
   background: #1a1a1a;
@@ -203,11 +203,11 @@ button{cursor:pointer}
 .cal-tooltip::after {
   content: '';
   position: absolute;
-  top: 100%;
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
   border: 6px solid transparent;
-  border-top-color: #1a1a1a;
+  border-bottom-color: #1a1a1a;
 }
 .cday:hover .cal-tooltip { display: block; }
 .nb {
@@ -590,13 +590,14 @@ button{cursor:pointer}
   min-height:100px;
   cursor:pointer;
   transition:all .15s;
-  overflow:hidden;
   position:relative;
 }
 .cday:hover {
   border-color:var(--accent);
   background:var(--card2);
   transform:translateY(-1px);
+  z-index:50;
+  overflow:visible;
 }
 .cday.tdy {
   border-color:var(--accent);
