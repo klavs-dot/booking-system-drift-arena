@@ -169,6 +169,20 @@ button{cursor:pointer}
 
 /* ── NAV BUTTONS ── */
 .nav{display:flex;gap:2px;flex:1;flex-wrap:wrap;}
+.nb-main {
+  padding: 14px 28px !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px !important;
+  border: 2px solid var(--border) !important;
+  border-radius: 8px !important;
+  min-width: 140px;
+  text-align: center;
+  justify-content: center;
+  transition: all .2s;
+}
+.nb-main:hover { border-color: var(--accent) !important; background: rgba(232,77,14,0.1) !important; transform: translateY(-1px); }
+.nb-main.active { border-color: var(--accent) !important; background: rgba(232,77,14,0.15) !important; border-bottom: 3px solid var(--accent) !important; }
 .nb {
   background: none;
   border: none;
@@ -2216,10 +2230,10 @@ window.google={script:{run:window.__gsr__}};
       <button class="nb" id="nb-contacts" onclick="goNav('contacts',this)">📇 Noderīgi kontakti</button>
     </div>
     <!-- Apakšējais menū -->
-    <div class="nav">
-      <button class="nb" id="nb-calendar" onclick="goNav('calendar',this)">📅 Pārskats</button>
-      <button class="nb active" id="nb-today" onclick="goNav('today',this)">📅 Timeline</button>
-      <button class="nb" id="nb-texts" onclick="goNav('texts',this)">💬 Teksti</button>
+    <div class="nav" style="gap:8px;align-items:center;">
+      <button class="nb nb-main" id="nb-calendar" onclick="goNav('calendar',this)">📅 Pārskats</button>
+      <button class="nb nb-main active" id="nb-today" onclick="goNav('today',this)">📅 Timeline</button>
+      <button class="nb nb-main" id="nb-texts" onclick="goNav('texts',this)">💬 Teksti</button>
       <button class="nb" id="nb-day" style="display:none;"></button>
       <div class="nb-new-wrap">
         <button class="nb nb-new" id="nb-new" onclick="goNav('new',this)">＋ Jauna rezervācija</button>
