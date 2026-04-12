@@ -6986,6 +6986,7 @@ function prRenderTable() {
       + '<button onclick="prEdit(\''+r.id+'\')" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:3px;padding:3px 8px;cursor:pointer;font-size:10px;font-family:var(--font-head);font-weight:700;" onmouseover="this.style.color=\'var(--accent)\'" onmouseout="this.style.color=\'var(--text3)\'">✏️</button>'
       + '<button onclick="prAdjust(\''+r.id+'\',-1)" style="background:none;border:1px solid var(--border2);color:var(--red);border-radius:3px;padding:3px 8px;cursor:pointer;font-size:12px;font-weight:700;" title="Noņemt 1 braucienu">−1</button>'
       + '<button onclick="prAdjust(\''+r.id+'\',1)" style="background:none;border:1px solid var(--border2);color:#22c55e;border-radius:3px;padding:3px 8px;cursor:pointer;font-size:12px;font-weight:700;" title="Pievienot 1 braucienu">+1</button>'
+      + '<button onclick="prDelete(\''+r.id+'\')" style="background:none;border:1px solid var(--border2);color:var(--red);border-radius:3px;padding:3px 8px;cursor:pointer;font-size:10px;font-family:var(--font-head);font-weight:700;" onmouseover="this.style.borderColor=\'var(--red)\'" onmouseout="this.style.borderColor=\'var(--border2)\'">🗑️</button>'
       + '</div></td>'
       + '</tr>';
   }).join('');
@@ -7042,6 +7043,8 @@ function prSave() {
 function prAdjust(id, delta) {
   var r = _prData.find(function(x){return x.id===id;});
   if (!r) return;
+  var label = delta > 0 ? 'Pievienot '+delta+' braucienu?' : 'Noņemt '+Math.abs(delta)+' braucienu?';
+  if (!confirm(label)) return;
   var newRides = Math.max(0, (parseInt(r.rides)||0) + delta);
 
   fetch('/api/paidrides', {
@@ -7050,8 +7053,21 @@ function prAdjust(id, delta) {
     body: JSON.stringify({action:'update', id:id, name:r.name, surname:r.surname, phone:r.phone, rides:String(newRides), notes:r.notes})
   })
   .then(function(r2){return r2.json();})
-  .then(function(res){ if(res.ok){r.rides=String(newRides);prRenderTable();}else toast('Kļūda','err'); })
+  .then(function(res){ if(res.ok){r.rides=String(newRides);prRenderTable();toast('✓ Braucieni: '+newRides,'ok');}else toast('Kļūda','err'); })
   .catch(function(e){ toast('Kļūda: '+e.message,'err'); });
+}
+
+function prDelete(id) {
+  if (!confirm('Vai tiešām dzēst šo ierakstu?')) return;
+  ovl('Dzēš...');
+  fetch('/api/paidrides', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({action:'delete', id:id})
+  })
+  .then(function(r){return r.json();})
+  .then(function(res){ hovl(); if(res.ok){toast('✓ Dzēsts','ok');loadPaidRides();}else toast('Kļūda: '+(res.error||''),'err'); })
+  .catch(function(e){ hovl(); toast('Kļūda: '+e.message,'err'); });
 }
 
 // ══ DIENAS PIEZĪMES (STICKY NOTES) ══
