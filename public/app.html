@@ -2763,12 +2763,60 @@ window.google={script:{run:window.__gsr__}};
 
 <!-- ══ NODERĪGI KONTAKTI ══ -->
 <div class="view" id="view-contacts">
-  <div class="phdr">
-    <div class="ptitle">NODERĪGI KONTAKTI</div>
-    <div class="psub">Svarīgi kontakti un saites</div>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+    <div class="phdr" style="margin:0;padding:0;">
+      <div class="ptitle">NODERĪGI KONTAKTI</div>
+      <div class="psub">Vizītkartes un svarīgi kontakti</div>
+    </div>
+    <button class="btn btn-p" onclick="ctAddNew()" style="padding:10px 20px;font-size:13px;">＋ Pievienot kontaktu</button>
   </div>
-  <div style="padding:40px 20px;text-align:center;color:var(--text3);font-family:var(--font-head);font-size:12px;letter-spacing:2px;text-transform:uppercase;">
-    📇 Šī sadaļa tiek izstrādāta
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:20px;margin-top:20px;">
+    <div>
+      <div style="font-family:var(--font-head);font-size:18px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#ef4444;margin-bottom:12px;text-align:center;">🚨 ĀRKĀRTAS</div>
+      <div id="ct_col_emergency"></div>
+    </div>
+    <div>
+      <div style="font-family:var(--font-head);font-size:18px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#60a5fa;margin-bottom:12px;text-align:center;">🔧 TEHNISKIE</div>
+      <div id="ct_col_technical"></div>
+    </div>
+    <div>
+      <div style="font-family:var(--font-head);font-size:18px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#22c55e;margin-bottom:12px;text-align:center;">📦 PRODUKCIJA</div>
+      <div id="ct_col_production"></div>
+    </div>
+    <div>
+      <div style="font-family:var(--font-head);font-size:18px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#facc15;margin-bottom:12px;text-align:center;">👥 IEKŠĒJIE</div>
+      <div id="ct_col_internal"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ KONTAKTU MODĀLIS ══ -->
+<div class="mbg" id="M_CT">
+  <div class="mbox" style="max-width:450px;background:#111;position:relative;">
+    <button onclick="closeM('M_CT')" style="position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border2);color:var(--text2);width:32px;height:32px;border-radius:var(--r);cursor:pointer;font-size:16px;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">✕</button>
+    <div id="ct_modal_title" style="font-family:var(--font-head);font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;">📇 JAUNS KONTAKTS</div>
+    <div class="field"><label>Kategorija</label>
+      <select id="ct_f_cat" style="padding:10px;font-size:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);color:var(--text);width:100%;">
+        <option value="emergency">🚨 Ārkārtas</option>
+        <option value="technical">🔧 Tehniskie</option>
+        <option value="production">📦 Produkcija</option>
+        <option value="internal">👥 Iekšējie</option>
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+      <div class="field"><label>Vārds / Nosaukums</label><input type="text" id="ct_f_name" placeholder="Jānis Bērziņš"></div>
+      <div class="field"><label>Amats / Apraksts</label><input type="text" id="ct_f_role" placeholder="Elektriķis, piegādātājs..."></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+      <div class="field"><label>Telefons</label><input type="text" id="ct_f_phone" placeholder="+371 20000000"></div>
+      <div class="field"><label>E-pasts</label><input type="email" id="ct_f_email" placeholder="info@example.com"></div>
+    </div>
+    <div class="field" style="margin-top:12px;"><label>Piezīmes</label><input type="text" id="ct_f_notes" placeholder="Strādā 24/7, zvani ja..."></div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px;">
+      <button class="btn btn-s" onclick="closeM('M_CT')" style="padding:10px 20px;">Atcelt</button>
+      <button class="btn btn-p" onclick="ctSave()" style="padding:10px 24px;">💾 Saglabāt</button>
+    </div>
+    <input type="hidden" id="ct_f_id">
   </div>
 </div>
 
@@ -4746,6 +4794,7 @@ function goNav(name, btn) {
   if (name === 'kitchen') { setTimeout(renderKitchen, 50); }
   if (name === 'paidrides') { setTimeout(function(){ if(!_prLoaded) loadPaidRides(); else prRenderTable(); }, 50); }
   if (name === 'texts') { setTimeout(txtRender, 50); }
+  if (name === 'contacts') { setTimeout(function(){ if(!_ctLoaded) loadContacts(); else ctRender(); }, 50); }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
@@ -7284,6 +7333,106 @@ function prDelete(id) {
   })
   .then(function(r){return r.json();})
   .then(function(res){ hovl(); if(res.ok){toast('✓ Dzēsts','ok');loadPaidRides();}else toast('Kļūda: '+(res.error||''),'err'); })
+  .catch(function(e){ hovl(); toast('Kļūda: '+e.message,'err'); });
+}
+
+// ══ NODERĪGI KONTAKTI ══
+var _ctData = [];
+var _ctLoaded = false;
+
+function loadContacts() {
+  fetch('/api/contacts')
+    .then(function(r){return r.json();})
+    .then(function(res){
+      if (res.ok) { _ctData = res.data; _ctLoaded = true; ctRender(); }
+      else toast('Kļūda: '+(res.error||''), 'err');
+    })
+    .catch(function(e){ toast('Kļūda: '+e.message, 'err'); });
+}
+
+function ctRender() {
+  if (!_ctLoaded) { loadContacts(); return; }
+  var cats = {emergency:[], technical:[], production:[], internal:[]};
+  _ctData.forEach(function(c) { if (cats[c.category]) cats[c.category].push(c); });
+
+  var catColors = {emergency:'#ef4444', technical:'#60a5fa', production:'#22c55e', internal:'#facc15'};
+
+  ['emergency','technical','production','internal'].forEach(function(cat) {
+    var el = document.getElementById('ct_col_'+cat);
+    if (!el) return;
+    if (!cats[cat].length) { el.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:11px;padding:20px;">Nav kontaktu</div>'; return; }
+
+    el.innerHTML = cats[cat].map(function(c) {
+      var borderColor = catColors[cat];
+      return '<div style="background:var(--card);border:1px solid var(--border);border-left:4px solid '+borderColor+';border-radius:var(--r);padding:14px 16px;margin-bottom:10px;position:relative;">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+        + '<div style="font-size:15px;font-weight:800;color:#fff;">'+esc(c.name)+'</div>'
+        + '<div style="display:flex;gap:2px;" >'
+        + '<button onclick="ctEdit(\''+c.id+'\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;">✏️</button>'
+        + '<button onclick="ctDelete(\''+c.id+'\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;">🗑️</button>'
+        + '</div></div>'
+        + (c.role ? '<div style="font-size:11px;color:'+borderColor+';font-weight:700;margin-top:2px;">'+esc(c.role)+'</div>' : '')
+        + (c.phone ? '<div style="font-size:13px;color:var(--text);margin-top:8px;font-weight:600;"><a href="tel:'+esc(c.phone)+'" style="color:var(--text);text-decoration:none;">📞 '+esc(c.phone)+'</a></div>' : '')
+        + (c.email ? '<div style="font-size:12px;color:var(--text2);margin-top:4px;"><a href="mailto:'+esc(c.email)+'" style="color:var(--text2);text-decoration:none;">📧 '+esc(c.email)+'</a></div>' : '')
+        + (c.notes ? '<div style="font-size:11px;color:var(--text3);margin-top:6px;font-style:italic;">'+esc(c.notes)+'</div>' : '')
+        + '</div>';
+    }).join('');
+  });
+}
+
+function ctAddNew() {
+  document.getElementById('ct_f_id').value = '';
+  document.getElementById('ct_f_cat').value = 'emergency';
+  document.getElementById('ct_f_name').value = '';
+  document.getElementById('ct_f_role').value = '';
+  document.getElementById('ct_f_phone').value = '';
+  document.getElementById('ct_f_email').value = '';
+  document.getElementById('ct_f_notes').value = '';
+  document.getElementById('ct_modal_title').textContent = '📇 JAUNS KONTAKTS';
+  openM('M_CT');
+}
+
+function ctEdit(id) {
+  var c = _ctData.find(function(x){return x.id===id;});
+  if (!c) return;
+  document.getElementById('ct_f_id').value = id;
+  document.getElementById('ct_f_cat').value = c.category;
+  document.getElementById('ct_f_name').value = c.name;
+  document.getElementById('ct_f_role').value = c.role;
+  document.getElementById('ct_f_phone').value = c.phone;
+  document.getElementById('ct_f_email').value = c.email;
+  document.getElementById('ct_f_notes').value = c.notes;
+  document.getElementById('ct_modal_title').textContent = '✏️ LABOT KONTAKTU';
+  openM('M_CT');
+}
+
+function ctSave() {
+  var id = document.getElementById('ct_f_id').value;
+  var body = {
+    action: id ? 'update' : 'add',
+    id: id || undefined,
+    category: document.getElementById('ct_f_cat').value,
+    name: document.getElementById('ct_f_name').value.trim(),
+    role: document.getElementById('ct_f_role').value.trim(),
+    phone: document.getElementById('ct_f_phone').value.trim(),
+    email: document.getElementById('ct_f_email').value.trim(),
+    notes: document.getElementById('ct_f_notes').value.trim(),
+  };
+  if (!body.name) { toast('Ievadi vārdu!', 'warn'); return; }
+
+  ovl('Saglabā...');
+  fetch('/api/contacts', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) })
+  .then(function(r){return r.json();})
+  .then(function(res){ hovl(); closeM('M_CT'); if(res.ok){toast('✓ Saglabāts','ok');loadContacts();}else toast('Kļūda: '+(res.error||''),'err'); })
+  .catch(function(e){ hovl(); toast('Kļūda: '+e.message,'err'); });
+}
+
+function ctDelete(id) {
+  if (!confirm('Vai tiešām dzēst šo kontaktu?')) return;
+  ovl('Dzēš...');
+  fetch('/api/contacts', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action:'delete',id:id}) })
+  .then(function(r){return r.json();})
+  .then(function(res){ hovl(); if(res.ok){toast('✓ Dzēsts','ok');loadContacts();}else toast('Kļūda','err'); })
   .catch(function(e){ hovl(); toast('Kļūda: '+e.message,'err'); });
 }
 
