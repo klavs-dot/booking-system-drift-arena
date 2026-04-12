@@ -3173,6 +3173,17 @@ window.google={script:{run:window.__gsr__}};
   </div>
 </div>
 
+<!-- ══ APSTIPRINĀJUMA MODĀLIS ══ -->
+<div class="mbg" id="M_CONFIRM" style="z-index:9999;">
+  <div class="mbox" style="max-width:400px;background:#111;position:relative;text-align:center;padding:30px;">
+    <div id="cfm_text" style="font-family:var(--font-head);font-size:16px;font-weight:800;letter-spacing:1px;color:var(--text);margin-bottom:24px;line-height:1.5;"></div>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button class="btn btn-s" id="cfm_no" style="padding:12px 30px;font-size:14px;">Nē</button>
+      <button class="btn btn-p" id="cfm_yes" style="padding:12px 30px;font-size:14px;">Jā</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ FOOTER ══ -->
 <footer style="margin-top:40px;padding:20px;text-align:center;border-top:1px solid var(--border);background:var(--surface);">
   <div style="font-size:11px;color:var(--text3);font-family:var(--font-head);letter-spacing:1px;margin-bottom:8px;">SIA WOLFTRIKE</div>
@@ -7217,8 +7228,8 @@ function txtSave() {
   toast('✓ Saglabāts', 'ok');
 }
 
-function txtDelete(id) {
-  if (!confirm('Vai tiešām dzēst šo tekstu?')) return;
+async function txtDelete(id) {
+  if (!await daConfirm('Vai tiešām dzēst šo tekstu?')) return;
   var data = getTxtData().filter(function(x){return x.id!==id;});
   localStorage.setItem('da_texts', JSON.stringify(data));
   txtRender();
@@ -7321,11 +7332,11 @@ function prSave() {
   .catch(function(e){ hovl(); toast('Kļūda: '+e.message,'err'); });
 }
 
-function prAdjust(id, delta) {
+async function prAdjust(id, delta) {
   var r = _prData.find(function(x){return x.id===id;});
   if (!r) return;
   var label = delta > 0 ? 'Pievienot '+delta+' braucienu?' : 'Noņemt '+Math.abs(delta)+' braucienu?';
-  if (!confirm(label)) return;
+  if (!await daConfirm(label)) return;
   var newRides = Math.max(0, (parseInt(r.rides)||0) + delta);
 
   fetch('/api/paidrides', {
@@ -7338,8 +7349,8 @@ function prAdjust(id, delta) {
   .catch(function(e){ toast('Kļūda: '+e.message,'err'); });
 }
 
-function prDelete(id) {
-  if (!confirm('Vai tiešām dzēst šo ierakstu?')) return;
+async function prDelete(id) {
+  if (!await daConfirm('Vai tiešām dzēst šo ierakstu?')) return;
   ovl('Dzēš...');
   fetch('/api/paidrides', {
     method: 'POST',
@@ -7349,6 +7360,19 @@ function prDelete(id) {
   .then(function(r){return r.json();})
   .then(function(res){ hovl(); if(res.ok){toast('✓ Dzēsts','ok');loadPaidRides();}else toast('Kļūda: '+(res.error||''),'err'); })
   .catch(function(e){ hovl(); toast('Kļūda: '+e.message,'err'); });
+}
+
+// ══ CUSTOM CONFIRM ══
+function daConfirm(text) {
+  return new Promise(function(resolve) {
+    document.getElementById('cfm_text').textContent = text;
+    openM('M_CONFIRM');
+    var yesBtn = document.getElementById('cfm_yes');
+    var noBtn = document.getElementById('cfm_no');
+    function cleanup() { yesBtn.onclick = null; noBtn.onclick = null; closeM('M_CONFIRM'); }
+    yesBtn.onclick = function() { cleanup(); resolve(true); };
+    noBtn.onclick = function() { cleanup(); resolve(false); };
+  });
 }
 
 // ══ NODERĪGI KONTAKTI ══
@@ -7446,8 +7470,8 @@ function ctSave() {
   .catch(function(e){ hovl(); toast('Kļūda: '+e.message,'err'); });
 }
 
-function ctDelete(id) {
-  if (!confirm('Vai tiešām dzēst šo kontaktu?')) return;
+async function ctDelete(id) {
+  if (!await daConfirm('Vai tiešām dzēst šo kontaktu?')) return;
   ovl('Dzēš...');
   fetch('/api/contacts', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action:'delete',id:id}) })
   .then(function(r){return r.json();})
@@ -7538,8 +7562,8 @@ function getDayNotes() {
   try { return JSON.parse(localStorage.getItem('da_day_notes') || '[]'); } catch(e) { return []; }
 }
 
-function deleteNote(id) {
-  if (!confirm('Vai tiešām dzēst šo piezīmi?')) return;
+async function deleteNote(id) {
+  if (!await daConfirm('Vai tiešām dzēst šo piezīmi?')) return;
   var notes = getDayNotes().filter(function(n){ return n.id !== id; });
   localStorage.setItem('da_day_notes', JSON.stringify(notes));
   renderToday();
