@@ -2728,15 +2728,15 @@ window.google={script:{run:window.__gsr__}};
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:16px;">
     <div>
-      <div style="font-family:var(--font-head);font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;text-align:center;">📧 E-PASTI</div>
+      <div style="font-family:var(--font-head);font-size:22px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;text-align:center;">📧 E-PASTI</div>
       <div id="txt_col_email"></div>
     </div>
     <div>
-      <div style="font-family:var(--font-head);font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#22c55e;margin-bottom:12px;text-align:center;">💬 WHATSAPP</div>
+      <div style="font-family:var(--font-head);font-size:22px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#22c55e;margin-bottom:16px;text-align:center;">💬 WHATSAPP</div>
       <div id="txt_col_whatsapp"></div>
     </div>
     <div>
-      <div style="font-family:var(--font-head);font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#60a5fa;margin-bottom:12px;text-align:center;">📱 SOC. TĪKLI</div>
+      <div style="font-family:var(--font-head);font-size:22px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#60a5fa;margin-bottom:16px;text-align:center;">📱 SOC. TĪKLI</div>
       <div id="txt_col_social"></div>
     </div>
   </div>
@@ -7056,15 +7056,15 @@ function txtRender() {
       return;
     }
     el.innerHTML = cols[col].map(function(t) {
-      return '<div class="txt-bubble">'
-        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-        + '<div class="txt-bubble-title" style="font-size:14px;">'+esc(t.title)+'</div>'
-        + '<div style="display:flex;gap:2px;" onclick="event.stopPropagation();">'
-        + '<button onclick="copyBubbleById(\''+t.id+'\')" style="background:#f0f0f0;border:1px solid #ddd;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:9px;font-weight:700;color:#666;">📋 COPY</button>'
-        + '<button onclick="txtEdit(\''+t.id+'\')" style="background:none;border:none;color:#999;cursor:pointer;font-size:11px;">✏️</button>'
-        + '<button onclick="txtDelete(\''+t.id+'\')" style="background:none;border:none;color:#999;cursor:pointer;font-size:11px;">🗑️</button>'
+      return '<div class="txt-bubble" style="padding:16px 20px;margin-bottom:14px;">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">'
+        + '<div class="txt-bubble-title" style="font-size:18px;font-weight:900;color:#333;">'+esc(t.title)+'</div>'
+        + '<div style="display:flex;gap:4px;align-items:center;" onclick="event.stopPropagation();">'
+        + '<button onclick="copyBubbleById(\''+t.id+'\')" style="background:#f0f0f0;border:1px solid #ddd;border-radius:4px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:700;color:#666;">📋 COPY</button>'
+        + '<button onclick="txtEdit(\''+t.id+'\')" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:14px;">✏️</button>'
+        + '<button onclick="txtDelete(\''+t.id+'\')" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:14px;">🗑️</button>'
         + '</div></div>'
-        + '<div class="txt-bubble-text" style="font-size:15px;margin-top:8px;" id="txtb_'+t.id+'">'+esc(t.text)+'</div>'
+        + '<div class="txt-bubble-text" style="font-size:15px;line-height:1.6;">'+esc(t.text)+'</div>'
         + '</div>';
     }).join('');
   });
