@@ -2204,20 +2204,27 @@ window.google={script:{run:window.__gsr__}};
       Šodien maiņā: <span id="today-shift-names" style="color:var(--green);font-weight:700;">...</span>
     </div>
   </div>
-  <nav class="nav">
-    <button class="nb" id="nb-calendar" onclick="goNav('calendar',this)">📅 Pārskats</button>
-    <button class="nb active" id="nb-today" onclick="goNav('today',this)">📅 Timeline</button>
-    <button class="nb" id="nb-giftcards" onclick="goNav('giftcards',this)">🎁 Dāvanu kartes</button>
-    <button class="nb" id="nb-paidrides" onclick="goNav('paidrides',this)">🎟️ Apmaksātie braucieni</button>
-    <button class="nb" id="nb-texts" onclick="goNav('texts',this)">💬 Teksti</button>
-    <button class="nb" id="nb-todo" onclick="goNav('todo',this)">📋 To-Do</button>
-    <button class="nb" id="nb-schedule" onclick="goNav('schedule',this)">🗓️ Grafiks</button>
-    <button class="nb" id="nb-day" style="display:none;"></button>
-    <button class="nb" id="nb-invoices" onclick="goNav('invoices',this)">🧾 Rēķini</button>
-    <button class="nb" id="nb-kitchen" onclick="goNav('kitchen',this)">🍽️ Virtuves rēķini</button>
-    <div class="nb-new-wrap">
-      <button class="nb nb-new" id="nb-new" onclick="goNav('new',this)">＋ Jauna rezervācija</button>
-      <button class="nb" onclick="openDayNote()" style="font-size:11px;padding:6px 12px;margin-top:4px;background:var(--card2);border:1px solid var(--border2);color:#facc15;">📌 Pievienot piezīmi dienai</button>
+  <nav style="display:flex;flex-direction:column;gap:4px;flex:1;">
+    <!-- Augšējais menū -->
+    <div class="nav">
+      <button class="nb" id="nb-giftcards" onclick="goNav('giftcards',this)">🎁 Dāvanu kartes</button>
+      <button class="nb" id="nb-paidrides" onclick="goNav('paidrides',this)">🎟️ Apmaksātie braucieni</button>
+      <button class="nb" id="nb-invoices" onclick="goNav('invoices',this)">🧾 Rēķini</button>
+      <button class="nb" id="nb-kitchen" onclick="goNav('kitchen',this)">🍽️ Virtuves rēķini</button>
+      <button class="nb" id="nb-schedule" onclick="goNav('schedule',this)">🗓️ Grafiks</button>
+      <button class="nb" id="nb-todo" onclick="goNav('todo',this)">📋 To-Do</button>
+      <button class="nb" id="nb-contacts" onclick="goNav('contacts',this)">📇 Noderīgi kontakti</button>
+    </div>
+    <!-- Apakšējais menū -->
+    <div class="nav">
+      <button class="nb" id="nb-calendar" onclick="goNav('calendar',this)">📅 Pārskats</button>
+      <button class="nb active" id="nb-today" onclick="goNav('today',this)">📅 Timeline</button>
+      <button class="nb" id="nb-texts" onclick="goNav('texts',this)">💬 Teksti</button>
+      <button class="nb" id="nb-day" style="display:none;"></button>
+      <div class="nb-new-wrap">
+        <button class="nb nb-new" id="nb-new" onclick="goNav('new',this)">＋ Jauna rezervācija</button>
+      </div>
+      <button class="nb" onclick="openDayNote()" style="font-size:11px;padding:6px 12px;background:var(--card2);border:1px solid var(--border2);color:#facc15;">📌 Piezīme dienai</button>
     </div>
   </nav>
 </header>
@@ -2751,6 +2758,17 @@ window.google={script:{run:window.__gsr__}};
   </div>
   <div style="padding:40px 20px;text-align:center;color:var(--text3);font-family:var(--font-head);font-size:12px;letter-spacing:2px;text-transform:uppercase;">
     📋 Šī sadaļa tiek izstrādāta
+  </div>
+</div>
+
+<!-- ══ NODERĪGI KONTAKTI ══ -->
+<div class="view" id="view-contacts">
+  <div class="phdr">
+    <div class="ptitle">NODERĪGI KONTAKTI</div>
+    <div class="psub">Svarīgi kontakti un saites</div>
+  </div>
+  <div style="padding:40px 20px;text-align:center;color:var(--text3);font-family:var(--font-head);font-size:12px;letter-spacing:2px;text-transform:uppercase;">
+    📇 Šī sadaļa tiek izstrādāta
   </div>
 </div>
 
