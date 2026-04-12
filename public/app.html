@@ -5617,16 +5617,7 @@ function initQuickDates() {
 }
 
 function quickDateSet(iso) {
-  document.getElementById('w_date').value = iso;
-  var parts = iso.split('-');
-  var d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-  document.getElementById('dp_label').textContent = parseInt(parts[2]) + '. ' + MLV[parseInt(parts[1])-1] + ' ' + parts[0];
-  var btn = document.getElementById('dp_btn');
-  if (btn) { btn.classList.remove('empty-val'); btn.style.borderColor=''; }
-  // Atjaunot darba laiku info
-  if (typeof updateWorkHours === 'function') updateWorkHours(iso);
-  // Atjaunot laiku dropdownus
-  if (typeof buildTimePicker === 'function') buildTimePicker();
+  selectDate(iso);
 }
 
 // Izsaukt ielādē
