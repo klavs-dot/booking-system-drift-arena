@@ -4559,21 +4559,24 @@ function wSidebarUpdate() {
 
   var dayBookings = (ALL||[]).filter(function(b){return b.date===date && b.status!=='Atcelta';});
 
-  // Rezervāciju skaits pa stundām
+  // Rezervāciju skaits un cilvēku skaits pa stundām
   var wh = getWorkHoursClient(date);
   var openH = Math.floor(tmin(wh.open) / 60);
   var closeH = Math.ceil(tmin(wh.close) / 60);
   var hourRows = '';
   for (var h = openH; h < closeH; h++) {
     var midMin = h * 60 + 30;
-    var resCnt = dayBookings.filter(function(b){return tmin(b.timeFrom)<=midMin && tmin(b.timeTo)>midMin;}).length;
-    var barPct = Math.min(100, Math.round(resCnt / 8 * 100)); // max ~8 rezervācijas stundā
+    var hourBookings = dayBookings.filter(function(b){return tmin(b.timeFrom)<=midMin && tmin(b.timeTo)>midMin;});
+    var resCnt = hourBookings.length;
+    var pplCnt = hourBookings.reduce(function(s,b){return s+(parseInt(b.people)||0);},0);
+    var barPct = Math.min(100, Math.round(resCnt / 8 * 100));
     var barCol = resCnt === 0 ? 'var(--border)' : resCnt >= 4 ? '#ef4444' : resCnt >= 2 ? '#facc15' : '#22c55e';
     var inSel = from && to && midMin >= tmin(from) && midMin < tmin(to);
     hourRows += '<div style="display:flex;align-items:center;gap:6px;padding:3px 0;'+(inSel?'background:rgba(232,77,14,0.08);border-left:2px solid var(--accent);padding-left:6px;':'')+'">'
       + '<span style="font-size:11px;color:'+(resCnt>0?'var(--text)':'var(--text3)')+';width:36px;font-weight:'+(resCnt>0?'700':'400')+';">'+p2(h)+':00</span>'
       + '<div style="flex:1;height:6px;background:var(--border);border-radius:3px;"><div style="height:100%;width:'+barPct+'%;background:'+barCol+';border-radius:3px;transition:width .3s;"></div></div>'
       + '<span style="font-size:11px;color:'+barCol+';width:16px;text-align:right;font-weight:700;">'+(resCnt||'')+'</span>'
+      + '<span style="font-size:10px;color:var(--text3);width:32px;text-align:right;">'+(pplCnt>0?pplCnt+' cilv':'')+'</span>'
       + '</div>';
   }
 
@@ -4908,11 +4911,13 @@ function renderCal() {
       for (let hr = openHr; hr < closeHr; hr++) {
         const hrFrom = hr * 60;
         const hrTo = (hr + 1) * 60;
-        const occ = dayBookings.filter(b => tmin(b.timeFrom) < hrTo && tmin(b.timeTo) > hrFrom).length;
+        const hrBookings = dayBookings.filter(b => tmin(b.timeFrom) < hrTo && tmin(b.timeTo) > hrFrom);
+        const occ = hrBookings.length;
+        const pplH = hrBookings.reduce((s,b) => s + (parseInt(b.people)||0), 0);
         if (occ > 0 || hr <= closeHr) {
           const pct = Math.min(100, Math.round(occ / 8 * 100));
           const barColor = occ === 0 ? '#333' : occ >= 4 ? '#ef4444' : occ >= 2 ? '#facc15' : '#22c55e';
-          hourBars += '<div style="display:flex;align-items:center;gap:4px;"><span style="font-size:9px;color:#999;width:32px;">' + p2(hr) + ':00</span><div style="flex:1;height:6px;background:#333;border-radius:3px;"><div style="height:100%;width:' + pct + '%;background:' + barColor + ';border-radius:3px;"></div></div><span style="font-size:9px;color:' + barColor + ';width:20px;text-align:right;font-weight:700;">' + (occ||'') + '</span></div>';
+          hourBars += '<div style="display:flex;align-items:center;gap:4px;"><span style="font-size:9px;color:#999;width:32px;">' + p2(hr) + ':00</span><div style="flex:1;height:6px;background:#333;border-radius:3px;"><div style="height:100%;width:' + pct + '%;background:' + barColor + ';border-radius:3px;"></div></div><span style="font-size:9px;color:' + barColor + ';width:14px;text-align:right;font-weight:700;">' + (occ||'') + '</span><span style="font-size:8px;color:#777;width:28px;text-align:right;">' + (pplH>0?pplH+'c':'') + '</span></div>';
         }
       }
 
