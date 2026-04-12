@@ -3230,10 +3230,10 @@ window.google={script:{run:window.__gsr__}};
 
 /* Tekstu burbuļi */
 .txt-bubble {
-  background: #fff;
+  background: #fff !important;
   border-radius: 12px;
-  padding: 14px 16px;
-  margin-bottom: 10px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
   cursor: pointer;
   transition: all .15s;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
@@ -3242,18 +3242,18 @@ window.google={script:{run:window.__gsr__}};
 .txt-bubble:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
 .txt-bubble:active { transform: scale(0.98); }
 .txt-bubble-title {
-  font-size: 10px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 900;
   font-family: var(--font-head);
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: #999;
+  color: #E84D0E !important;
   margin-bottom: 6px;
 }
 .txt-bubble-text {
-  font-size: 13px;
-  color: #1a1a1a;
-  line-height: 1.5;
+  font-size: 15px;
+  color: #1a1a1a !important;
+  line-height: 1.6;
   font-weight: 500;
 }
 .txt-bubble::after {
@@ -7058,13 +7058,13 @@ function txtRender() {
     el.innerHTML = cols[col].map(function(t) {
       return '<div class="txt-bubble" style="padding:16px 20px;margin-bottom:14px;">'
         + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">'
-        + '<div class="txt-bubble-title" style="font-size:18px;font-weight:900;color:#333;">'+esc(t.title)+'</div>'
+        + '<div class="txt-bubble-title">'+esc(t.title)+'</div>'
         + '<div style="display:flex;gap:4px;align-items:center;" onclick="event.stopPropagation();">'
         + '<button onclick="copyBubbleById(\''+t.id+'\')" style="background:#f0f0f0;border:1px solid #ddd;border-radius:4px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:700;color:#666;">📋 COPY</button>'
         + '<button onclick="txtEdit(\''+t.id+'\')" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:14px;">✏️</button>'
         + '<button onclick="txtDelete(\''+t.id+'\')" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:14px;">🗑️</button>'
         + '</div></div>'
-        + '<div class="txt-bubble-text" style="font-size:15px;line-height:1.6;">'+esc(t.text)+'</div>'
+        + '<div class="txt-bubble-text">'+esc(t.text)+'</div>'
         + '</div>';
     }).join('');
   });
