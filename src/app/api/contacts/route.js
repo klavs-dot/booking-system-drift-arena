@@ -32,15 +32,15 @@ export async function GET() {
       });
       await sheets.spreadsheets.values.update({
         spreadsheetId: SHEET_ID,
-        range: `'${TAB_NAME}'!A1:G1`,
+        range: `'${TAB_NAME}'!A1:H1`,
         valueInputOption: 'USER_ENTERED',
-        resource: { values: [['ID', 'Kategorija', 'Vārds', 'Amats', 'Telefons', 'E-pasts', 'Piezīmes']] }
+        resource: { values: [['ID', 'Kategorija', 'Vārds', 'Amats', 'Telefons', 'E-pasts', 'Piezīmes', 'Virsraksts']] }
       });
     }
 
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
-      range: `'${TAB_NAME}'!A:G`,
+      range: `'${TAB_NAME}'!A:H`,
     });
 
     const rows = res.data.values || [];
@@ -51,7 +51,7 @@ export async function GET() {
       role: r[3] || '',
       phone: r[4] || '',
       email: r[5] || '',
-      notes: r[6] || '',
+      notes: r[6] || '', title: r[7] || '',
     })).filter(r => r.id);
 
     return NextResponse.json({ ok: true, data });
@@ -71,30 +71,30 @@ export async function POST(req) {
       const id = 'CT_' + Date.now();
       await sheets.spreadsheets.values.append({
         spreadsheetId: SHEET_ID,
-        range: `'${TAB_NAME}'!A:G`,
+        range: `'${TAB_NAME}'!A:H`,
         valueInputOption: 'USER_ENTERED',
-        resource: { values: [[id, body.category||'', body.name||'', body.role||'', body.phone||'', body.email||'', body.notes||'']] }
+        resource: { values: [[id, body.category||'', body.name||'', body.role||'', body.phone||'', body.email||'', body.notes||'', body.title||'']] }
       });
       return NextResponse.json({ ok: true, id });
     }
 
     if (body.action === 'update') {
-      const res = await sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: `'${TAB_NAME}'!A:G` });
+      const res = await sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: `'${TAB_NAME}'!A:H` });
       const rows = res.data.values || [];
       let rowIdx = -1;
       for (let i = 1; i < rows.length; i++) { if (rows[i][0] === body.id) { rowIdx = i + 1; break; } }
       if (rowIdx === -1) return NextResponse.json({ ok: false, error: 'Nav atrasts' }, { status: 404 });
       await sheets.spreadsheets.values.update({
         spreadsheetId: SHEET_ID,
-        range: `'${TAB_NAME}'!A${rowIdx}:G${rowIdx}`,
+        range: `'${TAB_NAME}'!A${rowIdx}:H${rowIdx}`,
         valueInputOption: 'USER_ENTERED',
-        resource: { values: [[body.id, body.category||'', body.name||'', body.role||'', body.phone||'', body.email||'', body.notes||'']] }
+        resource: { values: [[body.id, body.category||'', body.name||'', body.role||'', body.phone||'', body.email||'', body.notes||'', body.title||'']] }
       });
       return NextResponse.json({ ok: true });
     }
 
     if (body.action === 'delete') {
-      const res = await sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: `'${TAB_NAME}'!A:G` });
+      const res = await sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: `'${TAB_NAME}'!A:H` });
       const rows = res.data.values || [];
       let rowIdx = -1;
       for (let i = 1; i < rows.length; i++) { if (rows[i][0] === body.id) { rowIdx = i; break; } }

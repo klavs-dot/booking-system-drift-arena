@@ -2803,6 +2803,7 @@ window.google={script:{run:window.__gsr__}};
         <option value="internal">👥 Iekšējie</option>
       </select>
     </div>
+    <div class="field" style="margin-top:12px;"><label>Virsraksts (kas tas ir?)</label><input type="text" id="ct_f_title" placeholder="Piem. Elektriķis, Ēdināšana, Apsargs..."></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
       <div class="field"><label>Vārds / Nosaukums</label><input type="text" id="ct_f_name" placeholder="Jānis Bērziņš"></div>
       <div class="field"><label>Amats / Apraksts</label><input type="text" id="ct_f_role" placeholder="Elektriķis, piegādātājs..."></div>
@@ -7365,6 +7366,7 @@ function ctRender() {
     el.innerHTML = cats[cat].map(function(c) {
       var borderColor = catColors[cat];
       return '<div style="background:var(--card);border:1px solid var(--border);border-left:4px solid '+borderColor+';border-radius:var(--r);padding:14px 16px;margin-bottom:10px;position:relative;">'
+        + (c.title ? '<div style="font-size:11px;font-weight:800;font-family:var(--font-head);letter-spacing:1px;text-transform:uppercase;color:'+borderColor+';margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:6px;">'+esc(c.title)+'</div>' : '')
         + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
         + '<div style="font-size:15px;font-weight:800;color:#fff;">'+esc(c.name)+'</div>'
         + '<div style="display:flex;gap:2px;" >'
@@ -7384,6 +7386,7 @@ function ctAddNew() {
   document.getElementById('ct_f_id').value = '';
   document.getElementById('ct_f_cat').value = 'emergency';
   document.getElementById('ct_f_name').value = '';
+  document.getElementById('ct_f_title').value = '';
   document.getElementById('ct_f_role').value = '';
   document.getElementById('ct_f_phone').value = '';
   document.getElementById('ct_f_email').value = '';
@@ -7398,6 +7401,7 @@ function ctEdit(id) {
   document.getElementById('ct_f_id').value = id;
   document.getElementById('ct_f_cat').value = c.category;
   document.getElementById('ct_f_name').value = c.name;
+  document.getElementById('ct_f_title').value = c.title || '';
   document.getElementById('ct_f_role').value = c.role;
   document.getElementById('ct_f_phone').value = c.phone;
   document.getElementById('ct_f_email').value = c.email;
@@ -7413,6 +7417,7 @@ function ctSave() {
     id: id || undefined,
     category: document.getElementById('ct_f_cat').value,
     name: document.getElementById('ct_f_name').value.trim(),
+    title: document.getElementById('ct_f_title').value.trim(),
     role: document.getElementById('ct_f_role').value.trim(),
     phone: document.getElementById('ct_f_phone').value.trim(),
     email: document.getElementById('ct_f_email').value.trim(),
