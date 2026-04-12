@@ -3022,6 +3022,28 @@ window.google={script:{run:window.__gsr__}};
   </div>
 </div>
 
+<!-- ══ TEKSTU PIEVIENOŠANAS MODĀLIS ══ -->
+<div class="mbg" id="M_TXT">
+  <div class="mbox" style="max-width:500px;background:#111;position:relative;">
+    <button onclick="closeM('M_TXT')" style="position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border2);color:var(--text2);width:32px;height:32px;border-radius:var(--r);cursor:pointer;font-size:16px;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">✕</button>
+    <div id="txt_modal_title" style="font-family:var(--font-head);font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;">💬 JAUNS TEKSTS</div>
+    <div class="field"><label>Kolonna</label>
+      <select id="txt_f_col" style="padding:10px;font-size:13px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);color:var(--text);width:100%;">
+        <option value="email">📧 E-pasti</option>
+        <option value="whatsapp">💬 WhatsApp</option>
+        <option value="social">📱 Soc. tīkli</option>
+      </select>
+    </div>
+    <div class="field" style="margin-top:12px;"><label>Nosaukums</label><input type="text" id="txt_f_title" placeholder="Piem. Rezervācijas apstiprinājums"></div>
+    <div class="field" style="margin-top:12px;"><label>Teksts</label><textarea id="txt_f_text" placeholder="Raksti tekstu šeit..." style="min-height:120px;font-size:14px;"></textarea></div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px;">
+      <button class="btn btn-s" onclick="closeM('M_TXT')" style="padding:10px 20px;">Atcelt</button>
+      <button class="btn btn-p" onclick="txtSave()" style="padding:10px 24px;">💾 Saglabāt</button>
+    </div>
+    <input type="hidden" id="txt_f_id">
+  </div>
+</div>
+
 <!-- ══ APMAKSĀTO BRAUCIENU MODĀLIS ══ -->
 <div class="mbg" id="M_PR">
   <div class="mbox" style="max-width:500px;background:#111;position:relative;">
@@ -7034,44 +7056,68 @@ function txtRender() {
       return;
     }
     el.innerHTML = cols[col].map(function(t) {
-      return '<div class="txt-bubble" onclick="copyBubble(this)">'
-        + '<div class="txt-bubble-title">'+esc(t.title)+'</div>'
-        + '<div class="txt-bubble-text">'+esc(t.text)+'</div>'
-        + '<div style="margin-top:8px;display:flex;gap:4px;justify-content:flex-end;" onclick="event.stopPropagation();">'
-        + '<button onclick="txtEdit(\''+t.id+'\')" style="background:none;border:none;color:#999;cursor:pointer;font-size:10px;">✏️</button>'
-        + '<button onclick="txtDelete(\''+t.id+'\')" style="background:none;border:none;color:#999;cursor:pointer;font-size:10px;">🗑️</button>'
-        + '</div></div>';
+      return '<div class="txt-bubble">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+        + '<div class="txt-bubble-title" style="font-size:14px;">'+esc(t.title)+'</div>'
+        + '<div style="display:flex;gap:2px;" onclick="event.stopPropagation();">'
+        + '<button onclick="copyBubbleById(\''+t.id+'\')" style="background:#f0f0f0;border:1px solid #ddd;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:9px;font-weight:700;color:#666;">📋 COPY</button>'
+        + '<button onclick="txtEdit(\''+t.id+'\')" style="background:none;border:none;color:#999;cursor:pointer;font-size:11px;">✏️</button>'
+        + '<button onclick="txtDelete(\''+t.id+'\')" style="background:none;border:none;color:#999;cursor:pointer;font-size:11px;">🗑️</button>'
+        + '</div></div>'
+        + '<div class="txt-bubble-text" style="font-size:15px;margin-top:8px;" id="txtb_'+t.id+'">'+esc(t.text)+'</div>'
+        + '</div>';
     }).join('');
   });
 }
 
-function txtAddBubble() {
-  var col = prompt('Kolonna:\n1. E-pasti\n2. WhatsApp\n3. Soc. tīkli\n\nIevadi (1-3):');
-  var cols = ['email','whatsapp','social'];
-  var ci = parseInt(col);
-  if (ci < 1 || ci > 3) return;
-  var title = prompt('Nosaukums:');
-  if (!title) return;
-  var text = prompt('Teksts:');
-  if (!text) return;
-
+function copyBubbleById(id) {
   var data = getTxtData();
-  data.push({id: 'txt_'+Date.now(), col: cols[ci-1], title: title, text: text});
-  localStorage.setItem('da_texts', JSON.stringify(data));
-  txtRender();
-  toast('✓ Teksts pievienots', 'ok');
+  var t = data.find(function(x){return x.id===id;});
+  if (!t) return;
+  navigator.clipboard.writeText(t.text).then(function() {
+    toast('📋 Teksts nokopēts!', 'ok');
+  });
+}
+
+function txtAddBubble() {
+  document.getElementById('txt_f_id').value = '';
+  document.getElementById('txt_f_col').value = 'email';
+  document.getElementById('txt_f_title').value = '';
+  document.getElementById('txt_f_text').value = '';
+  document.getElementById('txt_modal_title').textContent = '💬 JAUNS TEKSTS';
+  openM('M_TXT');
 }
 
 function txtEdit(id) {
   var data = getTxtData();
   var t = data.find(function(x){return x.id===id;});
   if (!t) return;
-  var title = prompt('Nosaukums:', t.title); if(title===null) return;
-  var text = prompt('Teksts:', t.text); if(text===null) return;
-  t.title = title; t.text = text;
+  document.getElementById('txt_f_id').value = id;
+  document.getElementById('txt_f_col').value = t.col;
+  document.getElementById('txt_f_title').value = t.title;
+  document.getElementById('txt_f_text').value = t.text;
+  document.getElementById('txt_modal_title').textContent = '✏️ LABOT TEKSTU';
+  openM('M_TXT');
+}
+
+function txtSave() {
+  var id = document.getElementById('txt_f_id').value;
+  var col = document.getElementById('txt_f_col').value;
+  var title = document.getElementById('txt_f_title').value.trim();
+  var text = document.getElementById('txt_f_text').value.trim();
+  if (!title || !text) { toast('Ievadi nosaukumu un tekstu!', 'warn'); return; }
+
+  var data = getTxtData();
+  if (id) {
+    var t = data.find(function(x){return x.id===id;});
+    if (t) { t.col = col; t.title = title; t.text = text; }
+  } else {
+    data.push({id: 'txt_'+Date.now(), col: col, title: title, text: text});
+  }
   localStorage.setItem('da_texts', JSON.stringify(data));
+  closeM('M_TXT');
   txtRender();
-  toast('✓ Atjaunots', 'ok');
+  toast('✓ Saglabāts', 'ok');
 }
 
 function txtDelete(id) {
