@@ -2711,12 +2711,8 @@ window.google={script:{run:window.__gsr__}};
         <div class="wsb-hours-val" id="wsb-hours-val">—</div>
       </div>
       <div class="wsb-card">
-        <div class="wsb-title">📊 Noslodze izvēlētajā laikā</div>
+        <div class="wsb-title">📊 Rezervāciju skaits pa stundām</div>
         <div id="wsb-cap-content"><div class="wsb-hint">Izvēlies datumu un laiku</div></div>
-      </div>
-      <div class="wsb-card" id="wsb-slots-card" style="display:none;">
-        <div class="wsb-title">👥 Dienas slodze pa stundām</div>
-        <div id="wsb-slots-content"></div>
       </div>
     </div>
 
@@ -4563,87 +4559,34 @@ function wSidebarUpdate() {
 
   var dayBookings = (ALL||[]).filter(function(b){return b.date===date && b.status!=='Atcelta';});
 
-  if (!from || !to) {
-    // Nav laika — rādām dienas kopējo max noslodzi
-    var peakUsed = 0;
-    for (var h = 0; h < 24; h++) {
-      var midMin = h * 60 + 30;
-      var cnt = dayBookings.filter(function(b){return tmin(b.timeFrom)<=midMin && tmin(b.timeTo)>midMin;})
-        .reduce(function(s,b){return s+b.people;},0);
-      if (cnt > peakUsed) peakUsed = cnt;
-    }
-    var total = CAP;
-    var newTotal = peakUsed + ppl;
-    var newPct = Math.round(newTotal/total*100);
-    var color = newTotal>CAP?'var(--red)':newTotal>Math.round(CAP*0.67)?'#f59e0b':'#22c55e';
-    var el = document.getElementById('wsb-cap-content');
-    if (el) el.innerHTML = '<div class="wsb-cap-row">'
-      + '<span class="wsb-cap-num" style="color:'+color+'">'+newTotal+'</span>'
-      + '<span class="wsb-cap-of"> / '+total+' cilv.</span>'
-      + '</div>'
-      + '<div class="wsb-bar-wrap"><div class="wsb-bar-fill" style="width:'+Math.min(100,newPct)+'%;background:'+color+'"></div></div>'
-      + '<div class="wsb-cap-sub">'+(peakUsed>0?'Pīķa noslodze šodien: '+peakUsed+' cilv.':'Diena brīva')+(ppl>0?' + '+ppl+' jauni':'')+'</div>'
-      + '<div style="font-size:11px;color:var(--text3);margin-top:4px;">Izvēlies laiku precīzākai noslodzei</div>'
-      + (newTotal>CAP?'<div class="wsb-warn">⚠️ Pārsniedz kapacitāti!</div>':'');
-    wSidebarSlots(date, ppl);
-    return;
-  }
-
-  var fromMin = tmin(from), toMin = tmin(to);
-  // Kapacitāte izvēlētajā laikā
-  var overlap = dayBookings.filter(function(b){
-    return tmin(b.timeFrom)<toMin && tmin(b.timeTo)>fromMin;
-  });
-  var used = overlap.reduce(function(s,b){return s+b.people;},0);
-  var total = CAP;
-  var pct = Math.round(used/total*100);
-  var newTotal = used + ppl;
-  var newPct = Math.round(newTotal/total*100);
-  var color = newTotal>CAP?'var(--red)':newTotal>Math.round(CAP*0.67)?'#f59e0b':'#22c55e';
-
-  var el = document.getElementById('wsb-cap-content');
-  if (el) el.innerHTML = '<div class="wsb-cap-row">'
-    + '<span class="wsb-cap-num" style="color:'+color+'">'+newTotal+'</span>'
-    + '<span class="wsb-cap-of"> / '+total+' cilv.</span>'
-    + '</div>'
-    + '<div class="wsb-bar-wrap"><div class="wsb-bar-fill" style="width:'+Math.min(100,newPct)+'%;background:'+color+'"></div></div>'
-    + '<div class="wsb-cap-sub">'+(used>0?'Jau rezervēti: '+used+' cilv.':'Brīvi')+(ppl>0?' + '+ppl+' jauni':'')+'</div>'
-    + (newTotal>CAP?'<div class="wsb-warn">⚠️ Pārsniedz kapacitāti!</div>':'');
-
-  // Stundu slodze visa diena
-  wSidebarSlots(date, ppl);
-}
-
-function wSidebarSlots(date, newPpl) {
-  var card = document.getElementById('wsb-slots-card');
-  var content = document.getElementById('wsb-slots-content');
-  if (!card || !content) return;
-  card.style.display = 'block';
-  var dayBookings = (ALL||[]).filter(function(b){return b.date===date && b.status!=='Atcelta';});
-  // Darba laika stundas
-  var WORK_HOURS = {1:{o:'11:00',c:'22:00'},2:{o:'11:00',c:'22:00'},3:{o:'11:00',c:'22:00'},
-    4:{o:'11:00',c:'22:00'},5:{o:'11:00',c:'23:00'},6:{o:'10:00',c:'23:00'},0:{o:'10:00',c:'22:00'}};
-  var parts = date.split('-').map(Number);
-  var dow = new Date(parts[0],parts[1]-1,parts[2]).getDay();
-  var wh = WORK_HOURS[dow]||{o:'11:00',c:'22:00'};
-  var startH = parseInt(wh.o);
-  var endH = parseInt(wh.c);
-  var html = '';
-  for (var h = startH; h < endH; h++) {
-    var slotFrom = h*60, slotTo = (h+1)*60;
-    var overlap = dayBookings.filter(function(b){return tmin(b.timeFrom)<slotTo && tmin(b.timeTo)>slotFrom;});
-    var used = overlap.reduce(function(s,b){return s+b.people;},0);
-    var total = CAP;
-    var pct = Math.min(100, Math.round(used/total*100));
-    var color = used>Math.round(CAP*0.67)?'var(--red)':used>Math.round(CAP*0.44)?'#f59e0b':used>0?'#22c55e':'var(--border)';
-    html += '<div class="wsb-slot-row">'
-      + '<span class="wsb-slot-lbl">'+p2(h)+':00</span>'
-      + '<div class="wsb-slot-bar"><div style="width:'+pct+'%;background:'+color+';height:100%;border-radius:2px;"></div></div>'
-      + '<span class="wsb-slot-num" style="color:'+(used>0?color:'var(--text3)')+'">'+(used||'·')+'</span>'
+  // Rezervāciju skaits pa stundām
+  var wh = getWorkHoursClient(date);
+  var openH = Math.floor(tmin(wh.open) / 60);
+  var closeH = Math.ceil(tmin(wh.close) / 60);
+  var hourRows = '';
+  for (var h = openH; h < closeH; h++) {
+    var midMin = h * 60 + 30;
+    var resCnt = dayBookings.filter(function(b){return tmin(b.timeFrom)<=midMin && tmin(b.timeTo)>midMin;}).length;
+    var barPct = Math.min(100, Math.round(resCnt / 8 * 100)); // max ~8 rezervācijas stundā
+    var barCol = resCnt === 0 ? 'var(--border)' : resCnt >= 4 ? '#ef4444' : resCnt >= 2 ? '#facc15' : '#22c55e';
+    var inSel = from && to && midMin >= tmin(from) && midMin < tmin(to);
+    hourRows += '<div style="display:flex;align-items:center;gap:6px;padding:3px 0;'+(inSel?'background:rgba(232,77,14,0.08);border-left:2px solid var(--accent);padding-left:6px;':'')+'">'
+      + '<span style="font-size:11px;color:'+(resCnt>0?'var(--text)':'var(--text3)')+';width:36px;font-weight:'+(resCnt>0?'700':'400')+';">'+p2(h)+':00</span>'
+      + '<div style="flex:1;height:6px;background:var(--border);border-radius:3px;"><div style="height:100%;width:'+barPct+'%;background:'+barCol+';border-radius:3px;transition:width .3s;"></div></div>'
+      + '<span style="font-size:11px;color:'+barCol+';width:16px;text-align:right;font-weight:700;">'+(resCnt||'')+'</span>'
       + '</div>';
   }
-  content.innerHTML = html || '<div class="wsb-hint">Nav rezervāciju šajā dienā</div>';
-}
+
+  var totalRes = dayBookings.length;
+  var totalPpl = dayBookings.reduce(function(s,b){return s+(parseInt(b.people)||0);},0);
+
+  var el = document.getElementById('wsb-cap-content');
+  if (el) el.innerHTML = '<div style="display:flex;gap:16px;margin-bottom:10px;">'
+    + '<div><span style="font-size:28px;font-weight:800;color:var(--accent);font-family:var(--font-head);">'+totalRes+'</span><span style="font-size:12px;color:var(--text3);"> rezervācijas</span></div>'
+    + '<div><span style="font-size:28px;font-weight:800;color:#22c55e;font-family:var(--font-head);">'+totalPpl+'</span><span style="font-size:12px;color:var(--text3);"> cilv.</span></div>'
+    + '</div>'
+    + '<div style="display:flex;flex-direction:column;gap:1px;">'+hourRows+'</div>';
+  return;
 
 // ── Rides upsell ──
 var _ridesUpsellAnswered = false;
@@ -4965,11 +4908,10 @@ function renderCal() {
       for (let hr = openHr; hr < closeHr; hr++) {
         const hrFrom = hr * 60;
         const hrTo = (hr + 1) * 60;
-        const occ = dayBookings.filter(b => tmin(b.timeFrom) < hrTo && tmin(b.timeTo) > hrFrom)
-          .reduce((s,b) => s + (parseInt(b.people)||0), 0);
-        if (occ > 0 || hr <= 21) {
-          const pct = Math.min(100, Math.round(occ / CAP * 100));
-          const barColor = occ >= CAP ? '#ef4444' : occ >= CAP*0.6 ? '#facc15' : '#22c55e';
+        const occ = dayBookings.filter(b => tmin(b.timeFrom) < hrTo && tmin(b.timeTo) > hrFrom).length;
+        if (occ > 0 || hr <= closeHr) {
+          const pct = Math.min(100, Math.round(occ / 8 * 100));
+          const barColor = occ === 0 ? '#333' : occ >= 4 ? '#ef4444' : occ >= 2 ? '#facc15' : '#22c55e';
           hourBars += '<div style="display:flex;align-items:center;gap:4px;"><span style="font-size:9px;color:#999;width:32px;">' + p2(hr) + ':00</span><div style="flex:1;height:6px;background:#333;border-radius:3px;"><div style="height:100%;width:' + pct + '%;background:' + barColor + ';border-radius:3px;"></div></div><span style="font-size:9px;color:' + barColor + ';width:20px;text-align:right;font-weight:700;">' + (occ||'') + '</span></div>';
         }
       }
@@ -5962,13 +5904,13 @@ function renderDLP(dateStr) {
   // Filtrē šīs dienas rezervācijas (bez atceltajām)
   const dayB = ALL.filter(b => b.date === dateStr && b.status !== 'Atcelta');
 
-  // Aprēķina cilvēku skaitu katrā stundā (sweep per hour)
+  // Aprēķina rezervāciju skaitu katrā stundā
   const hours = [];
   for (let h = openH; h < closeH; h++) {
     const midMin = h * 60 + 30;
     const cnt = dayB
       .filter(b => tmin(b.timeFrom) <= midMin && tmin(b.timeTo) > midMin)
-      .reduce((s, b) => s + (parseInt(b.people)||0), 0);
+      .length;
     hours.push({ h, cnt });
   }
 
