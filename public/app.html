@@ -6955,6 +6955,7 @@ function getDayNotes() {
 }
 
 function deleteNote(id) {
+  if (!confirm('Vai tiešām dzēst šo piezīmi?')) return;
   var notes = getDayNotes().filter(function(n){ return n.id !== id; });
   localStorage.setItem('da_day_notes', JSON.stringify(notes));
   renderToday();
