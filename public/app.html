@@ -5548,7 +5548,7 @@ function initQuickDates() {
     else if (i === 2) label = 'Parīt';
     else label = 'Šo ' + DAY_SHORT[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth()+1)+'.';
 
-    btns.push('<button type="button" onclick="quickDateSet(\''+iso+'\')" style="padding:4px 10px;font-size:10px;font-family:var(--font-head);font-weight:700;letter-spacing:0.3px;background:var(--card2);border:1px solid var(--border2);border-radius:4px;color:var(--text2);cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border2)\';this.style.color=\'var(--text2)\'">'+label+'</button>');
+    btns.push('<button type="button" onclick="quickDateSet(\''+iso+'\')" style="padding:8px 18px;font-size:13px;font-family:var(--font-head);font-weight:700;letter-spacing:0.5px;background:var(--card2);border:1px solid var(--border2);border-radius:6px;color:#fff;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.background=\'rgba(232,77,14,0.15)\'" onmouseout="this.style.borderColor=\'var(--border2)\';this.style.background=\'var(--card2)\'">'+label+'</button>');
   }
   el.innerHTML = btns.join('');
 }
