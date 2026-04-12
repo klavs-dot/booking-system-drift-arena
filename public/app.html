@@ -2688,12 +2688,30 @@ window.google={script:{run:window.__gsr__}};
 
 <!-- ══ APMAKSĀTIE BRAUCIENI ══ -->
 <div class="view" id="view-paidrides">
-  <div class="phdr">
-    <div class="ptitle">APMAKSĀTIE BRAUCIENI</div>
-    <div class="psub">Priekšapmaksāto braucienu uzskaite</div>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+    <div class="phdr" style="margin:0;padding:0;">
+      <div class="ptitle">APMAKSĀTIE BRAUCIENI</div>
+      <div class="psub">Priekšapmaksāto braucienu uzskaite</div>
+    </div>
+    <button class="btn btn-p" onclick="prAddNew()" style="padding:10px 20px;font-size:13px;">＋ Pievienot jaunu</button>
   </div>
-  <div style="padding:40px 20px;text-align:center;color:var(--text3);font-family:var(--font-head);font-size:12px;letter-spacing:2px;text-transform:uppercase;">
-    🎟️ Šī sadaļa tiek izstrādāta
+  <div style="margin-top:12px;">
+    <input type="text" id="pr_search" placeholder="🔍 Meklēt pēc vārda vai telefona..." oninput="prRenderTable()" style="width:100%;max-width:400px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:13px;">
+  </div>
+  <div style="margin-top:12px;overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;" id="pr_table">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:10px 12px;font-size:11px;font-family:var(--font-head);font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--accent);">Vārds</th>
+          <th style="text-align:left;padding:10px 12px;font-size:11px;font-family:var(--font-head);font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--accent);">Uzvārds</th>
+          <th style="text-align:left;padding:10px 12px;font-size:11px;font-family:var(--font-head);font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--accent);">Telefons</th>
+          <th style="text-align:center;padding:10px 12px;font-size:11px;font-family:var(--font-head);font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--accent);">Braucieni</th>
+          <th style="text-align:left;padding:10px 12px;font-size:11px;font-family:var(--font-head);font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--accent);">Piezīmes</th>
+          <th style="width:80px;border-bottom:2px solid var(--accent);"></th>
+        </tr>
+      </thead>
+      <tbody id="pr_tbody"></tbody>
+    </table>
   </div>
 </div>
 
@@ -4588,6 +4606,7 @@ window.onload = function() {
 function goNav(name, btn) {
   if (name === 'invoices') { setTimeout(renderInvoices, 50); }
   if (name === 'kitchen') { setTimeout(renderKitchen, 50); }
+  if (name === 'paidrides') { setTimeout(function(){ if(!_prLoaded) loadPaidRides(); else prRenderTable(); }, 50); }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
@@ -6901,6 +6920,107 @@ function invSendEmail() {
     var body = 'Sveiki,\n\nPielikumā nosūtam rēķinu.\n\nPriecāsimies par savlaicīgu apmaksu un gaidīsim Jūs ciemos atkal.\n\nAr cieņu,\nDrift Arena komanda';
     window.open('mailto:'+email+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body), '_blank');
   }, 500);
+}
+
+// ══ APMAKSĀTIE BRAUCIENI ══
+var _prData = [];
+var _prLoaded = false;
+
+function loadPaidRides() {
+  fetch('/api/paidrides')
+    .then(function(r){return r.json();})
+    .then(function(res){
+      if (res.ok) { _prData = res.data; _prLoaded = true; prRenderTable(); }
+      else toast('Kļūda: '+(res.error||''), 'err');
+    })
+    .catch(function(e){ toast('Kļūda: '+e.message, 'err'); });
+}
+
+function prRenderTable() {
+  if (!_prLoaded) { loadPaidRides(); return; }
+  var q = (document.getElementById('pr_search')||{}).value||'';
+  q = q.toLowerCase();
+  var filtered = _prData.filter(function(r) {
+    if (!q) return true;
+    return (r.name+' '+r.surname+' '+r.phone).toLowerCase().includes(q);
+  });
+
+  var tbody = document.getElementById('pr_tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3);font-family:var(--font-head);font-size:12px;letter-spacing:2px;">'+(q?'Nav rezultātu':'Nav ierakstu')+'</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(function(r) {
+    var ridesNum = parseInt(r.rides)||0;
+    var ridesColor = ridesNum <= 0 ? 'var(--text3)' : ridesNum <= 3 ? '#facc15' : '#22c55e';
+    return '<tr style="border-bottom:1px solid var(--border);">'
+      + '<td style="padding:10px 12px;font-size:14px;font-weight:700;">'+esc(r.name)+'</td>'
+      + '<td style="padding:10px 12px;font-size:14px;">'+esc(r.surname)+'</td>'
+      + '<td style="padding:10px 12px;font-size:13px;color:var(--text2);">'+esc(r.phone)+'</td>'
+      + '<td style="padding:10px 12px;text-align:center;font-size:22px;font-weight:800;font-family:var(--font-head);color:'+ridesColor+';">'+ridesNum+'</td>'
+      + '<td style="padding:10px 12px;font-size:12px;color:var(--text3);">'+esc(r.notes)+'</td>'
+      + '<td style="padding:10px 12px;"><div style="display:flex;gap:4px;">'
+      + '<button onclick="prEdit(\''+r.id+'\')" style="background:none;border:1px solid var(--border2);color:var(--text3);border-radius:3px;padding:3px 8px;cursor:pointer;font-size:10px;font-family:var(--font-head);font-weight:700;" onmouseover="this.style.color=\'var(--accent)\'" onmouseout="this.style.color=\'var(--text3)\'">✏️</button>'
+      + '<button onclick="prAdjust(\''+r.id+'\',-1)" style="background:none;border:1px solid var(--border2);color:var(--red);border-radius:3px;padding:3px 8px;cursor:pointer;font-size:12px;font-weight:700;" title="Noņemt 1 braucienu">−1</button>'
+      + '<button onclick="prAdjust(\''+r.id+'\',1)" style="background:none;border:1px solid var(--border2);color:#22c55e;border-radius:3px;padding:3px 8px;cursor:pointer;font-size:12px;font-weight:700;" title="Pievienot 1 braucienu">+1</button>'
+      + '</div></td>'
+      + '</tr>';
+  }).join('');
+}
+
+function prAddNew() {
+  var name = prompt('Vārds:');
+  if (!name) return;
+  var surname = prompt('Uzvārds:') || '';
+  var phone = prompt('Telefona numurs:') || '';
+  var rides = prompt('Apmaksāto braucienu skaits:', '10') || '0';
+  var notes = prompt('Piezīmes:') || '';
+
+  ovl('Saglabā...');
+  fetch('/api/paidrides', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({action:'add', name:name, surname:surname, phone:phone, rides:rides, notes:notes})
+  })
+  .then(function(r){return r.json();})
+  .then(function(res){ hovl(); if(res.ok){toast('✓ Pievienots','ok');loadPaidRides();}else toast('Kļūda: '+(res.error||''),'err'); })
+  .catch(function(e){ hovl(); toast('Kļūda: '+e.message,'err'); });
+}
+
+function prEdit(id) {
+  var r = _prData.find(function(x){return x.id===id;});
+  if (!r) return;
+  var name = prompt('Vārds:', r.name); if(name===null) return;
+  var surname = prompt('Uzvārds:', r.surname); if(surname===null) return;
+  var phone = prompt('Telefons:', r.phone); if(phone===null) return;
+  var rides = prompt('Braucienu skaits:', r.rides); if(rides===null) return;
+  var notes = prompt('Piezīmes:', r.notes); if(notes===null) return;
+
+  ovl('Saglabā...');
+  fetch('/api/paidrides', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({action:'update', id:id, name:name, surname:surname, phone:phone, rides:rides, notes:notes})
+  })
+  .then(function(r){return r.json();})
+  .then(function(res){ hovl(); if(res.ok){toast('✓ Atjaunots','ok');loadPaidRides();}else toast('Kļūda: '+(res.error||''),'err'); })
+  .catch(function(e){ hovl(); toast('Kļūda: '+e.message,'err'); });
+}
+
+function prAdjust(id, delta) {
+  var r = _prData.find(function(x){return x.id===id;});
+  if (!r) return;
+  var newRides = Math.max(0, (parseInt(r.rides)||0) + delta);
+
+  fetch('/api/paidrides', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({action:'update', id:id, name:r.name, surname:r.surname, phone:r.phone, rides:String(newRides), notes:r.notes})
+  })
+  .then(function(r2){return r2.json();})
+  .then(function(res){ if(res.ok){r.rides=String(newRides);prRenderTable();}else toast('Kļūda','err'); })
+  .catch(function(e){ toast('Kļūda: '+e.message,'err'); });
 }
 
 // ══ DIENAS PIEZĪMES (STICKY NOTES) ══
