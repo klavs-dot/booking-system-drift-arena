@@ -3006,6 +3006,28 @@ window.google={script:{run:window.__gsr__}};
   </div>
 </div>
 
+<!-- ══ APMAKSĀTO BRAUCIENU MODĀLIS ══ -->
+<div class="mbg" id="M_PR">
+  <div class="mbox" style="max-width:500px;background:#111;position:relative;">
+    <button onclick="closeM('M_PR')" style="position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border2);color:var(--text2);width:32px;height:32px;border-radius:var(--r);cursor:pointer;font-size:16px;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">✕</button>
+    <div id="pr_modal_title" style="font-family:var(--font-head);font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;">🎟️ JAUNS IERAKSTS</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="field"><label>Vārds</label><input type="text" id="pr_f_name" placeholder="Jānis"></div>
+      <div class="field"><label>Uzvārds</label><input type="text" id="pr_f_surname" placeholder="Bērziņš"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+      <div class="field"><label>Telefona numurs</label><input type="text" id="pr_f_phone" placeholder="+371 20000000"></div>
+      <div class="field"><label>Apmaksāto braucienu skaits</label><input type="number" id="pr_f_rides" min="0" value="10" style="font-size:18px;text-align:center;font-weight:700;"></div>
+    </div>
+    <div class="field" style="margin-top:12px;"><label>Piezīmes</label><textarea id="pr_f_notes" placeholder="VIP klients, dāvanu karte u.c." style="min-height:60px;"></textarea></div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:16px;">
+      <button class="btn btn-s" onclick="closeM('M_PR')" style="padding:10px 20px;">Atcelt</button>
+      <button class="btn btn-p" id="pr_save_btn" onclick="prSave()" style="padding:10px 24px;">💾 Saglabāt</button>
+    </div>
+    <input type="hidden" id="pr_f_id">
+  </div>
+</div>
+
 <!-- ══ PIEZĪMES MODĀLIS ══ -->
 <div class="mbg" id="M_NOTE">
   <div class="mbox" style="max-width:500px;background:#111;position:relative;">
@@ -6970,41 +6992,50 @@ function prRenderTable() {
 }
 
 function prAddNew() {
-  var name = prompt('Vārds:');
-  if (!name) return;
-  var surname = prompt('Uzvārds:') || '';
-  var phone = prompt('Telefona numurs:') || '';
-  var rides = prompt('Apmaksāto braucienu skaits:', '10') || '0';
-  var notes = prompt('Piezīmes:') || '';
-
-  ovl('Saglabā...');
-  fetch('/api/paidrides', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({action:'add', name:name, surname:surname, phone:phone, rides:rides, notes:notes})
-  })
-  .then(function(r){return r.json();})
-  .then(function(res){ hovl(); if(res.ok){toast('✓ Pievienots','ok');loadPaidRides();}else toast('Kļūda: '+(res.error||''),'err'); })
-  .catch(function(e){ hovl(); toast('Kļūda: '+e.message,'err'); });
+  document.getElementById('pr_f_id').value = '';
+  document.getElementById('pr_f_name').value = '';
+  document.getElementById('pr_f_surname').value = '';
+  document.getElementById('pr_f_phone').value = '';
+  document.getElementById('pr_f_rides').value = '10';
+  document.getElementById('pr_f_notes').value = '';
+  document.getElementById('pr_modal_title').textContent = '🎟️ JAUNS IERAKSTS';
+  openM('M_PR');
 }
 
 function prEdit(id) {
   var r = _prData.find(function(x){return x.id===id;});
   if (!r) return;
-  var name = prompt('Vārds:', r.name); if(name===null) return;
-  var surname = prompt('Uzvārds:', r.surname); if(surname===null) return;
-  var phone = prompt('Telefons:', r.phone); if(phone===null) return;
-  var rides = prompt('Braucienu skaits:', r.rides); if(rides===null) return;
-  var notes = prompt('Piezīmes:', r.notes); if(notes===null) return;
+  document.getElementById('pr_f_id').value = id;
+  document.getElementById('pr_f_name').value = r.name;
+  document.getElementById('pr_f_surname').value = r.surname;
+  document.getElementById('pr_f_phone').value = r.phone;
+  document.getElementById('pr_f_rides').value = r.rides;
+  document.getElementById('pr_f_notes').value = r.notes;
+  document.getElementById('pr_modal_title').textContent = '✏️ LABOT IERAKSTU';
+  openM('M_PR');
+}
+
+function prSave() {
+  var id = document.getElementById('pr_f_id').value;
+  var name = document.getElementById('pr_f_name').value.trim();
+  var surname = document.getElementById('pr_f_surname').value.trim();
+  var phone = document.getElementById('pr_f_phone').value.trim();
+  var rides = document.getElementById('pr_f_rides').value;
+  var notes = document.getElementById('pr_f_notes').value.trim();
+  if (!name) { toast('Ievadi vārdu!', 'warn'); return; }
+
+  var action = id ? 'update' : 'add';
+  var body = {action:action, name:name, surname:surname, phone:phone, rides:rides, notes:notes};
+  if (id) body.id = id;
 
   ovl('Saglabā...');
   fetch('/api/paidrides', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({action:'update', id:id, name:name, surname:surname, phone:phone, rides:rides, notes:notes})
+    body: JSON.stringify(body)
   })
   .then(function(r){return r.json();})
-  .then(function(res){ hovl(); if(res.ok){toast('✓ Atjaunots','ok');loadPaidRides();}else toast('Kļūda: '+(res.error||''),'err'); })
+  .then(function(res){ hovl(); closeM('M_PR'); if(res.ok){toast('✓ Saglabāts','ok');loadPaidRides();}else toast('Kļūda: '+(res.error||''),'err'); })
   .catch(function(e){ hovl(); toast('Kļūda: '+e.message,'err'); });
 }
 
