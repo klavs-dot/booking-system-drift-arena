@@ -7352,14 +7352,24 @@ function deleteNote(id) {
 function renderDayNotes(dateStr) {
   var notes = getDayNotes().filter(function(n){ return n.date === dateStr; });
   if (!notes.length) return '';
-  return notes.map(function(n) {
-    return '<div style="background:'+n.color+';border-radius:4px;padding:14px 20px;margin:0 auto 12px auto;max-width:600px;text-align:center;box-shadow:2px 3px 8px rgba(0,0,0,0.4);position:relative;">'
-      + '<button onclick="deleteNote(\''+n.id+'\')" style="position:absolute;top:4px;right:8px;background:none;border:none;font-size:12px;cursor:pointer;opacity:0.5;color:#1a1a1a;">✕</button>'
-      + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#1a1a1a;opacity:0.7;margin-bottom:4px;">📌 '+(n.author||'Piezīme')+'</div>'
-      + '<div style="font-size:20px;font-weight:800;color:#1a1a1a;text-shadow:0 1px 2px rgba(255,255,255,0.2);line-height:1.4;">'+esc(n.text)+'</div>'
-      + '<div style="font-size:10px;color:#1a1a1a;opacity:0.4;margin-top:4px;">'+esc(n.time||'')+'</div>'
-      + '</div>';
-  }).join('');
+  return '<div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;padding:12px 0;">' + notes.map(function(n,i) {
+    var rot = (i % 2 === 0) ? '-1.5' : '1';
+    var darkerColor = n.color === '#facc15' ? '#e6b800' : n.color === '#f472b6' ? '#d44a9a' : n.color === '#60a5fa' ? '#4a8fe0' : n.color === '#22c55e' ? '#1a9e4a' : '#d46312';
+    return '<div style="position:relative;width:220px;transform:rotate('+rot+'deg);filter:drop-shadow(3px 4px 6px rgba(0,0,0,0.4));">'
+      // Piespraude
+      + '<div style="position:absolute;top:-8px;right:20px;z-index:2;font-size:22px;filter:drop-shadow(1px 1px 2px rgba(0,0,0,0.3));">📌</div>'
+      // Lapiņa
+      + '<div style="background:'+n.color+';padding:20px 16px 28px 16px;border-radius:2px 2px 2px 20px;position:relative;min-height:80px;">'
+      // Locījums apakšā
+      + '<div style="position:absolute;bottom:0;left:0;width:28px;height:28px;background:linear-gradient(135deg,'+darkerColor+' 50%,transparent 50%);border-radius:0 0 0 2px;"></div>'
+      // Aizvērt poga
+      + '<button onclick="deleteNote(\''+n.id+'\')" style="position:absolute;top:4px;left:6px;background:none;border:none;font-size:11px;cursor:pointer;opacity:0.3;color:#1a1a1a;">✕</button>'
+      // Saturs
+      + '<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#1a1a1a;opacity:0.5;text-align:center;margin-bottom:6px;">📌 '+(n.author||'Piezīme')+'</div>'
+      + '<div style="font-size:16px;font-weight:800;color:#1a1a1a;text-align:center;line-height:1.4;word-break:break-word;">'+esc(n.text)+'</div>'
+      + '<div style="font-size:9px;color:#1a1a1a;opacity:0.3;text-align:center;margin-top:8px;">'+esc(n.time||'')+'</div>'
+      + '</div></div>';
+  }).join('') + '</div>';
 }
 
 // ══ VIRTUVES RĒĶINU SISTĒMA ══
