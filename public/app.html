@@ -7461,6 +7461,9 @@ function ctDelete(id) {
   var lastScroll = 0;
   window.addEventListener('scroll', function() {
     var sy = window.scrollY;
+    // Tikai timeline skatā
+    var timelineView = document.getElementById('view-today');
+    if (!timelineView || !timelineView.classList.contains('active')) { floatEl.style.display = 'none'; return; }
     if (sy < 200) { floatEl.style.display = 'none'; return; }
 
     // Tikai šodienas piezīmes
