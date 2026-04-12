@@ -4953,14 +4953,16 @@ function renderCal() {
     // Hover tooltip dati
     let tooltipContent = '';
     if (resCount > 0) {
-      // Darba laiks
-      const dayOfWeek = new Date(calY, calM, d).getDay();
-      const workFrom = '10:00';
-      const workTo = dayOfWeek === 0 ? '20:00' : '22:00';
+      // Darba laiks no WORK_HOURS_CLIENT
+      const wh = getWorkHoursClient(ds);
+      const workFrom = wh.open;
+      const workTo = wh.close;
+      const openHr = parseInt(workFrom.split(':')[0]);
+      const closeHr = parseInt(workTo.split(':')[0]);
 
       // Slodze pa stundām
       let hourBars = '';
-      for (let hr = 10; hr <= 21; hr++) {
+      for (let hr = openHr; hr < closeHr; hr++) {
         const hrFrom = hr * 60;
         const hrTo = (hr + 1) * 60;
         const occ = dayBookings.filter(b => tmin(b.timeFrom) < hrTo && tmin(b.timeTo) > hrFrom)
